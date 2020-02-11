@@ -5,4 +5,4 @@ Ubpa_AddCurPathSrcs(sources)
 
 set(libs "")
 
-Ubpa_AddTarget(MODE ${mode} NAME ${targetName} SOURCES ${sources} LIBS ${libs})
+Ubpa_AddTarget(MODE "EXE" NAME ${targetName} SOURCES ${sources} LIBS ${libs})
