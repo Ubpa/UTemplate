@@ -8,10 +8,10 @@ file(GLOB sources
 	"${CMAKE_CURRENT_SOURCE_DIR}/*.h"
 	"${CMAKE_CURRENT_SOURCE_DIR}/*.inl"
 )
-list(APPEND sources "${CMAKE_SOURCE_DIR}/include/Template/Typelist.h")
-list(APPEND sources "${CMAKE_SOURCE_DIR}/include/Template/List.h")
-list(APPEND sources "${CMAKE_SOURCE_DIR}/include/Template/Name.h")
+list(APPEND sources "${${PROJECT_NAME}_SOURCE_DIR}/include/Template/Typelist.h")
+list(APPEND sources "${${PROJECT_NAME}_SOURCE_DIR}/include/Template/List.h")
+list(APPEND sources "${${PROJECT_NAME}_SOURCE_DIR}/include/Template/Name.h")
 #多个库文件用 ';' 分隔，如果为空，则为 ""
 #如：set(libs "targetName;xxx.lib")
 set(libs "")
-Ubpa_AddTarget(MODE "EXE" NAME ${targetName} SOURCES ${sources} LIBS ${libs})
+Ubpa_AddTarget(MODE "EXE" NAME "${PROJECT_NAME}_${targetName}" SOURCES ${sources} LIBS ${libs})

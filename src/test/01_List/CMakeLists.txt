@@ -11,4 +11,4 @@ file(GLOB sources
 #多个库文件用 ';' 分隔，如果为空，则为 ""
 #如：set(libs "targetName;xxx.lib")
 set(libs "")
-Ubpa_AddTarget(MODE ${mode} NAME ${targetName} SOURCES ${sources} LIBS ${libs})
+Ubpa_AddTarget(MODE ${mode} NAME "${PROJECT_NAME}_${targetName}" SOURCES ${sources} LIBS ${libs})
