@@ -16,7 +16,7 @@ set(CMAKE_DEBUG_POSTFIX d)
 # 确定 C++ 版本
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
- 
+
 if(MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /permissive-")
 endif()
