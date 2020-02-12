@@ -1,6 +1,6 @@
 #pragma once
-#ifndef UBPA_TEMPLATE_LIST_H_
-#define UBPA_TEMPLATE_LIST_H_
+#ifndef _UBPA_TEMPLATE_LIST_LIST_H_
+#define _UBPA_TEMPLATE_LIST_LIST_H_
 
 namespace Ubpa {
 	/* [ Interface ]
@@ -136,4 +136,4 @@ namespace Ubpa {
 	using Select = typename SelectT<List, Indices...>::type;
 }
 
-#endif // !UBPA_TEMPLATE_LIST_H_
+#endif // !_UBPA_TEMPLATE_LIST_LIST_H_

@@ -1,6 +1,6 @@
 #pragma once
-#ifndef UBPA_TYPELIST_H_
-#define UBPA_TYPELIST_H_
+#ifndef _UBPA_TEMPLATE_LIST_TYPELIST_H_
+#define _UBPA_TEMPLATE_LIST_TYPELIST_H_
 
 #include "../Name.h"
 #include "List.h"
@@ -52,4 +52,4 @@ namespace Ubpa {
 	};
 }
 
-#endif // !UBPA_TYPELIST_H_
+#endif // !_UBPA_TEMPLATE_LIST_TYPELIST_H_

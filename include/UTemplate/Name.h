@@ -1,6 +1,6 @@
 #pragma once
-#ifndef UBPA_TEMPLATE_NAME_H_
-#define UBPA_TEMPLATE_NAME_H_
+#ifndef _UBPA_TEMPLATE_NAME_H_
+#define _UBPA_TEMPLATE_NAME_H_
 
 #include <iostream>
 
@@ -154,4 +154,4 @@ namespace Ubpa {
 	};
 }
 
-#endif // !UBPA_TEMPLATE_NAME_H_
+#endif // !_UBPA_TEMPLATE_NAME_H_

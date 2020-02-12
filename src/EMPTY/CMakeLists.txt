@@ -3,7 +3,7 @@ set(targetName "${TARGET_PREFIX}${DIRNAME}")
 
 Ubpa_GlobGroupSrcs(RST sources PATHS
 	${CMAKE_CURRENT_SOURCE_DIR}
-	"${PROJECT_SOURCE_DIR}/include/Template"
+	"${PROJECT_SOURCE_DIR}/include/UTemplate"
 )
 
 set(libs "")
