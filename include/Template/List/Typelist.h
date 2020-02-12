@@ -2,14 +2,14 @@
 #ifndef UBPA_TYPELIST_H_
 #define UBPA_TYPELIST_H_
 
-#include "Name.h"
+#include "../Name.h"
 #include "List.h"
 
 namespace Ubpa {
 	template<typename... Ts>
 	struct Typelist { };
 
-	// [ name ]
+	// [ Name ]
 	template<typename... Ts>
 	struct Name<Typelist<Ts...>> {
 		friend std::ostream& operator<<(std::ostream& os, Name<Typelist<Ts...>>) {
@@ -20,7 +20,7 @@ namespace Ubpa {
 
 	// [ List ]
 
-	// basic
+	// Basic
 	template<>
 	struct IsEmpty<Typelist<>> {
 		static constexpr bool value = true;
@@ -40,7 +40,7 @@ namespace Ubpa {
 		using type = Typelist<Tail...>;
 	};
 
-	// optimized
+	// Optimized
 	template<typename... Ts>
 	struct ClearT<Typelist<Ts...>, false> {
 		using type = Typelist<>;

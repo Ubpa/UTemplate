@@ -39,7 +39,7 @@ include(FetchContent)
 FetchContent_Declare(
   UCMake
   GIT_REPOSITORY https://github.com/Ubpa/UCMake
-  GIT_TAG        44b3f87
+  GIT_TAG        952302b
 )
 FetchContent_MakeAvailable(UCMake)
 
