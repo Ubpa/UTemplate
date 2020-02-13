@@ -39,6 +39,14 @@ namespace Ubpa {
 		}
 	};
 
+	template<>
+	struct BasicName<decltype(sizeof(void*)), true> {
+		friend std::ostream& operator<<(std::ostream& os, BasicName<decltype(sizeof(void*)), true>) {
+			os << "size_t";
+			return os;
+		}
+	};
+
 	template<typename T>
 	struct BasicName<T, false> {
 		friend std::ostream& operator<<(std::ostream& os, BasicName<T, false>) {
