@@ -1,4 +1,4 @@
-#include <UTemplate/List/Typelist.h>
+#include <UTemplate/Name.h>
 
 #include <iostream>
 
@@ -15,7 +15,6 @@ int main() {
 	cout << Name<int &&>() << endl;
 	cout << Name<int *>() << endl;
 	cout << Name<const int * &>() << endl;
-	cout << Name<Typelist<int, int>>() << endl;
 	cout << Name<void()>() << endl;
 	cout << Name<void(*)(int, int)>() << endl;
 	cout << Name<int[2]>() << endl;
@@ -23,5 +22,4 @@ int main() {
 	cout << Name<int[]>() << endl;
 	cout << Name<const int[]>() << endl;
 	cout << Name<void (* const [2])(int, int)>() << endl;
-	cout << Name<Typelist<int, float, bool>>() << endl;
 }
