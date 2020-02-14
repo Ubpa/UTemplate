@@ -27,30 +27,36 @@ namespace Ubpa {
 	};
 
 	template<typename Head, typename... Tail>
-	struct FrontT<Typelist<Head, Tail...>> {
+	struct Front<Typelist<Head, Tail...>> {
 		using type = Head;
 	};
 
 	template<typename T, typename... Ts>
-	struct PushFrontT<Typelist<Ts...>, T> {
+	struct PushFront<Typelist<Ts...>, T> {
 		using type = Typelist<T, Ts...>;
 	};
 
 	template<typename Head, typename... Tail>
-	struct PopFrontT<Typelist<Head, Tail...>> {
+	struct PopFront<Typelist<Head, Tail...>> {
 		using type = Typelist<Tail...>;
 	};
 
 	// Optimized
 	template<typename... Ts>
-	struct ClearT<Typelist<Ts...>, false> {
+	struct Clear<Typelist<Ts...>, false> {
 		using type = Typelist<>;
 	};
 
 	template<template<typename T> class Op, typename... Ts>
-	struct TransformT<Typelist<Ts...>, Op> {
+	struct Transform<Typelist<Ts...>, Op> {
 		using type = Typelist<typename Op<Ts>::type...>;
 	};
+
+	template<typename List, typename... Ts>
+	struct ContainList<List, Typelist<Ts...>> : Conjunction<Bool<Contain_v<List, Ts>>...> {};
+
+	template<typename List, typename... Ts>
+	constexpr bool ContainList_v = ContainList<List, Ts...>::type::value;
 }
 
 #endif // !_UBPA_TEMPLATE_LIST_TYPELIST_H_
