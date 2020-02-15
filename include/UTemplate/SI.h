@@ -2,69 +2,125 @@
 #ifndef _UBPA_TEMPLATE_SI_H_
 #define _UBPA_TEMPLATE_SI_H_
 
-/*
-* Single Inheritance (SI)
-* Single Inheritance - Template (SIT)
-* 
-* [ Usage ]
-* - SI
-*   template<typename Base>
-*   class $class-name$ : Base {
-*   private:
-*		using VBCs = SIVBCs<typename Base::$VBC-name$, ...>;
-*   public:
-*		using Base::Base;
-*		//...
-*   }
-*   
-*   template<typename Base>
-*   class $class-name$ : SI<$base-class-name$, ...>::type<Base> {
-*   private:
-*		using VBCs = SIVBCs<typename Base::$VBC-name$, ...>;
-*   public:
-*		using Base::Base;
-*		//...
-*   }
-*
-*/
+#include "List/TemplateList.h"
 
 namespace Ubpa {
-	struct SINil {};
+	struct SI_Nil {
+		using VBs = TemplateList<>;
+		using AllVBs = TemplateList<>;
+	};
+	template<typename Base, typename... Ts>
+	struct SI_TNil : Base {
+		using VBs = TemplateList<>;
+		using AllVBs = TemplateList<>;
+	};
+	template<typename... Ts>
+	struct SI_TNil<SI_Nil, Ts...> {
+		using VBs = TemplateList<>;
+		using AllVBs = TemplateList<>;
+	};
 
-	template<typename... VBCs> // virtual base classes
-	struct SIVBCs {};
+	template<typename NBList>
+	struct SI_NBList;
 
-	template<template<typename> class... Classes>
+	template<>
+	struct SI_NBList<TemplateList<>> {
+		template<typename Base, typename... Ts>
+		using Ttype = SI_TNil<Base, Ts...>;
+	};
+
+	template<template<typename, typename...> class THead,
+		template<typename, typename...> class... TTail>
+	struct SI_NBList<TemplateList<THead, TTail...>> {
+		template<typename Base, typename... Ts>
+		struct Ttype : THead<typename SI_NBList<TemplateList<TTail...>>::template Ttype<Base, Ts...>, Ts...> {
+		
+		private:
+			using B = THead<typename SI_NBList<TemplateList<TTail...>>::template Ttype<Base, Ts...>, Ts...>;
+			using BB = typename SI_NBList<TemplateList<TTail...>>::template Ttype<Base, Ts...>;
+
+			template<typename B, typename BB>
+			struct check {
+				using type = typename std::enable_if<
+					TInstantiableList_v<typename BB::AllVBs, TInstanceList_t<typename B::VBs, TypeList<SI_Nil, Ts...>>>,
+					typename BB::AllVBs
+				>::type;
+			};
+		
+		public:
+			/*using AllVBs = typename std::enable_if<
+				TInstantiableList_v<typename BB::AllVBs, TInstanceList_t<typename B::VBs, TypeList<SI_Nil, Ts...>>>,
+				typename BB::AllVBs
+			>::type;*/
+			using AllVBs = typename check<B, BB>::type;
+		};
+	};
+	
+	template<typename VBList, typename NBList = TemplateList<>>
 	struct SI;
 
-	template<template<typename> class Class>
-	struct SI<Class> {
-		template<typename Base>
-		using type = Class<Base>;
-	};
-
-	template<template<typename> class ClassHead,
-		template<typename> class... ClassTail>
-	struct SI<ClassHead, ClassTail...> {
-		template<typename Base>
-		using type = ClassHead<typename SI<ClassTail...>::template type<Base>>;
-	};
-
-	template<template<typename, typename...> class... Interfaces>
-	struct SIT;
-
-	template<template<typename, typename...> class Interface>
-	struct SIT<Interface> {
+	template<typename VBList>
+	struct SI<VBList, TemplateList<>> {
 		template<typename Base, typename... Ts>
-		using type = Interface<Base, Ts...>;
+		struct Ttype : Base {
+			using VBs = VBList;
+		};
+
+		template<typename... Ts>
+		struct Ttype<SI_Nil, Ts...> {
+			using VBs = VBList;
+		};
 	};
 
-	template<template<typename, typename...> class IHead,
-		template<typename, typename...> class... ITail>
-	struct SIT<IHead, ITail...> {
+	/*template<>
+	struct SI<TemplateList<>, TemplateList<>> {
 		template<typename Base, typename... Ts>
-		using type = IHead<typename SIT<ITail...>::template type<Base, Ts...>, Ts...>;
+		using Ttype = Base;
+	};*/
+
+	template<typename VBList, typename NBList>
+	struct SI {
+		template<typename Base, typename... Ts>
+		struct Ttype : SI_NBList<NBList>::template Ttype<Base, Ts...> {
+			using VBs = VBList;
+		};
 	};
+
+	template<typename BList>
+	struct SII;
+	template<>
+	struct SII<TemplateList<>> {
+		template<typename Base, typename... Ts>
+		struct Ttype : Base {};
+	};
+
+	template<template<typename, typename...> class THead,
+		template<typename, typename...> class... TTail>
+	struct SII<TemplateList<THead, TTail...>> {
+		template<typename Base, typename... Ts>
+		struct Ttype : THead<typename SII<TemplateList<TTail...>>::template Ttype<Base, Ts...>, Ts...> {
+
+		private:
+			using B = THead<typename SII<TemplateList<TTail...>>::template Ttype<Base, Ts...>, Ts...>;
+			using BB = typename SII<TemplateList<TTail...>>::template Ttype<Base, Ts...>;
+
+			template<typename B, typename BB>
+			struct check {
+				using type = typename std::enable_if <
+					TInstantiableList_v<typename BB::AllVBs, TInstanceList_t<typename B::VBs, TypeList<SI_Nil, Ts...>>>,
+					TPushFront_t<typename BB::AllVBs, THead>
+				>::type;
+			};
+
+		public:
+			/*using AllVBs = typename std::enable_if<
+				TInstantiableList_v<typename BB::AllVBs, TInstanceList_t<typename B::VBs, TypeList<SI_Nil, Ts...>>>,
+				typename BB::AllVBs
+			>::type;*/
+			using AllVBs = typename check<B, BB>::type;
+		};
+	};
+
 }
 
 #endif // !_UBPA_TEMPLATE_SI_H_
