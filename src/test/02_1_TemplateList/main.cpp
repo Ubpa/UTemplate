@@ -44,24 +44,25 @@ struct D {
 	string name = "D";
 };
 
-template<typename ArgList>
-struct Name<TemplateList<ArgList>> {
-	friend std::ostream& operator<<(std::ostream& os, Name<TemplateList<ArgList>>) {
+template<>
+struct Name<TemplateList<>> {
+	friend std::ostream& operator<<(std::ostream& os, Name<TemplateList<>>) {
 		return os;
 	}
 };
-template<typename ArgList, template<typename...> class T>
-struct Name<TemplateList<ArgList, T>> {
-	friend std::ostream& operator<<(std::ostream& os, Name<TemplateList<ArgList, T>>) {
-		os << T<void>().name << " | " << Name<ArgList>();
+
+template<template<typename...> class T>
+struct Name<TemplateList<T>> {
+	friend std::ostream& operator<<(std::ostream& os, Name<TemplateList<T>>) {
+		os << T<void>().name;
 		return os;
 	}
 };
-template<typename ArgList, template<typename...>class... Ts>
-struct Name<TemplateList<ArgList, Ts...>> {
-	friend std::ostream& operator<<(std::ostream& os, Name<TemplateList<ArgList, Ts...>>) {
-		os << TFront<TemplateList<ArgList, Ts...>>::template Ttype<void>().name << ", "
-			<< Name<TPopFront_t<TemplateList<ArgList, Ts...>>>();
+template<template<typename...>class... Ts>
+struct Name<TemplateList<Ts...>> {
+	friend std::ostream& operator<<(std::ostream& os, Name<TemplateList<Ts...>>) {
+		os << TFront<TemplateList<Ts...>>::template Ttype<void>().name << ", "
+			<< Name<TPopFront_t<TemplateList<Ts...>>>();
 		return os;
 	}
 };
@@ -75,13 +76,15 @@ struct Double {
 	using Ttype = typename T<void>::template Double<Ts...>;
 };
 
-template<typename NonVoid>
-struct Test {
-	NonVoid a;
-};
+struct Rst : is_instance_of<A<void>, TFront<TemplateList<A>>::Ttype> {};
+template<typename T>
+using BAlias = B<T>;
+
+template<typename T0, typename T1>
+struct T2 {};
 
 int main() {
-	using list0 = TemplateList<TypeList<void>, A, B, C>;
+	using list0 = TemplateList<A, B, C>;
 
 	cout << "list0" << endl
 		<< "\t" << Name<list0>() << endl;
@@ -96,20 +99,20 @@ int main() {
 	cout << "TPushBack_t<list0, D>" << endl
 		<< "\t" << Name<TPushBack_t<list0, D>>() << endl;
 	cout << "TConcat_t<list0, TemplateList<A,D>>" << endl
-		<< "\t" << Name<TConcat_t<list0, TemplateList<TypeList<void>, A,D>>>() << endl;
+		<< "\t" << Name<TConcat_t<list0, TemplateList<A,D>>>() << endl;
 	cout << "TAccumulateIS_t<list0, ToI, TemplateList<D>, 0, 2>" << endl
-		<< "\t" << Name<TAccumulateIS_t<list0, ToI, TemplateList<TypeList<void>, D>, 0, 2>>() << endl;
+		<< "\t" << Name<TAccumulateIS_t<list0, ToI, TemplateList<D>, 0, 2>>() << endl;
 	cout << "TSelect_t<list0, 0, 2>" << endl
 		<< "\t" << Name<TSelect_t<list0, 0, 2>>() << endl;
 	cout << "TSelect_t<list0, 0, 2>" << endl
 		<< "\t" << Name<TTransform_t<list0, Double>>() << endl;
-	cout << "TContain<list0, B>" << endl
-		<< "\t" << TContain_v<list0, B> << endl;
-	cout << "TContain<list0, D>" << endl
-		<< "\t" << TContain_v<list0, D> << endl;
-	cout << "TContainList_v<list0, TemplateList<TypeList<void>, A, B>>" << endl
-		<< "\t" << TContainList_v<list0, TemplateList<TypeList<void>, A, B>> << endl;
-	cout << "TContainList_v<list0, TemplateList<TypeList<void>, D, B>>" << endl
-		<< "\t" << TContainList_v<list0, TemplateList<TypeList<void>, D, B>> << endl;
+	cout << "TInstantiable<list0, B>" << endl
+		<< "\t" << TInstantiable_v<list0, B<>> << endl;
+	cout << "TInstantiable<list0, D>" << endl
+		<< "\t" << TInstantiable_v<list0, D<>> << endl;
+	cout << "TInstantiableList_v<list0, TemplateList<TypeList<void>, A, B>>" << endl
+		<< "\t" << TInstantiableList_v<list0, TInstanceList_t<TemplateList<A, B>, TypeList<void>>> << endl;
+	cout << "TInstantiableList_v<list0, TemplateList<TypeList<void>, D, B>>" << endl
+		<< "\t" << TInstantiableList_v<list0, TInstanceList_t<TemplateList<D, B>, TypeList<void>>> << endl;
 	return 0;
 }

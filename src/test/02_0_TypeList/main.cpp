@@ -38,5 +38,9 @@ int main() {
 	cout << "Concat_t<list0, TypeList<int, float>>: "
 		<< Name<Concat_t<list0, TypeList<int, float>>>() << endl;
 
+	cout << IsInstantiable_v<TypeList<bool>, TypeList> << endl;
+	cout << IsSameTemplate_v<TypeList, TypeList, TypeList<>> << endl;
+	cout << IsSameTemplate_v<std::is_same, TypeList, TypeList<bool>> << endl;
+
 	return 0;
 }

@@ -4,6 +4,7 @@
 
 #include "../Name.h"
 #include "../Num/Bool.h"
+#include "../Basic.h"
 
 namespace Ubpa {
 	/* [ Interface ]
@@ -204,6 +205,38 @@ namespace Ubpa {
 
 	template<typename List, typename... Ts>
 	constexpr bool ContainList_v = ContainList<List, Ts...>::type::value;
+
+	// IsTypeList
+	template<typename List>
+	using IsTypeList = is_instance_of<List, TypeList>;
+	template<typename List>
+	constexpr bool IsTypeList_v = IsTypeList<List>::value;
+
+	// Instance
+	template<typename List, template<typename...> class T>
+	struct Instance;
+	template<template<typename...> class T, typename... Args>
+	struct Instance<TypeList<Args...>, T> {
+		using type = T<Args...>;
+	};
+	template<typename List, template<typename...> class T>
+	using Instance_t = typename Instance<List, T>::type;
+
+	// is_instantiable
+	template<typename List, template<typename...> class T>
+	struct IsInstantiable;
+	template<template<typename...> class T, typename... Args>
+	struct IsInstantiable<TypeList<Args...>, T> : is_instantiable<T, Args...> {};
+	template<typename List, template<typename...> class T>
+	constexpr bool IsInstantiable_v = IsInstantiable<List, T>::value;
+
+	// is_same_template
+	template<template<typename...> class T, template<typename...> class U, typename List>
+	struct IsSameTemplate;
+	template<template<typename...> class T, template<typename...> class U, typename... Args>
+	struct IsSameTemplate<T, U, TypeList<Args...>> : is_same_template<T, U, Args...> {};
+	template<template<typename...> class T, template<typename...> class U, typename List>
+	constexpr bool IsSameTemplate_v = IsSameTemplate<T, U, List>::value;
 }
 
 #endif // !_UBPA_TEMPLATE_LIST_TYPELIST_H_

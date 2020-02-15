@@ -19,26 +19,12 @@ namespace Ubpa {
 	*  List TConcat_t<List0, List1>
 	*  List TTransform_t<List, <T> Op>
 	*  List TSelect_t<List, size...>
-	*  bool TContain_v<List, T>
-	*  bool TContainList_v<List0, List1>
+	*  bool TInstantiable_v<List, T>
+	*  bool TInstantiableList_v<List0, List1>
 	*/
 
-	template<typename ArgList, template<typename...> class T>
-	struct TInstance;
-	template<typename ArgList, template<typename...> class T>
-	using TInstance_t = typename TInstance<ArgList, T>::type;
-
-	template<typename _ArgList, template<typename...> class... Ts>
-	struct TemplateList {
-		using ArgList = _ArgList;
-	private:
-		using Valid = TypeList<TInstance_t<ArgList, Ts>...>;
-	};
-
-	template<template<typename...> class T, typename... Ts>
-	struct TInstance<TypeList<Ts...>, T> {
-		using type = T<Ts...>;
-	};
+	template<template<typename...> class... Ts>
+	struct TemplateList {};
 
 	// [ List ]
 
@@ -46,8 +32,8 @@ namespace Ubpa {
 	template<typename List>
 	struct TIsEmpty { static constexpr bool value = false; };
 
-	template<typename ArgList>
-	struct TIsEmpty<TemplateList<ArgList>> {
+	template<>
+	struct TIsEmpty<TemplateList<>> {
 		static constexpr bool value = true;
 	};
 
@@ -58,8 +44,8 @@ namespace Ubpa {
 	template<typename List>
 	struct TFront;
 
-	template<typename ArgList, template<typename...> class Head, template<typename...> class... Tail>
-	struct TFront<TemplateList<ArgList, Head, Tail...>> {
+	template<template<typename...> class Head, template<typename...> class... Tail>
+	struct TFront<TemplateList<Head, Tail...>> {
 		template<typename... Ts>
 		using Ttype = Head<Ts...>;
 	};
@@ -68,9 +54,9 @@ namespace Ubpa {
 	template<typename List, template<typename...> class Ts>
 	struct TPushFront;
 
-	template<typename ArgList, template<typename...> class T, template<typename...> class... Ts>
-	struct TPushFront<TemplateList<ArgList, Ts...>, T> {
-		using type = TemplateList<ArgList, T, Ts...>;
+	template<template<typename...> class T, template<typename...> class... Ts>
+	struct TPushFront<TemplateList<Ts...>, T> {
+		using type = TemplateList<T, Ts...>;
 	};
 
 	template<typename List, template<typename...> class... Ts>
@@ -83,9 +69,9 @@ namespace Ubpa {
 	template<typename List>
 	using TPopFront_t = typename TPopFront<List>::type;
 
-	template<typename ArgList, template<typename...> class Head, template<typename...> class... Tail>
-	struct TPopFront<TemplateList<ArgList, Head, Tail...>> {
-		using type = TemplateList<ArgList, Tail...>;
+	template<template<typename...> class Head, template<typename...> class... Tail>
+	struct TPopFront<TemplateList<Head, Tail...>> {
+		using type = TemplateList<Tail...>;
 	};
 
 	// TAt
@@ -135,7 +121,7 @@ namespace Ubpa {
 
 	// TReverse
 	template<typename List>
-	using TReverse = TAccumulate<List, TPushFront, TemplateList<typename List::ArgList>>;
+	using TReverse = TAccumulate<List, TPushFront, TemplateList<>>;
 
 	template<typename List>
 	using TReverse_t = typename TReverse<List>::type;
@@ -157,9 +143,9 @@ namespace Ubpa {
 	template<typename List, template<template<typename...> class T> class Op>
 	struct TTransform;
 
-	template<typename ArgList, template<template<typename...> class T> class Op, template<typename...> class... Ts>
-	struct TTransform<TemplateList<ArgList, Ts...>, Op> {
-		using type = TemplateList<ArgList, Op<Ts>::template Ttype...>;
+	template<template<template<typename...> class T> class Op, template<typename...> class... Ts>
+	struct TTransform<TemplateList<Ts...>, Op> {
+		using type = TemplateList<Op<Ts>::template Ttype...>;
 	};
 
 	template<typename List, template<template<typename...> class T> class Op>
@@ -168,49 +154,55 @@ namespace Ubpa {
 	// TSelect
 	template<typename List, size_t... Indices>
 	struct TSelect {
-		using type = TemplateList<typename List::ArgList, TAt<List, Indices>::template Ttype...>;
+		using type = TemplateList<TAt<List, Indices>::template Ttype...>;
 	};
 
 	template<typename List, size_t... Indices>
 	using TSelect_t = typename TSelect<List, Indices...>::type;
 
-	// TContain
-	template<typename List, template<typename...> class T, bool found = false, bool = TIsEmpty<List>::value>
-	struct TContainRec;
+	// TInstantiable
+	template<typename List, typename Instance, bool found, bool isEmpty = TIsEmpty_v<List>>
+	struct TInstantiableRec;
 
-	template<typename List, template<typename...> class T>
-	struct TContainRec<List, T, false, true> {
-		static constexpr bool value = false;
-	};
-
-	template<typename List, template<typename...> class T, bool isEmpty>
-	struct TContainRec<List, T, true, isEmpty> {
+	template<typename List, typename Instance, bool isEmpty>
+	struct TInstantiableRec<List, Instance, true, isEmpty> {
 		static constexpr bool value = true;
 	};
 
-	template<typename List, template<typename...> class T>
-	struct TContainRec<List, T, false, false> :
-		TContainRec<TPopFront_t<List>, T,
-		std::is_same<
-		TInstance_t<typename List::ArgList, TFront<List>::template Ttype>,
-		TInstance_t<typename List::ArgList, T>
-		>::value> {};
+	template<typename List, typename Instance>
+	struct TInstantiableRec<List, Instance, false, true> {
+		static constexpr bool value = false;
+	};
 
-	template<typename List, template<typename...> class T>
-	using TContain = TContainRec<List, T>;
+	template<typename List, typename Instance>
+	struct TInstantiableRec<List, Instance, false, false> :
+		TInstantiableRec<TPopFront_t<List>, Instance, is_instance_of_v<Instance, TFront<List>::template Ttype>> {};
 
-	template<typename List, template<typename...> class T>
-	constexpr bool TContain_v = TContain<List, T>::value;
+	template<typename List, typename Instance>
+	using TInstantiable = TInstantiableRec<List, Instance, false>;
 
-	// TContainList
-	template<typename List0, typename List1>
-	struct TContainList;
+	template<typename List, typename Instance>
+	constexpr bool TInstantiable_v = TInstantiable<List, Instance>::value;
 
-	template<typename List, template<typename...> class... Ts>
-	struct TContainList<List, TemplateList<typename List::ArgList, Ts...>> : Conjunction<Bool<TContain_v<List, Ts>>...> {};
+	// InstanceList
+	template<typename TList, typename ArgList>
+	struct TInstanceList;
+	template<typename ArgList, template<typename...> class... Ts>
+	struct TInstanceList<TemplateList<Ts...>, ArgList> {
+		using type = TypeList<Instance_t<ArgList, Ts>...>;
+	};
+	template<typename TList, typename ArgList>
+	using TInstanceList_t = typename TInstanceList<TList, ArgList>::type;
 
-	template<typename List0, typename List1>
-	constexpr bool TContainList_v = TContainList<List0, List1>::type::value;
+	// TInstantiableList
+	template<typename List, typename InstanceList>
+	struct TInstantiableList;
+
+	template<typename List, typename... Instances>
+	struct TInstantiableList<List, TypeList<Instances...>> : Conjunction<Bool<TInstantiable_v<List, Instances>>...> {};
+
+	template<typename List, typename InstanceList>
+	constexpr bool TInstantiableList_v = TInstantiableList<List, InstanceList>::type::value;
 }
 
 #endif // !_UBPA_tEMPLATE_LIST_tEMPLATELIST_H_
