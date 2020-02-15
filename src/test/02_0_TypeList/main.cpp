@@ -44,5 +44,6 @@ int main() {
 	cout << ExistInstance_v<TypeList<bool, TypeList<TypeList<bool>>, int>, TypeList> << endl;
 	cout << Name<SearchInstance_t<TypeList<bool, TypeList<TypeList<bool>>, int>, TypeList>>() << endl;
 
+	cout << Name<Rotate<list0>::type>() << endl;
 	return 0;
 }

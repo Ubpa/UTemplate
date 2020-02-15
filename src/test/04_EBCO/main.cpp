@@ -17,30 +17,30 @@ struct Struct2 : Struct1, Empty1 {};
 
 template<typename Base>
 struct IEmpty1 : Base {};
-struct EBCO_Empty1 : SII<IEmpty1>::Ttype<> {};
+struct EBCO_Empty1 : SII<IEmpty1> {};
 template<typename Base>
 struct IStruct1 : Base { char c; };
-struct EBCO_Struct1 : SII<IStruct1>::Ttype<> {};
+struct EBCO_Struct1 : SII<IStruct1> {};
 template<typename Base>
-struct IDerived1 : SIN<IEmpty1>::Ttype<Base> { char c; };
-struct EBCO_Derived1 : SII<IDerived1>::Ttype<> {};
+struct IDerived1 : SIN<Base, IEmpty1> { char c; };
+struct EBCO_Derived1 : SII<IDerived1> {};
 template<typename Base>
-struct IEmpty2 : SIN<IEmpty1>::Ttype<Base> {};
-struct EBCO_Empty2 : SII<IEmpty2>::Ttype<> {};
+struct IEmpty2 : SIN<Base, IEmpty1> {};
+struct EBCO_Empty2 : SII<IEmpty2> {};
 template<typename Base>
-struct IDerived2 : SIN<IEmpty2>::Ttype<Base> { char c; };
-struct EBCO_Derived2 : SII<IDerived2>::Ttype<> {};
+struct IDerived2 : SIN<Base, IEmpty2> { char c; };
+struct EBCO_Derived2 : SII<IDerived2> {};
 template<typename Base>
 struct IEmpty3 : Base {};
 template<typename Base>
-struct IDerived3 : SIN<IEmpty2, IEmpty3>::Ttype<Base> { char c; };
-struct EBCO_Derived3 : SII<IDerived3>::Ttype<> {};
+struct IDerived3 : SIN<Base, IEmpty2, IEmpty3> { char c; };
+struct EBCO_Derived3 : SII<IDerived3> {};
 template<typename Base>
-struct IDerived4 : SIN<IEmpty2, IEmpty3>::Ttype<Base> { int c; };
-struct EBCO_Derived4 : SII<IDerived4>::Ttype<> {};
+struct IDerived4 : SIN<Base, IEmpty2, IEmpty3> { int c; };
+struct EBCO_Derived4 : SII<IDerived4> {};
 template<typename Base>
-struct IStruct2 : SIN<IStruct1, IEmpty1>::Ttype<Base> {};
-struct EBCO_Struct2 : SII<IStruct2>::Ttype<> {};
+struct IStruct2 : SIN<Base, IStruct1, IEmpty1> {};
+struct EBCO_Struct2 : SII<IStruct2> {};
 
 int main() {
 	cout << "1 : " << sizeof(Empty1) << " " << sizeof(EBCO_Empty1) << endl;

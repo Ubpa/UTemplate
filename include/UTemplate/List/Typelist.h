@@ -37,6 +37,14 @@ namespace Ubpa {
 
 	// [ List ]
 
+	template<typename List>
+	struct Rotate;
+	template<typename Head, typename... Tail>
+	struct Rotate<TypeList<Head, Tail...>> {
+		using type = TypeList<Tail..., Head>;
+	};
+
+
 	// Empty
 	template<typename List>
 	struct IsEmpty { static constexpr bool value = false; };

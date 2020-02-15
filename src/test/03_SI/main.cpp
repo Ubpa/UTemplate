@@ -17,8 +17,8 @@ struct IPeople : Base {
 };
 
 template<typename Base>
-struct ISing : Base {
-	using Base::Base;
+struct ISing : SIV<Base, IPeople> {
+	using SIV<Base, IPeople>::Ttype;
 
 	void Sing() {
 		cout << "Sing";
@@ -26,8 +26,8 @@ struct ISing : Base {
 };
 
 template<typename Base>
-struct IJump : Base {
-	using Base::Base;
+struct IJump : SIV<Base, ISing> {
+	using SIV<Base, ISing>::Ttype;
 
 	void Jump() {
 		cout << "Jump";
@@ -35,8 +35,8 @@ struct IJump : Base {
 };
 
 template<typename Base>
-struct IRap : Base {
-	using Base::Base;
+struct IRap : SIV<Base, IJump> {
+	using SIV<Base, IJump>::Ttype;
 
 	void Rap() {
 		cout << "Rap";
@@ -44,15 +44,15 @@ struct IRap : Base {
 };
 
 template<typename Base>
-struct IBasketball : Base {
-	using Base::Base;
+struct IBasketball : SIV<Base, IRap> {
+	using SIV<Base, IRap>::Ttype;
 
 	void Basketball() {
 		cout << "Basketball";
 	}
 };
 
-struct CXK : SII<IBasketball, ISing, IJump, IRap, IPeople>::Ttype<> {
+struct CXK : SII<IBasketball> {
 	CXK() : Ttype("CXK") {}
 };
 
