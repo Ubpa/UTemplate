@@ -224,11 +224,11 @@ namespace Ubpa {
 
 	// is_instantiable
 	template<typename List, template<typename...> class T>
-	struct IsInstantiable;
+	struct CanInstantiate;
 	template<template<typename...> class T, typename... Args>
-	struct IsInstantiable<TypeList<Args...>, T> : is_instantiable<T, Args...> {};
+	struct CanInstantiate<TypeList<Args...>, T> : is_instantiable<T, Args...> {};
 	template<typename List, template<typename...> class T>
-	constexpr bool IsInstantiable_v = IsInstantiable<List, T>::value;
+	constexpr bool CanInstantiate_v = CanInstantiate<List, T>::value;
 
 	// is_same_template
 	template<template<typename...> class T, template<typename...> class U, typename List>
@@ -237,6 +237,46 @@ namespace Ubpa {
 	struct IsSameTemplate<T, U, TypeList<Args...>> : is_same_template<T, U, Args...> {};
 	template<template<typename...> class T, template<typename...> class U, typename List>
 	constexpr bool IsSameTemplate_v = IsSameTemplate<T, U, List>::value;
+
+	// ExistInstance
+	template<typename List, template<typename...>class T, bool found = false, bool = IsEmpty<List>::value>
+	struct ExistInstanceRec;
+
+	template<typename List, template<typename...>class T>
+	struct ExistInstanceRec<List, T, false, true> : std::false_type {};
+
+	template<typename List, template<typename...>class T, bool isEmpty>
+	struct ExistInstanceRec<List, T, true, isEmpty> : std::true_type {};
+
+	template<typename List, template<typename...>class T>
+	struct ExistInstanceRec<List, T, false, false> : ExistInstanceRec<PopFront_t<List>, T, is_instance_of_v<Front_t<List>, T>> {};
+
+	template<typename List, template<typename...>class T>
+	using ExistInstance = ExistInstanceRec<List, T>;
+
+	template<typename List, template<typename...>class T>
+	constexpr bool ExistInstance_v = ExistInstance<List, T>::value;
+
+	// get first template instantiable type
+	template<typename List, typename LastT, template<typename...>class T, bool found = false, bool = IsEmpty<List>::value>
+	struct SearchInstanceRec;
+
+	template<typename List, typename LastT, template<typename...>class T>
+	struct SearchInstanceRec<List, LastT, T, false, true> { }; // no 'type'
+
+	template<typename List, typename LastT, template<typename...>class T, bool isEmpty>
+	struct SearchInstanceRec<List, LastT, T, true, isEmpty> {
+		using type = LastT;
+	};
+
+	template<typename List, typename LastT, template<typename...>class T>
+	struct SearchInstanceRec<List, LastT, T, false, false> : SearchInstanceRec<PopFront_t<List>, Front_t<List>, T, is_instance_of_v<Front_t<List>, T>> {};
+
+	template<typename List, template<typename...>class T>
+	using SearchInstance = SearchInstanceRec<List, void, T>;
+
+	template<typename List, template<typename...>class T>
+	using SearchInstance_t = typename SearchInstance<List, T>::type;
 }
 
 #endif // !_UBPA_TEMPLATE_LIST_TYPELIST_H_

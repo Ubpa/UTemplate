@@ -20,7 +20,7 @@ namespace Ubpa {
 	*  List TTransform_t<List, <T> Op>
 	*  List TSelect_t<List, size...>
 	*  bool TInstantiable_v<List, T>
-	*  bool TInstantiableList_v<List0, List1>
+	*  bool TCanInstantiateToList_v<List0, List1>
 	*/
 
 	template<template<typename...> class... Ts>
@@ -194,15 +194,25 @@ namespace Ubpa {
 	template<typename TList, typename ArgList>
 	using TInstanceList_t = typename TInstanceList<TList, ArgList>::type;
 
-	// TInstantiableList
+	// TCanInstantiateToList
 	template<typename List, typename InstanceList>
-	struct TInstantiableList;
+	struct TCanInstantiateToList;
 
 	template<typename List, typename... Instances>
-	struct TInstantiableList<List, TypeList<Instances...>> : Conjunction<Bool<TInstantiable_v<List, Instances>>...> {};
+	struct TCanInstantiateToList<List, TypeList<Instances...>> : Conjunction<Bool<TInstantiable_v<List, Instances>>...> {};
 
 	template<typename List, typename InstanceList>
-	constexpr bool TInstantiableList_v = TInstantiableList<List, InstanceList>::type::value;
+	constexpr bool TCanInstantiateToList_v = TCanInstantiateToList<List, InstanceList>::type::value;
+
+	// generalized form List
+	template<typename List, typename InstanceList>
+	struct TCanGeneralizeFromList;
+
+	template<typename InstanceList, template<typename...>class... Ts>
+	struct TCanGeneralizeFromList<TemplateList<Ts...>, InstanceList> : Conjunction<Bool<ExistInstance_v<InstanceList, Ts>>...> {};
+
+	template<typename List, typename InstanceList>
+	constexpr bool TCanGeneralizeFromList_v = TCanGeneralizeFromList<List, InstanceList>::type::value;
 }
 
 #endif // !_UBPA_tEMPLATE_LIST_tEMPLATELIST_H_

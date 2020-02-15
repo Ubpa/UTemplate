@@ -1,31 +1,29 @@
 #include <iostream>
 #include <type_traits>
+#include <array>
 
 #include <UTemplate/SI.h>
-//#include <UTemplate/List/List.h>
-//#include <UTemplate/Num/Bool.h>
 
 using namespace std;
 using namespace Ubpa;
 
-using EmptyTList = TemplateList<>;
-
-template<typename Base, typename N>
-struct INum : Base {
-	static constexpr typename N::type num = N::value;
+template<typename Base, typename T, typename N>
+struct IArray : Base, std::array<T, N::value> {
 };
 
-template<typename Base, typename N>
-struct ISayNum : SI<TemplateList<INum>>::Ttype<Base, N> {
-	void Say() {
-		cout << "call Say" << endl;
-		cout << static_cast<typename ISayNum::INum*>(this)->num << endl;
+template<typename Base, typename T, typename N>
+struct IPrint : SI<TemplateList<IArray>>::Ttype<Base, T, N> {
+	void Print() const {
+		const auto& ArrayObj = *SI_CastC<IArray>(this);
+		for (const auto& v : ArrayObj)
+			cout << v << ",";
 	}
 };
 
-struct Rst : SII<TemplateList<ISayNum, INum>>::Ttype<SI_Nil, Size<4>> {};
+struct Rst : SII<TemplateList<IPrint, IArray>>::Ttype<float, Size<3>> {};
+
 int main() {
 	Rst rst;
-	cout << rst.num << endl;
-	rst.Say();
+	rst.fill(2);
+	rst.Print();
 }

@@ -38,9 +38,11 @@ int main() {
 	cout << "Concat_t<list0, TypeList<int, float>>: "
 		<< Name<Concat_t<list0, TypeList<int, float>>>() << endl;
 
-	cout << IsInstantiable_v<TypeList<bool>, TypeList> << endl;
+	cout << CanInstantiate_v<TypeList<bool>, TypeList> << endl;
 	cout << IsSameTemplate_v<TypeList, TypeList, TypeList<>> << endl;
 	cout << IsSameTemplate_v<std::is_same, TypeList, TypeList<bool>> << endl;
+	cout << ExistInstance_v<TypeList<bool, TypeList<TypeList<bool>>, int>, TypeList> << endl;
+	cout << Name<SearchInstance_t<TypeList<bool, TypeList<TypeList<bool>>, int>, TypeList>>() << endl;
 
 	return 0;
 }
