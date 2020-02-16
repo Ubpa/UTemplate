@@ -1,1 +1,1 @@
-Ubpa_AddSubDirs(OFF)
+Ubpa_AddSubDirs()
