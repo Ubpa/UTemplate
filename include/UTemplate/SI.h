@@ -83,11 +83,17 @@ namespace Ubpa {
 	template<typename Base, typename ArgList, template<typename...>class... TNBases>
 	using SINT = Instance_t<PushFront_t<ArgList, Base>, SI<TemplateList<>, TemplateList<TNBases...>>::template Ttype>;
 
+	template<typename Base, typename ArgList, typename... CRTPWrapper>
+	using SINT_CRTP = SINT<Base, ArgList, CRTPWrapper::template Ttype...>;
+
 	template<typename Base, template<typename...>class... TVBases>
 	using SIV = typename SI<TemplateList<TVBases...>>::template Ttype<Base>;
 
 	template<typename Base, typename ArgList, template<typename...>class... TVBases>
-	using SIVT = Instance_t<PushFront_t<ArgList, Base>, SI<TemplateList<TVBases...>>::template Ttype>;
+	using SIVT = Instance_t<PushFront_t<ArgList, Base>, SI<TemplateList<TVBases...>, TemplateList<>>::template Ttype>;
+	
+	template<typename Base, typename ArgList, typename... CRTPWrapper>
+	using SIVT_CRTP = SIVT<Base, ArgList, CRTPWrapper::template Ttype...>;
 
 	//---------------------------------------------------------------------------------------
 
@@ -151,8 +157,8 @@ namespace Ubpa {
 			using NewTopoOrderBaseSet = typename TopoSort<TVBs, TopoOrderBaseSet, ArgList>::type;
 			using type = TPushFront_t<NewTopoOrderBaseSet, THead>;
 		};
-		public:
-			using type = typename TopoSort<TemplateList<TTail...>, typename Rec<isContainHead>::type, ArgList>::type;
+	public:
+		using type = typename TopoSort<TemplateList<TTail...>, typename Rec<isContainHead>::type, ArgList>::type;
 	};
 
 	template<typename BaseList, typename ArgList>
