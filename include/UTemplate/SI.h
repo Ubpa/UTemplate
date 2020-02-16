@@ -47,7 +47,7 @@ namespace Ubpa {
 			using AllVBs = std::enable_if_t<
 				TCanGeneralizeFromList_v<typename B::TVBs, typename BB::AllVBs>,
 				typename BB::AllVBs>;
-			using TVBs = TConcat_t<typename BB::TVBs, typename B::TVBs>;
+			using TVBs = TConcatR_t<typename BB::TVBs, typename B::TVBs>;
 		};
 	};
 
@@ -124,45 +124,38 @@ namespace Ubpa {
 		};
 	}
 
-	template<template<typename...>class To, typename From>
-	SearchInstance_t<typename From::AllVBs, To>* SI_Cast(From* from) {
-		return static_cast<SearchInstance_t<typename From::AllVBs, To>*>(from);
-	}
-	template<template<typename...>class To, typename From>
-	const SearchInstance_t<typename From::AllVBs, To>* SI_CastC(const From* from) {
-		return static_cast<const SearchInstance_t<typename From::AllVBs, To>*>(from);
-	}
+	namespace detail {
+		template<typename BaseList, typename TopoOrderBaseSet, typename ArgList>
+		struct TopoSort;
 
-	template<typename BaseList, typename TopoOrderBaseSet, typename ArgList>
-	struct TopoSort;
-
-	template<typename TopoOrderBaseSet, typename ArgList>
-	struct TopoSort<TemplateList<>, TopoOrderBaseSet, ArgList> {
-		using type = TopoOrderBaseSet;
-	};
-
-	template<typename TopoOrderBaseSet, typename ArgList,
-		template<typename...>class THead,
-		template<typename...>class... TTail>
-	struct TopoSort<TemplateList<THead, TTail...>, TopoOrderBaseSet, ArgList> {
-	private:
-		using BaseList = TemplateList<THead, TTail...>;
-		static constexpr bool isContainHead = TInstantiable_v<TopoOrderBaseSet, Instance_t<ArgList, THead>>;
-		template<bool> struct Rec;
-		template<>
-		struct Rec<true> { using type = TopoOrderBaseSet; };
-		template<>
-		struct Rec<false> {
-			using TVBs = typename Instance_t<ArgList, THead>::TVBs;
-			using NewTopoOrderBaseSet = typename TopoSort<TVBs, TopoOrderBaseSet, ArgList>::type;
-			using type = TPushFront_t<NewTopoOrderBaseSet, THead>;
+		template<typename TopoOrderBaseSet, typename ArgList>
+		struct TopoSort<TemplateList<>, TopoOrderBaseSet, ArgList> {
+			using type = TopoOrderBaseSet;
 		};
-	public:
-		using type = typename TopoSort<TemplateList<TTail...>, typename Rec<isContainHead>::type, ArgList>::type;
-	};
+
+		template<typename TopoOrderBaseSet, typename ArgList,
+			template<typename...>class THead,
+			template<typename...>class... TTail>
+		struct TopoSort<TemplateList<THead, TTail...>, TopoOrderBaseSet, ArgList> {
+		private:
+			using BaseList = TemplateList<THead, TTail...>;
+			static constexpr bool isContainHead = TInstantiable_v<TopoOrderBaseSet, Instance_t<ArgList, THead>>;
+			template<bool> struct Rec;
+			template<>
+			struct Rec<true> { using type = TopoOrderBaseSet; };
+			template<>
+			struct Rec<false> {
+				using TVBs = typename Instance_t<ArgList, THead>::TVBs;
+				using NewTopoOrderBaseSet = typename TopoSort<TVBs, TopoOrderBaseSet, ArgList>::type;
+				using type = TPushFront_t<NewTopoOrderBaseSet, THead>;
+			};
+		public:
+			using type = typename TopoSort<TemplateList<TTail...>, typename Rec<isContainHead>::type, ArgList>::type;
+		};
+	}
 
 	template<typename BaseList, typename ArgList>
-	using TopoSort_t = typename TopoSort<BaseList, TemplateList<>, ArgList>::type;
+	using TopoSort_t = typename detail::TopoSort<BaseList, TemplateList<>, ArgList>::type;
 
 	template<typename TopoOrderBaseSet, typename... Args>
 	using SIIPro = typename detail::SII<TopoOrderBaseSet>::template Ttype<Args...>;
@@ -172,6 +165,15 @@ namespace Ubpa {
 
 	template<template<typename...>class... Bases>
 	using SII = SIIT<TemplateList<Bases...>>;
+
+	template<template<typename...>class To, typename From>
+	SearchInstance_t<typename From::AllVBs, To>* SI_Cast(From* from) {
+		return static_cast<SearchInstance_t<typename From::AllVBs, To>*>(from);
+	}
+	template<template<typename...>class To, typename From>
+	const SearchInstance_t<typename From::AllVBs, To>* SI_CastC(const From* from) {
+		return static_cast<const SearchInstance_t<typename From::AllVBs, To>*>(from);
+	}
 }
 
 #endif // !_UBPA_TEMPLATE_SI_H_

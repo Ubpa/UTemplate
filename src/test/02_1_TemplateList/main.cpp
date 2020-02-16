@@ -58,17 +58,18 @@ struct Name<TemplateList<T>> {
 		return os;
 	}
 };
-template<template<typename...>class... Ts>
-struct Name<TemplateList<Ts...>> {
-	friend std::ostream& operator<<(std::ostream& os, Name<TemplateList<Ts...>>) {
-		os << TFront<TemplateList<Ts...>>::template Ttype<void>().name << ", "
-			<< Name<TPopFront_t<TemplateList<Ts...>>>();
+
+template<template<typename...>class THead, template<typename...>class... TTail>
+struct Name<TemplateList<THead, TTail...>> {
+	friend std::ostream& operator<<(std::ostream& os, Name<TemplateList<THead, TTail...>>) {
+		os << THead<void>().name << ", "
+			<< Name<TemplateList<TTail...>>();
 		return os;
 	}
 };
 
-template<typename I, typename List, size_t Index>
-using ToI = TPushFront<I, TAt<List, Index>::template Ttype>;
+//template<typename I, typename List, size_t Index>
+//using ToI = TPushFront<I, TAt<List, Index>::template Ttype>;
 
 template<template<typename...>class T>
 struct Double {
@@ -76,7 +77,6 @@ struct Double {
 	using Ttype = typename T<void>::template Double<Ts...>;
 };
 
-struct Rst : is_instance_of<A<void>, TFront<TemplateList<A>>::Ttype> {};
 template<typename T>
 using BAlias = B<T>;
 
@@ -92,20 +92,22 @@ int main() {
 		<< "\t" << Name<TPushFront_t<list0, D>>() << endl;
 	cout << "TPopFront_t<list0>" << endl
 		<< "\t" << Name<TPopFront_t<list0>>() << endl;
-	cout << "TAt<list0, 1>" << endl
-		<< "\t" << TAt<list0, 1>::Ttype<>().name << endl;
-	cout << "TReverse_t<list0>" << endl
-		<< "\t" << Name<TReverse_t<list0>>() << endl;
-	cout << "TPushBack_t<list0, D>" << endl
-		<< "\t" << Name<TPushBack_t<list0, D>>() << endl;
-	cout << "TConcat_t<list0, TemplateList<A,D>>" << endl
-		<< "\t" << Name<TConcat_t<list0, TemplateList<A,D>>>() << endl;
-	cout << "TAccumulateIS_t<list0, ToI, TemplateList<D>, 0, 2>" << endl
+	/*cout << "TAt<list0, 1>" << endl
+		<< "\t" << TAt<list0, 1>::Ttype<>().name << endl;*/
+	/*cout << "TReverse_t<list0>" << endl
+		<< "\t" << Name<TReverse_t<list0>>() << endl;*/
+	/*cout << "TPushBack_t<list0, D>" << endl
+		<< "\t" << Name<TPushBack_t<list0, D>>() << endl;*/
+	/*cout << "TConcat_t<list0, TemplateList<A,D>>" << endl
+		<< "\t" << Name<TConcat_t<list0, TemplateList<A,D>>>() << endl;*/
+	cout << "TConcatR_t<list0, TemplateList<A,D>>" << endl
+		<< "\t" << Name<TConcatR_t<list0, TemplateList<A, D>>>() << endl;
+	/*cout << "TAccumulateIS_t<list0, ToI, TemplateList<D>, 0, 2>" << endl
 		<< "\t" << Name<TAccumulateIS_t<list0, ToI, TemplateList<D>, 0, 2>>() << endl;
 	cout << "TSelect_t<list0, 0, 2>" << endl
 		<< "\t" << Name<TSelect_t<list0, 0, 2>>() << endl;
 	cout << "TSelect_t<list0, 0, 2>" << endl
-		<< "\t" << Name<TTransform_t<list0, Double>>() << endl;
+		<< "\t" << Name<TTransform_t<list0, Double>>() << endl;*/
 	cout << "TInstantiable<list0, B>" << endl
 		<< "\t" << TInstantiable_v<list0, B<>> << endl;
 	cout << "TInstantiable<list0, D>" << endl

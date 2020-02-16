@@ -47,15 +47,15 @@ namespace Ubpa {
 		static constexpr decltype(sizeof(void*)) value = sizeof...(Ts);
 	};
 
-	// TFront
-	template<typename List>
+	// TFront // TFront will introduce new template
+	/*template<typename List>
 	struct TFront;
 
 	template<template<typename...> class Head, template<typename...> class... Tail>
 	struct TFront<TemplateList<Head, Tail...>> {
 		template<typename... Ts>
 		using Ttype = Head<Ts...>;
-	};
+	};*/
 
 	// TPushFront
 	template<typename List, template<typename...> class Ts>
@@ -81,8 +81,8 @@ namespace Ubpa {
 		using type = TemplateList<Tail...>;
 	};
 
-	// TAt
-	template<typename List, size_t N>
+	// TAt // TAt will introduce new template
+	/*template<typename List, size_t N>
 	struct TAt;
 
 	template<typename List>
@@ -92,39 +92,40 @@ namespace Ubpa {
 	};
 
 	template<typename List, size_t N>
-	struct TAt : TAt<TPopFront_t<List>, N - 1> { };
+	struct TAt : TAt<TPopFront_t<List>, N - 1> { };*/
 
 	// TAccumulate : list
-	template<typename List, template <typename I, template<typename...> class X> class Op, typename I, bool = TIsEmpty_v<List>>
+	template<typename List, template <typename I, template<typename...> class X> class Op, typename I>
 	struct TAccumulate;
 
-	template<typename List, template <typename I, template<typename...> class X> class Op, typename I>
-	struct TAccumulate<List, Op, I, false> : TAccumulate<TPopFront_t<List>, Op, typename Op<I, TFront<List>::template Ttype>::type> { };
-
-	template<typename List, template <typename I, template<typename...> class X> class Op, typename I>
-	struct TAccumulate<List, Op, I, true> {
+	template<template <typename I, template<typename...> class X> class Op, typename I>
+	struct TAccumulate<TemplateList<>, Op, I> {
 		using type = I;
 	};
+
+	template<template <typename I, template<typename...> class X> class Op, typename I,
+		template<typename...>class THead, template<typename...>class... TTail>
+	struct TAccumulate<TemplateList<THead, TTail...>, Op, I> : TAccumulate<TemplateList<TTail...>, Op, typename Op<I, THead>::type> { };
 
 	template<typename List, template <typename I, template<typename...> class X> class Op, typename I>
 	using TAccumulate_t = typename TAccumulate<List, Op, I>::type;
 
-	// TAccumulateIS : TAccumulate by integer sequence
-	template<typename List, template<typename I, typename List, size_t Num> class Op, typename I, size_t... Nums>
-	struct TAccumulateIS;
+	//// TAccumulateIS : TAccumulate by integer sequence
+	//template<typename List, template<typename I, typename List, size_t Num> class Op, typename I, size_t... Nums>
+	//struct TAccumulateIS;
 
-	template<typename List, template<typename I, typename List, size_t Num> class Op, typename I>
-	struct TAccumulateIS<List, Op, I> {
-		using type = I;
-	};
+	//template<typename List, template<typename I, typename List, size_t Num> class Op, typename I>
+	//struct TAccumulateIS<List, Op, I> {
+	//	using type = I;
+	//};
 
-	template<typename List, template<typename I, typename List, size_t Num> class Op, typename I,
-		size_t NumHead, size_t... NumTail>
-		struct TAccumulateIS<List, Op, I, NumHead, NumTail...>
-		: TAccumulateIS<List, Op, typename Op<I, List, NumHead>::type, NumTail...> { };
+	//template<typename List, template<typename I, typename List, size_t Num> class Op, typename I,
+	//	size_t NumHead, size_t... NumTail>
+	//	struct TAccumulateIS<List, Op, I, NumHead, NumTail...>
+	//	: TAccumulateIS<List, Op, typename Op<I, List, NumHead>::type, NumTail...> { };
 
-	template<typename List, template<typename I, typename List, size_t Num> class Op, typename I, size_t... Nums>
-	using TAccumulateIS_t = typename TAccumulateIS<List, Op, I, Nums...>::type;
+	//template<typename List, template<typename I, typename List, size_t Num> class Op, typename I, size_t... Nums>
+	//using TAccumulateIS_t = typename TAccumulateIS<List, Op, I, Nums...>::type;
 
 	// TReverse
 	template<typename List>
@@ -133,18 +134,26 @@ namespace Ubpa {
 	template<typename List>
 	using TReverse_t = typename TReverse<List>::type;
 
-	// TPushBack
-	template<typename List, template<typename...> class T>
-	using TPushBack = TReverse<TPushFront_t<TReverse_t<List>, T>>;
-	template<typename List, template<typename...> class T>
-	using TPushBack_t = typename TPushBack<List, T>::type;
+	//// TPushBack
+	//template<typename List, template<typename...> class T>
+	//using TPushBack = TReverse<TPushFront_t<TReverse_t<List>, T>>;
+	//template<typename List, template<typename...> class T>
+	//using TPushBack_t = typename TPushBack<List, T>::type;
 
-	// TConcat
+	// TConcatR
 	template<typename List0, typename List1>
-	using TConcat = TAccumulate<TReverse_t<List0>, TPushFront, List1>;
+	struct TConcatR;
+
+	template<typename List0>
+	struct TConcatR<List0, TemplateList<>> {
+		using type = List0;
+	};
+
+	template<typename List0, template<typename...>class THead, template<typename...>class... TTail>
+	struct TConcatR<List0, TemplateList<THead, TTail...>> : TConcatR<TPushFront_t<List0, THead>, TemplateList<TTail...>> {};
 
 	template<typename List0, typename List1>
-	using TConcat_t = typename TConcat<List0, List1>::type;
+	using TConcatR_t = typename TConcatR<List0, List1>::type;
 
 	// TTransform
 	template<typename List, template<template<typename...> class T> class Op>
@@ -158,32 +167,28 @@ namespace Ubpa {
 	template<typename List, template<template<typename...> class T> class Op>
 	using TTransform_t = typename TTransform<List, Op>::type;
 
-	// TSelect
-	template<typename List, size_t... Indices>
-	struct TSelect {
-		using type = TemplateList<TAt<List, Indices>::template Ttype...>;
-	};
+	//// TSelect
+	//template<typename List, size_t... Indices>
+	//struct TSelect {
+	//	using type = TemplateList<TAt<List, Indices>::template Ttype...>;
+	//};
 
-	template<typename List, size_t... Indices>
-	using TSelect_t = typename TSelect<List, Indices...>::type;
+	//template<typename List, size_t... Indices>
+	//using TSelect_t = typename TSelect<List, Indices...>::type;
 
 	// TInstantiable
-	template<typename List, typename Instance, bool found, bool isEmpty = TIsEmpty_v<List>>
+	template<typename List, typename Instance, bool found>
 	struct TInstantiableRec;
 
-	template<typename List, typename Instance, bool isEmpty>
-	struct TInstantiableRec<List, Instance, true, isEmpty> {
-		static constexpr bool value = true;
-	};
-
 	template<typename List, typename Instance>
-	struct TInstantiableRec<List, Instance, false, true> {
-		static constexpr bool value = false;
-	};
+	struct TInstantiableRec<List, Instance, true> : std::true_type {};
 
-	template<typename List, typename Instance>
-	struct TInstantiableRec<List, Instance, false, false> :
-		TInstantiableRec<TPopFront_t<List>, Instance, is_instance_of_v<Instance, TFront<List>::template Ttype>> {};
+	template<typename Instance>
+	struct TInstantiableRec<TemplateList<>, Instance, false> : std::false_type {};
+
+	template<typename Instance, template<typename...>class THead, template<typename...>class... TTail>
+	struct TInstantiableRec<TemplateList<THead, TTail...>, Instance, false> :
+		TInstantiableRec<TemplateList<TTail...>, Instance, is_instance_of_v<Instance, THead>> {};
 
 	template<typename List, typename Instance>
 	using TInstantiable = TInstantiableRec<List, Instance, false>;
