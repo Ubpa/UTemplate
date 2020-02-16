@@ -20,7 +20,7 @@ struct IArray : Base, array<T, Num::value> {
 
 template<typename Base, typename Impl, typename T, typename Num>
 struct IAdd : SIVT<Base, TypeList<Base,Impl,T,Num>, IArray> {
-	using SIVT<Base, TypeList<Base, Impl, T, Num>, IArray>::Ttype;
+	using SIVT<Base, TypeList<Base, Impl, T, Num>, IArray>::SIVT;
 
 	const Impl operator+(const Impl& y) const {
 		const Impl& x = *static_cast<const Impl*>(this);
@@ -33,7 +33,7 @@ struct IAdd : SIVT<Base, TypeList<Base,Impl,T,Num>, IArray> {
 
 template<typename Base, typename Impl, typename T, typename Num>
 struct IIn : SIVT<Base, TypeList<Base, Impl, T, Num>, IArray> {
-	using SIVT<Base, TypeList<Base, Impl, T, Num>, IArray>::Ttype;
+	using SIVT<Base, TypeList<Base, Impl, T, Num>, IArray>::SIVT;
 
 	friend istream& operator>>(istream& is, Impl& x) {
 		for (typename Num::type i = 0; i < Num::value; i++) // loop will be optimized in release
@@ -42,9 +42,14 @@ struct IIn : SIVT<Base, TypeList<Base, Impl, T, Num>, IArray> {
 	}
 };
 
+template<typename Impl, typename T, typename Num>
+struct IIn<SI_Nil, Impl, T, Num> : SIVT<SI_Nil, TypeList<SI_Nil, Impl, T, Num>, IArray> {
+	using SIVT<SI_Nil, TypeList<SI_Nil, Impl, T, Num>, IArray>::SIVT;
+};
+
 template<typename Base, typename Impl, typename T, typename Num>
 struct IOut : SIVT<Base, TypeList<Base, Impl, T, Num>, IArray> {
-	using SIVT<Base, TypeList<Base, Impl, T, Num>, IArray>::Ttype;
+	using SIVT<Base, TypeList<Base, Impl, T, Num>, IArray>::SIVT;
 
 	friend ostream& operator<<(ostream& os, const Impl& x) {
 		for (typename Num::type i = 0; i < Num::value - 1; i++) // loop will be optimized in release
@@ -54,6 +59,11 @@ struct IOut : SIVT<Base, TypeList<Base, Impl, T, Num>, IArray> {
 	}
 };
 
+template<typename Impl, typename T, typename Num>
+struct IOut<SI_Nil, Impl, T, Num> : SIVT<SI_Nil, TypeList<SI_Nil, Impl, T, Num>, IArray> {
+	using SIVT<SI_Nil, TypeList<SI_Nil, Impl, T, Num>, IArray>::SIVT;
+};
+
 template<typename Base, typename Impl, typename T, typename Num>
 struct IInOut : SIVT<Base, TypeList<Base, Impl, T, Num>, IOut, IIn> {
 	using SIVT<Base, TypeList<Base, Impl, T, Num>, IOut, IIn>::Ttype;
@@ -61,22 +71,20 @@ struct IInOut : SIVT<Base, TypeList<Base, Impl, T, Num>, IOut, IIn> {
 
 template<typename Base, typename Impl, typename T, typename Num>
 struct IVal : SIVT<Base, TypeList<Base, Impl, T, Num>, IAdd, IInOut, IArray> {
-	using SIVT<Base, TypeList<Base, Impl, T, Num>, IAdd, IInOut, IArray>::Ttype;
+	using SIVT<Base, TypeList<Base, Impl, T, Num>, IAdd, IInOut, IArray>::SIVT;
 };
 
 template<typename T, unsigned N>
-struct Vec : SIIPro<TemplateList<IVal, IInOut, IOut, IIn, IAdd, IArray>, Vec<T,N>, T, Size<N>> {
-	using SIIPro<TemplateList<IVal, IInOut, IOut, IIn, IAdd, IArray>, Vec<T, N>, T, Size<N>>::Ttype;
+struct Vec : SIIT<TemplateList<IVal>, Vec<T, N>, T, Size<N>> {
+	using SIIT<TemplateList<IVal>, Vec<T, N>, T, Size<N>>::SIIT;
 };
 
 using Vecf3 = Vec<float, 3>;
 using Vecf100 = Vec<float, 100>;
-struct Rst : Vecf3 {};
 
 int main() {
 	cout << sizeof(Vecf3) << endl;
 	Vecf3 vs[4];
-	Vecf3 v(-1, 3, 4);
 
 	for (size_t i = 0; i < 4; i++)
 		std::cin >> vs[i];
@@ -86,5 +94,5 @@ int main() {
 
 	Vecf100 v100;
 	v100.fill(2);
-	cout << v100[2];
+	cout << v100;
 }
