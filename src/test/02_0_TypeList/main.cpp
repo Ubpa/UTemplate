@@ -35,8 +35,11 @@ int main() {
 	cout << "ContainList_v<list0, TypeList<char, int>>: "
 		<< ContainList_v<list0, TypeList<char, int>> << endl;
 
-	cout << "Concat_t<list0, TypeList<int, float>>: "
-		<< Name<Concat_t<list0, TypeList<int, float>>>() << endl;
+	cout << "Concat_t<list0, TypeList<char, double>>: "
+		<< Name<Concat_t<list0, TypeList<char, double>>>() << endl;
+
+	cout << "ConcatR_t<list0, TypeList<char, double>>: "
+		<< Name<ConcatR_t<list0, TypeList<char, double>>>() << endl;
 
 	cout << CanInstantiate_v<TypeList<bool>, TypeList> << endl;
 	cout << IsSameTemplate_v<TypeList, TypeList, TypeList<>> << endl;

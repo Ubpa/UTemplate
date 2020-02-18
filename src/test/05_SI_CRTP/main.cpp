@@ -42,11 +42,6 @@ struct IIn : SIVT<Base, TypeList<Base, Impl, T, Num>, IArray> {
 	}
 };
 
-template<typename Impl, typename T, typename Num>
-struct IIn<SI_Nil, Impl, T, Num> : SIVT<SI_Nil, TypeList<SI_Nil, Impl, T, Num>, IArray> {
-	using SIVT<SI_Nil, TypeList<SI_Nil, Impl, T, Num>, IArray>::SIVT;
-};
-
 template<typename Base, typename Impl, typename T, typename Num>
 struct IOut : SIVT<Base, TypeList<Base, Impl, T, Num>, IArray> {
 	using SIVT<Base, TypeList<Base, Impl, T, Num>, IArray>::SIVT;
@@ -57,11 +52,6 @@ struct IOut : SIVT<Base, TypeList<Base, Impl, T, Num>, IArray> {
 		os << x[Num::value - 1];
 		return os;
 	}
-};
-
-template<typename Impl, typename T, typename Num>
-struct IOut<SI_Nil, Impl, T, Num> : SIVT<SI_Nil, TypeList<SI_Nil, Impl, T, Num>, IArray> {
-	using SIVT<SI_Nil, TypeList<SI_Nil, Impl, T, Num>, IArray>::SIVT;
 };
 
 template<typename Base, typename Impl, typename T, typename Num>
@@ -75,8 +65,8 @@ struct IVal : SIVT<Base, TypeList<Base, Impl, T, Num>, IAdd, IInOut, IArray> {
 };
 
 template<typename T, unsigned N>
-struct Vec : SIIT<TemplateList<IVal>, Vec<T, N>, T, Size<N>> {
-	using SIIT<TemplateList<IVal>, Vec<T, N>, T, Size<N>>::SIIT;
+struct Vec : SIICRTP<TemplateList<IVal>, Vec<T, N>, T, Size<N>> {
+	using SIICRTP<TemplateList<IVal>, Vec<T, N>, T, Size<N>>::SIICRTP;
 };
 
 using Vecf3 = Vec<float, 3>;

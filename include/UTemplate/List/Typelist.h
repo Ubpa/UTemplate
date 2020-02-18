@@ -160,6 +160,21 @@ namespace Ubpa {
 	template<typename List0, typename List1>
 	using Concat_t = typename Concat<List0, List1>::type;
 
+	// ConcatR
+	template<typename List0, typename List1>
+	struct ConcatR;
+
+	template<typename List0>
+	struct ConcatR<List0, TypeList<>> {
+		using type = List0;
+	};
+
+	template<typename List0, typename Head, typename... Tail>
+	struct ConcatR<List0, TypeList<Head, Tail...>> : ConcatR<PushFront_t<List0, Head>, TypeList<Tail...>> {};
+
+	template<typename List0, typename List1>
+	using ConcatR_t = typename ConcatR<List0, List1>::type;
+
 	// Transform
 	template<typename List, template<typename T> class Op>
 	struct Transform;
