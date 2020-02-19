@@ -23,6 +23,7 @@ struct IAdd : SIV_CRTP<TemplateList<IArray>, Base, Impl, T, Num> {
 	using SIV_CRTP<TemplateList<IArray>, Base, Impl, T, Num>::SIV_CRTP;
 
 	const Impl operator+(const Impl& y) const {
+		const auto& arr = *SI_Cast<IArray>(this);
 		const Impl& x = *static_cast<const Impl*>(this);
 		Impl rst{};
 		for (typename Num::type i = 0; i < Num::value; i++) // loop will be optimized in release
@@ -72,6 +73,8 @@ struct Vec : SII_CRTP<TemplateList<IVal>, Vec<T, N>, T, Size<N>> {
 using Vecf3 = Vec<float, 3>;
 using Vecf100 = Vec<float, 100>;
 
+struct Rst : Vecf3 {};
+
 int main() {
 	cout << sizeof(Vecf3) << endl;
 	Vecf3 vs[4];
@@ -84,5 +87,5 @@ int main() {
 
 	Vecf100 v100;
 	v100.fill(2);
-	cout << v100;
+	cout << v100 << endl;
 }

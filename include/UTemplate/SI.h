@@ -6,6 +6,26 @@
 
 namespace Ubpa {
 	namespace detail {
+		template<template<typename...>class To, typename From>
+		struct SI_Cast;
+		template<template<typename...>class To, typename From>
+		struct SI_Cast<To, const From*> {
+			static auto Func(const From* from) {
+				return static_cast<const SearchInstance_t<typename From::AllVBs, To>*>(from);
+			}
+		};
+		template<template<typename...>class To, typename From>
+		struct SI_Cast<To, From*> {
+			static auto Func(From* from) {
+				return static_cast<SearchInstance_t<typename From::AllVBs, To>*>(from);
+			}
+		};
+
+		template<template<typename...>class To, typename From>
+		auto SI_CastC(const From* from) {
+			return static_cast<const SearchInstance_t<typename From::AllVBs, To>*>(from);
+		}
+
 		struct SI_Nil {
 			using TVBList = TemplateList<>;
 			using AllVBs = TypeList<>;
@@ -33,13 +53,22 @@ namespace Ubpa {
 		struct SI_TNBList<TemplateList<T>> {
 			template<typename Base, typename... Ts>
 			using Ttype = T<Base, Ts...>;
+
+			template<typename Base, typename... Ts>
+			using TAllVBs = PushFront_t<typename Base::AllVBs, Ttype<Base, Ts...>>;
 		};
 
 		template<template<typename, typename...> class THead,
 			template<typename, typename...> class... TTail>
 		struct SI_TNBList<TemplateList<THead, TTail...>> {
+		private:
+			using SI_TNBListTTail = SI_TNBList<TemplateList<TTail...>>;
+		public:
 			template<typename Base, typename... Ts>
-			using Ttype = THead<typename SI_TNBList<TemplateList<TTail...>>::template Ttype<Base, Ts...>, Ts...>;
+			using Ttype = THead<typename SI_TNBListTTail::template Ttype<Base, Ts...>, Ts...>;
+
+			template<typename Base, typename... Ts>
+			using TAllVBs = PushFront_t<typename SI_TNBListTTail::template TAllVBs<Base, Ts...>, Ttype<Base, Ts...>>;
 		};
 
 		template<bool CRTP, typename ArgList, typename TNBList>
@@ -65,13 +94,13 @@ namespace Ubpa {
 		struct SI : SI_TNBList<TNBList>::template Ttype<Base, Args...> {
 			using SI_TNBList<TNBList>::template Ttype<Base, Args...>::Ttype;
 			using TVBList = TConcatR_t<TVBList_of_TNBList_t<false, TypeList<Args...>, TNBList>, _TVBList>;
-			using AllVBs = typename SI_TNBList<TNBList>::template Ttype<Base, Args...>::AllVBs;
+			using AllVBs = typename SI_TNBList<TNBList>::template TAllVBs<Base, Args...>;
 		};
 		template<typename _TVBList, typename Base, typename... Args>
 		struct SI<_TVBList, TemplateList<>, Base, Args...> : Base {
 			using Base::Base;
 			using TVBList = _TVBList;
-			using AllVBs = typename Base::AllVBs;
+			using AllVBs = PushFront_t<typename Base::AllVBs, Base>;
 		};
 		template<typename _TVBList, typename... Args>
 		struct SI<_TVBList, TemplateList<>, SI_Nil, Args...> {
@@ -86,7 +115,7 @@ namespace Ubpa {
 		struct SI_CRTP<_TVBList, TemplateList<>, Base, Impl, Args...> : Base {
 			using Base::Base;
 			using TVBList = _TVBList;
-			using AllVBs = typename Base::AllVBs;
+			using AllVBs = PushFront_t<typename Base::AllVBs, Base>;
 		};
 
 		template<typename _TVBList, typename Impl, typename... Args>
@@ -99,7 +128,7 @@ namespace Ubpa {
 		struct SI_CRTP : SI_TNBList<TNBList>::template Ttype<Base, Impl, Args...> {
 			using SI_TNBList<TNBList>::template Ttype<Base, Impl, Args...>::Ttype;
 			using TVBList = TConcatR_t<TVBList_of_TNBList_t<true, TypeList<Args...>, TNBList>, _TVBList>;
-			using AllVBs = PushFront_t<typename SI_TNBList<TNBList>::template Ttype<Base, Impl, Args...>::AllVBs, typename SI_TNBList<TNBList>::template Ttype<Base, Impl, Args...>>;
+			using AllVBs = typename SI_TNBList<TNBList>::template TAllVBs<Base, Impl, Args...>;
 		};
 
 		template<typename BaseList, typename TopoOrderBaseSet, typename ArgList, bool CRTP>
@@ -165,6 +194,11 @@ namespace Ubpa {
 
 	template<typename BaseList, typename Impl, typename... Args>
 	using SII_CRTP = detail::SII_CRTP<detail::TopoSort_t<BaseList, TypeList<Args...>, true>, Impl, Args...>;
+
+	template<template<typename...>class To, typename From>
+	auto SI_Cast(From from) {
+		return detail::SI_Cast<To, From>::Func(from);
+	}
 }
 
 #endif // !_UBPA_TEMPLATE_SI_H_
