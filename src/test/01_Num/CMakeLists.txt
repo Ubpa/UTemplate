@@ -1,1 +1,1 @@
-Ubpa_AddTarget(MODE "EXE")
+Ubpa_AddSubDirs()

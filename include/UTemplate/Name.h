@@ -40,8 +40,8 @@ namespace Ubpa {
 	};
 
 	template<>
-	struct BasicName<decltype(sizeof(void*)), true> {
-		friend std::ostream& operator<<(std::ostream& os, BasicName<decltype(sizeof(void*)), true>) {
+	struct BasicName<size_t, true> {
+		friend std::ostream& operator<<(std::ostream& os, BasicName<size_t, true>) {
 			os << "size_t";
 			return os;
 		}

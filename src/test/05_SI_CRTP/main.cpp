@@ -19,8 +19,8 @@ struct IArray : Base, array<T, Num::value> {
 };
 
 template<typename Base, typename Impl, typename T, typename Num>
-struct IAdd : SIVT<Base, TypeList<Base,Impl,T,Num>, IArray> {
-	using SIVT<Base, TypeList<Base, Impl, T, Num>, IArray>::SIVT;
+struct IAdd : SIV_CRTP<TemplateList<IArray>, Base, Impl, T, Num> {
+	using SIV_CRTP<TemplateList<IArray>, Base, Impl, T, Num>::SIV_CRTP;
 
 	const Impl operator+(const Impl& y) const {
 		const Impl& x = *static_cast<const Impl*>(this);
@@ -32,8 +32,8 @@ struct IAdd : SIVT<Base, TypeList<Base,Impl,T,Num>, IArray> {
 };
 
 template<typename Base, typename Impl, typename T, typename Num>
-struct IIn : SIVT<Base, TypeList<Base, Impl, T, Num>, IArray> {
-	using SIVT<Base, TypeList<Base, Impl, T, Num>, IArray>::SIVT;
+struct IIn : SIV_CRTP<TemplateList<IArray>, Base, Impl, T, Num> {
+	using SIV_CRTP<TemplateList<IArray>, Base, Impl, T, Num>::SIV_CRTP;
 
 	friend istream& operator>>(istream& is, Impl& x) {
 		for (typename Num::type i = 0; i < Num::value; i++) // loop will be optimized in release
@@ -43,8 +43,8 @@ struct IIn : SIVT<Base, TypeList<Base, Impl, T, Num>, IArray> {
 };
 
 template<typename Base, typename Impl, typename T, typename Num>
-struct IOut : SIVT<Base, TypeList<Base, Impl, T, Num>, IArray> {
-	using SIVT<Base, TypeList<Base, Impl, T, Num>, IArray>::SIVT;
+struct IOut : SIV_CRTP<TemplateList<IArray>, Base, Impl, T, Num> {
+	using SIV_CRTP<TemplateList<IArray>, Base, Impl, T, Num>::SIV_CRTP;
 
 	friend ostream& operator<<(ostream& os, const Impl& x) {
 		for (typename Num::type i = 0; i < Num::value - 1; i++) // loop will be optimized in release
@@ -55,18 +55,18 @@ struct IOut : SIVT<Base, TypeList<Base, Impl, T, Num>, IArray> {
 };
 
 template<typename Base, typename Impl, typename T, typename Num>
-struct IInOut : SIVT<Base, TypeList<Base, Impl, T, Num>, IOut, IIn> {
-	using SIVT<Base, TypeList<Base, Impl, T, Num>, IOut, IIn>::Ttype;
+struct IInOut : SIV_CRTP<TemplateList<IOut, IIn>, Base, Impl, T, Num> {
+	using SIV_CRTP<TemplateList<IOut, IIn>, Base, Impl, T, Num>::SIV_CRTP;
 };
 
 template<typename Base, typename Impl, typename T, typename Num>
-struct IVal : SIVT<Base, TypeList<Base, Impl, T, Num>, IAdd, IInOut, IArray> {
-	using SIVT<Base, TypeList<Base, Impl, T, Num>, IAdd, IInOut, IArray>::SIVT;
+struct IVal : SIV_CRTP<TemplateList<IAdd, IInOut>, Base, Impl, T, Num> {
+	using SIV_CRTP<TemplateList<IAdd, IInOut>, Base, Impl, T, Num>::SIV_CRTP;
 };
 
 template<typename T, unsigned N>
-struct Vec : SIICRTP<TemplateList<IVal>, Vec<T, N>, T, Size<N>> {
-	using SIICRTP<TemplateList<IVal>, Vec<T, N>, T, Size<N>>::SIICRTP;
+struct Vec : SII_CRTP<TemplateList<IVal>, Vec<T, N>, T, Size<N>> {
+	using SII_CRTP<TemplateList<IVal>, Vec<T, N>, T, Size<N>>::SII_CRTP;
 };
 
 using Vecf3 = Vec<float, 3>;
