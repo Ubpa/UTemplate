@@ -39,8 +39,8 @@ int main() {
 	cout << &s2 << endl;
 	cout << static_cast<Struct2::Struct1*>(&s2) << endl;
 	cout << static_cast<Struct2::Empty1*>(&s2) << endl;
-	IStruct2<SI_Nil> ECBOs2;
+	IStruct2<detail::SI_Nil> ECBOs2;
 	cout << &ECBOs2 << endl;
-	cout << static_cast<IStruct2<SI_Nil>::IStruct1*>(&ECBOs2) << endl;
-	cout << static_cast<IStruct2<SI_Nil>::IEmpty1*>(&ECBOs2) << endl;
+	cout << static_cast<IStruct2<detail::SI_Nil>::IStruct1*>(&ECBOs2) << endl;
+	cout << static_cast<IStruct2<detail::SI_Nil>::IEmpty1*>(&ECBOs2) << endl;
 }
