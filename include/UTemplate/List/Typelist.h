@@ -1,6 +1,4 @@
 #pragma once
-#ifndef _UBPA_TEMPLATE_LIST_TYPELIST_H_
-#define _UBPA_TEMPLATE_LIST_TYPELIST_H_
 
 #include "../Name.h"
 #include "../Num/Bool.h"
@@ -305,5 +303,3 @@ namespace Ubpa {
 	template<typename List, template<typename...>class T>
 	using SearchInstance_t = typename SearchInstance<List, T>::type;
 }
-
-#endif // !_UBPA_TEMPLATE_LIST_TYPELIST_H_

@@ -1,6 +1,4 @@
 #pragma once
-#ifndef _UBPA_TEMPLATE_SI_H_
-#define _UBPA_TEMPLATE_SI_H_
 
 #include "List/TemplateList.h"
 
@@ -203,5 +201,3 @@ namespace Ubpa {
 		return detail::SI_Cast<To, From>::Func(from);
 	}
 }
-
-#endif // !_UBPA_TEMPLATE_SI_H_

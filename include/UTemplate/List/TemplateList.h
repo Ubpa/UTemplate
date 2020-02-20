@@ -1,6 +1,4 @@
 #pragma once
-#ifndef _UBPA_tEMPLATE_LIST_tEMPLATELIST_H_
-#define _UBPA_tEMPLATE_LIST_tEMPLATELIST_H_
 
 #include "../List/TypeList.h"
 #include "../Num/Bool.h"
@@ -230,5 +228,3 @@ namespace Ubpa {
 	template<typename List, typename InstanceList>
 	constexpr bool TCanGeneralizeFromList_v = TCanGeneralizeFromList<List, InstanceList>::type::value;
 }
-
-#endif // !_UBPA_tEMPLATE_LIST_tEMPLATELIST_H_

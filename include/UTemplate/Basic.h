@@ -1,6 +1,4 @@
 #pragma once
-#ifndef _UBPA_TEMPLATE_BASIC_H_
-#define _UBPA_TEMPLATE_BASIC_H_
 
 namespace Ubpa {
 	namespace detail {
@@ -80,5 +78,3 @@ namespace Ubpa {
 	template<typename T, size_t I>
 	using make_sequence = detail::make_sequence<T, I>;
 }
-
-#endif // !_UBPA_TEMPLATE_BASIC_H_

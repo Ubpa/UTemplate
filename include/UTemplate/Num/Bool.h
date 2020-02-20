@@ -1,6 +1,4 @@
 #pragma once
-#ifndef _UBPA_TEMPLATE_NUM_BOOL_
-#define _UBPA_TEMPLATE_NUM_BOOL_
 
 #include "Num.h"
 
@@ -45,5 +43,3 @@ namespace Ubpa {
 	template<typename... Ns>
 	using Disjunction_t = typename Disjunction<Ns...>::type;
 }
-
-#endif // !_UBPA_TEMPLATE_NUM_BOOL_

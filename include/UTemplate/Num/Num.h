@@ -1,6 +1,4 @@
 #pragma once
-#ifndef _UBPA_TEMPLATE_NUM_H_
-#define _UBPA_TEMPLATE_NUM_H_
 
 #include "../Name.h"
 #include "../Basic.h"
@@ -53,5 +51,3 @@ namespace Ubpa {
 	template<typename N>
 	using MakeSequence = make_sequence<typename N::type, static_cast<size_t>(N::value)>;
 }
-
-#endif // !_UBPA_TEMPLATE_NUM_H_
