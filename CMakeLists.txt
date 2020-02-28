@@ -35,13 +35,8 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE "${CMAKE_SOURCE_DIR}/lib")
 # 开启 VS 的文件夹功能
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
-include(FetchContent)
-FetchContent_Declare(
-  UCMake
-  GIT_REPOSITORY https://github.com/Ubpa/UCMake
-  GIT_TAG        2238ae6
-)
-FetchContent_MakeAvailable(UCMake)
+list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/external/UCMake/cmake")
+include(UbpaTool)
 
 include_directories (
 	${PROJECT_SOURCE_DIR}/include
@@ -54,4 +49,4 @@ link_directories (
 	# ...
 )
 
-add_subdirectory (src)
+Ubpa_AddSubDirsRec(src)
