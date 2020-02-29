@@ -142,6 +142,20 @@ namespace Ubpa {
 	template<typename List, template<typename I, typename List, size_t Num> class Op, typename I, size_t... Nums>
 	using AccumulateIS_t = typename AccumulateIS<List, Op, I, Nums...>::type;
 
+	// Filter
+	template<typename List, template<typename>class Op>
+	struct Filter {
+	private:
+		template<typename I, typename X>
+		struct FilterOp {
+			using type = std::conditional_t<Op<X>::value, PushFront_t<I, X>, I>;
+		};
+	public:
+		using type = Accumulate_t<List, FilterOp, TypeList<>>;
+	};
+	template<typename List, template<typename>class Op>
+	using Filter_t = typename Filter<List, Op>::type;
+
 	// Reverse
 	template<typename List>
 	using Reverse = Accumulate<List, PushFront, TypeList<>>;
@@ -302,4 +316,39 @@ namespace Ubpa {
 
 	template<typename List, template<typename...>class T>
 	using SearchInstance_t = typename SearchInstance<List, T>::type;
+
+	namespace detail {
+		template<typename List, template<typename X, typename Y>typename Less>
+		struct QuickSort;
+		template<template<typename X, typename Y>typename Less>
+		struct QuickSort<TypeList<>, Less> {
+			using type = TypeList<>;
+		};
+		template<template<typename X, typename Y>typename Less, typename T>
+		struct QuickSort<TypeList<T>, Less> {
+			using type = TypeList<T>;
+		};
+		template<template<typename X, typename Y>typename Less, typename Head, typename... Tail>
+		struct QuickSort<TypeList<Head,Tail...>, Less> {
+		private:
+			template<typename X>
+			struct LessThanHead {
+				static constexpr bool value = Less<X, Head>::value;
+			};
+			template<typename X>
+			struct GEThanHead {
+				static constexpr bool value = !Less<X, Head>::value;
+			};
+			using LessList = Filter_t<TypeList<Tail...>, LessThanHead>;
+			using GEList = Filter_t<TypeList<Tail...>, GEThanHead>;
+		public:
+			using type = Concat_t<
+				typename QuickSort<LessList, Less>::type,
+				PushFront_t<typename QuickSort<GEList, Less>::type, Head>>;
+		};
+	}
+	template<typename List, template<typename X, typename Y>typename Less>
+	using QuickSort = detail::QuickSort<List, Less>;
+	template<typename List, template<typename X, typename Y>typename Less>
+	using QuickSort_t = typename QuickSort<List, Less>::type;
 }

@@ -187,4 +187,10 @@ namespace Ubpa {
 
     template<typename T>
     constexpr size_t TypeID = detail::TypeID<T>::id();
+
+    template<typename X, typename Y>
+    struct TypeID_Less {
+        static constexpr bool value = TypeID<X> < TypeID<Y>;
+        static_assert(std::is_same_v<X, Y> || TypeID<X> != TypeID<Y>);
+    };
 }
