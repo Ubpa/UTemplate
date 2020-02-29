@@ -92,4 +92,5 @@ int main() {
 	Vecf100 v100;
 	v100.fill(2);
 	cout << v100 << endl;
+	
 }

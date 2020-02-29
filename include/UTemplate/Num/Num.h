@@ -28,7 +28,7 @@ namespace Ubpa {
 	template<long N>
 	using Long = Num<long, N>;
 
-	// std::size_t == decltype(sizeof(void*)
+	// size_t == decltype(sizeof(void*)
 	template<size_t N>
 	using Size = Num<size_t, N>;
 
