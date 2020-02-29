@@ -41,6 +41,12 @@ int main() {
 	cout << "ConcatR_t<list0, TypeList<char, double>>: "
 		<< Name<ConcatR_t<list0, TypeList<char, double>>>() << endl;
 
+	cout << "Find_v<list0, float>: "
+		<< Find_v<list0, float> << endl;
+
+	cout << "Find_v<list0, char> == static_cast<size_t>(-1): "
+		<< (Find_v<list0, char> == static_cast<size_t>(-1)) << endl;
+
 	cout << CanInstantiate_v<TypeList<bool>, TypeList> << endl;
 	cout << IsSameTemplate_v<TypeList, TypeList, TypeList<>> << endl;
 	cout << IsSameTemplate_v<std::is_same, TypeList, TypeList<bool>> << endl;

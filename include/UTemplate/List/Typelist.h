@@ -109,6 +109,27 @@ namespace Ubpa {
 
 	template<typename List, size_t N>
 	using At_t = typename At<List, N>::type;
+	
+	// Find
+	namespace detail {
+		template<typename List, typename T, size_t N, bool found>
+		struct Find;
+		template<typename T, size_t N, typename... Ts>
+		struct Find<TypeList<Ts...>, T, N, true> {
+			static constexpr size_t value = N - 1;
+		};
+		template<typename T, size_t N>
+		struct Find<TypeList<>, T, N, false> {
+			static constexpr size_t value = static_cast<size_t>(-1);
+		};
+		template<typename T, typename Head, size_t N, typename... Tail>
+		struct Find<TypeList<Head, Tail...>, T, N, false>
+			: Find<TypeList<Tail...>, T, N + 1, std::is_same_v<T, Head>> {};
+	}
+	template<typename List, typename T>
+	using Find = detail::Find<List, T, 0, false>;
+	template<typename List, typename T>
+	constexpr size_t Find_v = Find<List, T>::value;
 
 	// Accumulate : list
 	template<typename List, template <typename I, typename X> class Op, typename I, bool = IsEmpty_v<List>>
