@@ -3,8 +3,8 @@
 #include <array>
 
 #include <UTemplate/SI.h>
-#include <UTemplate/Num/Num.h>
-#include <UTemplate/List/TypeList.h>
+#include <UTemplate/Num.h>
+#include <UTemplate/TypeList.h>
 
 using namespace std;
 using namespace Ubpa;

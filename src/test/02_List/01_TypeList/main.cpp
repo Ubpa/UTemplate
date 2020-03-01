@@ -1,58 +1,64 @@
 #include <iostream>
 #include <type_traits>
 
-#include <UTemplate/List/TypeList.h>
+#include <UTemplate/TypeList.h>
+#include <UTemplate/Name.h>
 
 using namespace std;
 using namespace Ubpa;
 
 int main() {
-	using list0 = TypeList<int, float, bool>;
+	using list = TypeList<int, float, bool>;
 	
-	cout << "list0: " << Name<list0>() << endl;
-	cout << "Front_t<list0>: " << Name<Front_t<list0>>() << endl;
-	cout << "PushFront_t<list0, double>: " << Name<PushFront_t<list0, double>>() << endl;
-	cout << "PopFront_t<list0>: " << Name<PopFront_t<list0>>() << endl;
-	cout << "At_t<list0, 1>: " << Name<At_t<list0, 1>>() << endl;
-	cout << "Reverse_t<list0>: " << Name<Reverse_t<list0>>() << endl;
-	cout << "PushBack_t<list0, double>: " << Name<PushBack_t<list0, double>>() << endl;
+	cout << "list: " << Name<list>() << endl;
 
-	cout << "Transform_t<list0, add_const>: "
-		<< Name<Transform_t<list0, add_const>>() << endl;
+	static_assert(IsTypeList_v<list>);
+	static_assert(!IsTypeList_v<float>);
 
-	cout << "Select_t<list0, 0, 2>: "
-		<< Name<Select_t<list0, 0, 2>>() << endl;
+	static_assert(Length_v<list> == 3);
 
-	cout << "Contain_v<list0, int>: "
-		<< Contain_v<list0, int> << endl;
-	cout << "Contain_v<list0, long>: "
-		<< Contain_v<list0, long> << endl;
+	static_assert(!IsEmpty_v<list>);
+	static_assert(IsEmpty_v<TypeList<>>);
 
-	cout << "ContainList_v<list0, TypeList<>>: "
-		<< ContainList_v<list0, TypeList<>> << endl;
-	cout << "ContainList_v<list0, TypeList<int, float>>: "
-		<< ContainList_v<list0, TypeList<int, float>> << endl;
-	cout << "ContainList_v<list0, TypeList<char, int>>: "
-		<< ContainList_v<list0, TypeList<char, int>> << endl;
+	static_assert(is_same_v<Front_t<list>, int>);
+	static_assert(is_same_v<At_t<list, 1>, float>);
+	static_assert(is_same_v<Select_t<list, 0, 2>,TypeList<int, bool>>);
 
-	cout << "Concat_t<list0, TypeList<char, double>>: "
-		<< Name<Concat_t<list0, TypeList<char, double>>>() << endl;
+	static_assert(Find_v<list, float> == 1);
+	static_assert(Find_v<list, char> == Find_fail);
 
-	cout << "ConcatR_t<list0, TypeList<char, double>>: "
-		<< Name<ConcatR_t<list0, TypeList<char, double>>>() << endl;
+	static_assert(Contain_v<list, int>);
+	static_assert(!Contain_v<list, long>);
 
-	cout << "Find_v<list0, float>: "
-		<< Find_v<list0, float> << endl;
+	static_assert(ContainTs_v<list, int, float>);
+	static_assert(!ContainTs_v<list, int, long>);
 
-	cout << "Find_v<list0, char> == static_cast<size_t>(-1): "
-		<< (Find_v<list0, char> == static_cast<size_t>(-1)) << endl;
+	static_assert(ContainList_v<list, TypeList<>>);
+	static_assert(ContainList_v<list, TypeList<int, float>>);
+	static_assert(!ContainList_v<list, TypeList<char, int>>);
 
-	cout << CanInstantiate_v<TypeList<bool>, TypeList> << endl;
-	cout << IsSameTemplate_v<TypeList, TypeList, TypeList<>> << endl;
-	cout << IsSameTemplate_v<std::is_same, TypeList, TypeList<bool>> << endl;
-	cout << ExistInstance_v<TypeList<bool, TypeList<TypeList<bool>>, int>, TypeList> << endl;
-	cout << Name<SearchInstance_t<TypeList<bool, TypeList<TypeList<bool>>, int>, TypeList>>() << endl;
+	static_assert(CanInstantiate_v<list, TypeList>);
+	static_assert(!CanInstantiate_v<list, is_same>);
 
-	cout << Name<Rotate<list0>::type>() << endl;
+	static_assert(is_same_v<Instantiate_t<list, TypeList>, list>);
+	static_assert(!is_same_v<Instantiate_t<list, TypeList>, TypeList<>>);
+
+	static_assert(IsSameTemplate_v<TypeList, TypeList, TypeList<>>);
+	static_assert(!IsSameTemplate_v<TypeList, is_same, TypeList<>>);
+
+	static_assert(ExistInstance_v<TypeList<list>, TypeList>);
+	static_assert(!ExistInstance_v<TypeList<list>, is_same>);
+
+	static_assert(is_same_v<SearchInstance_t<TypeList<list>, TypeList>, list>);
+
+	static_assert(is_same_v<PushFront_t<list, double>, TypeList<double, int, float, bool>>);
+	static_assert(is_same_v<PushBack_t<list, double>, TypeList<int, float, bool, double>>);
+	static_assert(is_same_v<PopFront_t<list>, TypeList<float, bool>>);
+	static_assert(is_same_v<Rotate_t<list>, TypeList<float, bool, int>>);
+	static_assert(is_same_v<Filter_t<list, is_floating_point>, TypeList<float>>);
+	static_assert(is_same_v<Reverse_t<list>, TypeList<bool, float, int>>);
+	static_assert(is_same_v<Concat_t<list, TypeList<char, double>>, TypeList<int, float, bool, char, double>>);
+	static_assert(is_same_v<Transform_t<list, add_const>, TypeList<const int, const float, const bool>>);
+	
 	return 0;
 }

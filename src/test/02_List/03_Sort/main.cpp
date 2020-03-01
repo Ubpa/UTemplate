@@ -1,7 +1,7 @@
 #include <iostream>
 
-#include <UTemplate/TypeID/TypeID.h>
-#include <UTemplate/List/Typelist.h>
+#include <UTemplate/TypeID.h>
+#include <UTemplate/Typelist.h>
 #include <UTemplate/Name.h>
 
 using namespace std;

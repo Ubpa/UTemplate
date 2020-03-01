@@ -1,120 +1,50 @@
-#include <iostream>
 #include <type_traits>
-#include <string>
 
-#include <UTemplate/List/TemplateList.h>
-#include <UTemplate/Name.h>
+#include <UTemplate/TemplateList.h>
 
 using namespace std;
 using namespace Ubpa;
 
-template<typename = void>
-struct A {
-	template<typename = void>
-	struct Double {
-		string name = "AA";
-	};
-	string name = "A";
-};
+template<typename>
+struct A {};
 
-template<typename = void>
-struct B {
-	template<typename = void>
-	struct Double {
-		string name = "BB";
-	};
-	string name = "B";
-};
+template<typename>
+struct B {};
 
-template<typename = void>
-struct C {
-	template<typename = void>
-	struct Double {
-		string name = "CC";
-	};
-	string name = "C";
-};
+template<typename>
+struct C {};
 
-template<typename = void>
-struct D {
-	template<typename = void>
-	struct Double {
-		string name = "DD";
-	};
-	string name = "D";
-};
-
-template<>
-struct Name<TemplateList<>> {
-	friend std::ostream& operator<<(std::ostream& os, Name<TemplateList<>>) {
-		return os;
-	}
-};
-
-template<template<typename...> class T>
-struct Name<TemplateList<T>> {
-	friend std::ostream& operator<<(std::ostream& os, Name<TemplateList<T>>) {
-		os << T<void>().name;
-		return os;
-	}
-};
-
-template<template<typename...>class THead, template<typename...>class... TTail>
-struct Name<TemplateList<THead, TTail...>> {
-	friend std::ostream& operator<<(std::ostream& os, Name<TemplateList<THead, TTail...>>) {
-		os << THead<void>().name << ", "
-			<< Name<TemplateList<TTail...>>();
-		return os;
-	}
-};
-
-//template<typename I, typename List, size_t Index>
-//using ToI = TPushFront<I, TAt<List, Index>::template Ttype>;
-
-template<template<typename...>class T>
-struct Double {
-	template<typename... Ts>
-	using Ttype = typename T<void>::template Double<Ts...>;
-};
-
-template<typename T>
-using BAlias = B<T>;
+template<typename>
+struct D {};
 
 template<typename T0, typename T1>
 struct T2 {};
 
 int main() {
-	using list0 = TemplateList<A, B, C>;
+	using tlist = TemplateList<A, B, C>;
 
-	cout << "list0" << endl
-		<< "\t" << Name<list0>() << endl;
-	cout << "TPushFront_t<list0, D>" << endl
-		<< "\t" << Name<TPushFront_t<list0, D>>() << endl;
-	cout << "TPopFront_t<list0>" << endl
-		<< "\t" << Name<TPopFront_t<list0>>() << endl;
-	/*cout << "TAt<list0, 1>" << endl
-		<< "\t" << TAt<list0, 1>::Ttype<>().name << endl;*/
-	/*cout << "TReverse_t<list0>" << endl
-		<< "\t" << Name<TReverse_t<list0>>() << endl;*/
-	/*cout << "TPushBack_t<list0, D>" << endl
-		<< "\t" << Name<TPushBack_t<list0, D>>() << endl;*/
-	/*cout << "TConcat_t<list0, TemplateList<A,D>>" << endl
-		<< "\t" << Name<TConcat_t<list0, TemplateList<A,D>>>() << endl;*/
-	cout << "TConcatR_t<list0, TemplateList<A,D>>" << endl
-		<< "\t" << Name<TConcatR_t<list0, TemplateList<A, D>>>() << endl;
-	/*cout << "TAccumulateIS_t<list0, ToI, TemplateList<D>, 0, 2>" << endl
-		<< "\t" << Name<TAccumulateIS_t<list0, ToI, TemplateList<D>, 0, 2>>() << endl;
-	cout << "TSelect_t<list0, 0, 2>" << endl
-		<< "\t" << Name<TSelect_t<list0, 0, 2>>() << endl;
-	cout << "TSelect_t<list0, 0, 2>" << endl
-		<< "\t" << Name<TTransform_t<list0, Double>>() << endl;*/
-	cout << "TInstantiable<list0, B>" << endl
-		<< "\t" << TInstantiable_v<list0, B<>> << endl;
-	cout << "TInstantiable<list0, D>" << endl
-		<< "\t" << TInstantiable_v<list0, D<>> << endl;
-	cout << "TCanInstantiateToList_v<list0, TemplateList<TypeList<void>, A, B>>" << endl
-		<< "\t" << TCanInstantiateToList_v<list0, TInstanceList_t<TemplateList<A, B>, TypeList<void>>> << endl;
-	cout << "TCanInstantiateToList_v<list0, TemplateList<TypeList<void>, D, B>>" << endl
-		<< "\t" << TCanInstantiateToList_v<list0, TInstanceList_t<TemplateList<D, B>, TypeList<void>>> << endl;
+	static_assert(TLength_v<tlist> == 3);
+
+	static_assert(!TIsEmpty_v<tlist>);
+	static_assert(TIsEmpty_v<TemplateList<>>);
+
+	static_assert(is_same_v<TPushFront_t<tlist, D>, TemplateList<D, A, B, C>>);
+
+	static_assert(is_same_v<TPushBack_t<tlist, D>, TemplateList<A, B, C, D>>);
+
+	static_assert(is_same_v<TPopFront_t<tlist>, TemplateList<B, C>>);
+
+	static_assert(is_same_v<TReverse_t<tlist>, TemplateList<C, B, A>>);
+
+	static_assert(is_same_v<TConcat_t<tlist, TemplateList<A, D>>, TemplateList<A, B, C, A, D>>);
+
+	static_assert(TExistGenericity_v<tlist, A<int>>);
+
+	static_assert(TExistGenericities_v<tlist, TypeList<A<int>, B<float>>>);
+
+	static_assert(is_same_v<TInstance_t<tlist, TypeList<int>>, TypeList<A<int>, B<int>, C<int>>>);
+
+	static_assert(TCanGeneralizeFromList_v<tlist, TypeList<A<int>, B<float>, C<double>, D<long>>>);
+
 	return 0;
 }
