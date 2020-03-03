@@ -90,6 +90,11 @@ namespace Ubpa {
 	struct QuickSort;
 	template<typename List, template<typename X, typename Y>typename Less>
 	using QuickSort_t = typename QuickSort<List, Less>::type;
+
+	template<typename List>
+	struct IsSet;
+	template<typename List>
+	constexpr bool IsSet_v = IsSet<List>::value;
 }
 
 namespace Ubpa::detail::TypeList_ {
@@ -104,6 +109,9 @@ namespace Ubpa::detail::TypeList_ {
 
 	template<typename List, typename LastT, template<typename...>class T, bool found = false, bool = IsEmpty<List>::value>
 	struct SearchInstance;
+
+	template<typename List, bool haveSame = false>
+	struct IsSet;
 }
 
 namespace Ubpa {
@@ -266,6 +274,11 @@ namespace Ubpa {
 			typename QuickSort<LessList, Less>::type,
 			PushFront_t<typename QuickSort<GEList, Less>::type, Head>>;
 	};
+
+	// =================================================
+
+	template<typename List>
+	struct IsSet : detail::TypeList_::IsSet<List> {};
 }
 
 namespace Ubpa::detail::TypeList_ {
@@ -312,4 +325,13 @@ namespace Ubpa::detail::TypeList_ {
 
 	template<typename List, typename LastT, template<typename...>class T>
 	struct SearchInstance<List, LastT, T, false, false> : SearchInstance<PopFront_t<List>, Front_t<List>, T, is_instance_of_v<Front_t<List>, T>> {};
+
+	// =================================================
+
+	template<typename List>
+	struct IsSet<List, true> : std::false_type {};
+	template<>
+	struct IsSet<TypeList<>, false> : std::true_type {};
+	template<typename Head, typename... Tail>
+	struct IsSet<TypeList<Head, Tail...>, false> : IsSet<TypeList<Tail...>, Contain_v<TypeList<Tail...>, Head>> {};
 }

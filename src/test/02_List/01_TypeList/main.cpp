@@ -60,5 +60,8 @@ int main() {
 	static_assert(is_same_v<Concat_t<list, TypeList<char, double>>, TypeList<int, float, bool, char, double>>);
 	static_assert(is_same_v<Transform_t<list, add_const>, TypeList<const int, const float, const bool>>);
 	
+	static_assert(IsSet_v<list>);
+	static_assert(!IsSet_v<PushFront_t<list, float>>);
+
 	return 0;
 }
