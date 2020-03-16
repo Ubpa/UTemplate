@@ -1,4 +1,4 @@
-#include <UTemplate/FuncTraits.h>
+#include <UTemplate/Func.h>
 
 #include <iostream>
 
