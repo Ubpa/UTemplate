@@ -37,7 +37,7 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 include(FetchContent)
 
-find_package(UCMake QUIET)
+find_package(UCMake 0.1 EXACT QUIET)
 if(${UCMake_FOUND})
 	message(STATUS "UCMake found")
 else()
@@ -45,6 +45,7 @@ else()
 	FetchContent_Declare(
 	  UCMake
 	  GIT_REPOSITORY https://github.com/Ubpa/UCMake
+	  GIT_TAG "v0.1"
 	)
 	FetchContent_MakeAvailable(UCMake)
 endif()
