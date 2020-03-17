@@ -36,28 +36,27 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE "${PROJECT_SOURCE_DIR}/lib")
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 include(FetchContent)
-FetchContent_Declare(
-  UGit
-  GIT_REPOSITORY https://github.com/Ubpa/UGit
-  GIT_TAG        3c3cd3f
-)
-FetchContent_MakeAvailable(UGit)
 
-Ubpa_InitGit()
-Ubpa_UpdateSubModule()
-
-list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/external/UCMake/cmake")
-include(UbpaTool)
+find_package(UCMake QUIET)
+if(${UCMake_FOUND})
+	message(STATUS "UCMake found")
+else()
+	message(STATUS "UCMake not found, so fetch it ...")
+	FetchContent_Declare(
+	  UCMake
+	  GIT_REPOSITORY https://github.com/Ubpa/UCMake
+	)
+	FetchContent_MakeAvailable(UCMake)
+endif()
 
 include_directories (
 	${PROJECT_SOURCE_DIR}/include
-	# $ENV{XXX_INCLUDE_PATH}
-	# ...
 )
+
 link_directories (
 	${PROJECT_SOURCE_DIR}/lib
-	# $ENV{XXX_LIB_PATH}
-	# ...
 )
 
 Ubpa_AddSubDirsRec(src)
+
+Ubpa_Export()
