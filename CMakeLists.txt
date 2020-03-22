@@ -40,7 +40,7 @@ include(FetchContent)
 message(STATUS "find package: UCMake v0.3.0")
 find_package(UCMake 0.3.0 QUIET)
 if(${UCMake_FOUND})
-	message(STATUS "UCMake v${PACKAGE_VERSION} found")
+	message(STATUS "UCMake v${UCMake_VERSION} found")
 else()
 	set(_address "https://github.com/Ubpa/UCMake")
 	message(STATUS "UCMake v0.3.0 not found, so fetch it ...\n"
