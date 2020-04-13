@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 3.14 FATAL_ERROR)
 
 # 设定项目
-project(UTemplate VERSION 0.2.0)
+project(UTemplate VERSION 0.3.1)
 message(STATUS "[Project] ${PROJECT_NAME}")
 
 # 修改默认的安装路径前缀
@@ -37,26 +37,27 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 include(FetchContent)
 
-message(STATUS "find package: UCMake v0.3.0")
-find_package(UCMake 0.3.0 QUIET)
+message(STATUS "find package: UCMake v0.4.1")
+find_package(UCMake 0.4.1 QUIET)
 if(${UCMake_FOUND})
 	message(STATUS "UCMake v${UCMake_VERSION} found")
 else()
 	set(_address "https://github.com/Ubpa/UCMake")
-	message(STATUS "UCMake v0.3.0 not found, so fetch it ...\n"
-	"fetch: ${_address} with tag v0.3.0")
+	message(STATUS "UCMake v0.4.1 not found, so fetch it ...\n"
+	"fetch: ${_address} with tag v0.4.1")
 	FetchContent_Declare(
 	  UCMake
 	  GIT_REPOSITORY ${_address}
-	  GIT_TAG "v0.3.0"
+	  GIT_TAG "v0.4.1"
 	)
-	message(STATUS "UCMake v0.3.0 fetch done, building ...")
+	message(STATUS "UCMake v0.4.1 fetch done, building ...")
 	FetchContent_MakeAvailable(UCMake)
-	message(STATUS "UCMake v0.3.0 build done")
+	message(STATUS "UCMake v0.4.1 build done")
 endif()
 
 Ubpa_InitInstallPrefix()
+Ubpa_InitTestSwitch()
 
 Ubpa_AddSubDirsRec(src)
 
-Ubpa_Export()
+Ubpa_Export(DIRECTORIES "include")
