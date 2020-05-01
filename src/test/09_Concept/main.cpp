@@ -5,7 +5,7 @@
 using namespace Ubpa;
 
 template<class T>
-Concept(can_speak, std::declval<T>().Speak());
+Concept(can_speak, &T::Speak);
 
 class C {
 public:

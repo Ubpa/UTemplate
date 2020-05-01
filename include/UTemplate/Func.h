@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Typelist.h"
+#include "Concept.h"
 
 #include <tuple>
 #include <utility>
@@ -22,8 +23,19 @@ namespace Ubpa {
 	// - Ret == void or Ret <- Func'return type
 	template<typename NewFunc> struct FuncExpand;
 
+	// run()
 	template<typename Func>
 	struct MemFuncOf;
+
+	template<typename Func>
+	struct IsConstFunc;
+	template<typename Func>
+	constexpr bool IsConstFunc_v = IsConstFunc<Func>::value;
+
+	template<typename Func>
+	struct RemoveFuncConst;
+	template<typename Func>
+	using RemoveFuncConst_t = typename RemoveFuncConst<Func>::type;
 }
 
 //============================================================
@@ -139,10 +151,31 @@ namespace Ubpa {
 
 	// =========================
 
+	namespace detail::Func_ {
+		template<typename Func, typename>
+		struct IsConstFuncHelper : std::true_type {};
+		template<typename Func>
+		struct IsConstFuncHelper<Func, std::void_t<Func*>> : std::false_type {};
+	}
+
+	template<typename Func>
+	struct IsConstFunc : detail::Func_::IsConstFuncHelper<Func, void> {};
+
+	template<typename Func>
+	struct RemoveFuncConst : IType<Func> {};
+	template<typename Ret,typename... Args>
+	struct RemoveFuncConst<Ret(Args...)const> : IType<Ret(Args...)> {};
+	template<typename Obj, typename Ret, typename... Args>
+	struct RemoveFuncConst<Ret(Obj::*)(Args...)const> : IType<Ret(Obj::*)(Args...)> {};
+
 	template<typename Func>
 	struct MemFuncOf {
 		template<typename Obj>
 		static constexpr auto run(Func Obj::* func) noexcept {
+			return func;
+		}
+
+		static constexpr auto run(RemoveFuncConst_t<Func> func) noexcept {
 			return func;
 		}
 	};

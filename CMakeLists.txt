@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 3.14 FATAL_ERROR)
 
 # 设定项目
-project(UTemplate VERSION 0.3.2)
+project(UTemplate VERSION 0.3.3)
 message(STATUS "[Project] ${PROJECT_NAME}")
 
 # 修改默认的安装路径前缀
