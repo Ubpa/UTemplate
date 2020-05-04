@@ -2,91 +2,8 @@
 
 #include "TemplateList.h"
 
-namespace Ubpa::detail::SI {
-	template<template<typename...>class To, typename From>
-	struct SI_Cast;
-
-	struct SI_Nil;
-
-	template<typename TVBList, typename TNBList, typename Base, typename... Args>
-	struct SI;
-
-	template<typename TVBList, typename TNBList, typename Base, typename Impl, typename... Args>
-	struct SI_CRTP;
-
-	template<typename BaseList, typename TopoOrderBaseSet, typename ArgList, bool CRTP>
-	struct TopoSort;
-	template<typename BaseList, typename ArgList, bool CRTP>
-	using TopoSort_t = typename TopoSort<BaseList, TemplateList<>, ArgList, CRTP>::type;
-
-	template<typename BaseList, typename... Args>
-	using SIIT = SI<TemplateList<>, BaseList, SI_Nil, Args...>;
-
-	template<template<typename, typename...> class... Bases>
-	using SII = SIIT<TemplateList<Bases...>>;
-
-	template<typename BaseList, typename Impl, typename... Args>
-	using SII_CRTP = SI_CRTP<TemplateList<>, BaseList, SI_Nil, Impl, Args...>;
-}
-
-namespace Ubpa {
-	template<typename TVBList, typename TNBList, typename Base, typename... Args>
-	using SI = detail::SI::SI<TVBList, TNBList, Base, Args...>;
-	template<typename TVBList, typename Base, typename... Args>
-	using SIVT = detail::SI::SI<TVBList, TemplateList<>, Base, Args...>;
-	template<typename Base, template<typename...>class... VBs>
-	using SIV = SIVT<TemplateList<VBs...>, Base>;
-	template<typename TNBList, typename Base, typename... Args>
-	using SINT = detail::SI::SI<TemplateList<>, TNBList, Base, Args...>;
-	template<typename Base, template<typename...>class... NBs>
-	using SIN = SINT<TemplateList<NBs...>, Base>;
-
-	template<typename TVBList, typename TNBList, typename Base, typename Impl, typename... Args>
-	using SI_CRTP = detail::SI::SI_CRTP<TVBList, TNBList, Base, Impl, Args...>;
-	template<typename TVBList, typename Base, typename Impl, typename... Args>
-	using SIVT_CRTP = detail::SI::SI_CRTP<TVBList, TemplateList<>, Base, Impl, Args...>;
-	template<typename Base, typename Impl, template<typename...>class... VBs>
-	using SIV_CRTP = SIVT_CRTP<TemplateList<VBs...>, Base, Impl>;
-	template<typename TNBList, typename Base, typename Impl, typename... Args>
-	using SINT_CRTP = detail::SI::SI_CRTP<TemplateList<>, TNBList, Base, Impl, Args...>;
-	template<typename Base, typename Impl, template<typename...>class... NBs>
-	using SIN_CRTP = SINT_CRTP<TemplateList<NBs...>, Base, Impl>;
-
-	// implementation
-	template<typename BaseList, typename... Args>
-	using SIIT = detail::SI::SIIT<detail::SI::TopoSort_t<BaseList, TypeList<Args...>, false>, Args...>;
-	template<template<typename...>class... Bases>
-	using SII = SIIT<TemplateList<Bases...>>;
-
-	template<typename BaseList, typename Impl, typename... Args>
-	using SIIT_CRTP = detail::SI::SII_CRTP<detail::SI::TopoSort_t<BaseList, TypeList<Args...>, true>, Impl, Args...>;
-	template<typename Impl, template<typename...>class... Bases>
-	using SII_CRTP = SIIT_CRTP<TemplateList<Bases...>, Impl>;
-
-	template<template<typename...>class To, typename From>
-	auto SI_Cast(From from) {
-		return detail::SI::SI_Cast<To, From>::Func(from);
-	}
-}
-
-namespace Ubpa::detail::SI {
-	template<template<typename...>class To, typename From>
-	struct SI_Cast<To, const From*> {
-		static auto Func(const From* from) {
-			return static_cast<const SearchInstance_t<typename From::AllVBs, To>*>(from);
-		}
-	};
-
-	template<template<typename...>class To, typename From>
-	struct SI_Cast<To, From*> {
-		static auto Func(From* from) {
-			return static_cast<SearchInstance_t<typename From::AllVBs, To>*>(from);
-		}
-	};
-
-	// =================================================
-
-	struct SI_Nil {
+namespace Ubpa::detail::SI_ {
+	struct Nil {
 		template<typename SI_ERROR, typename = typename SI_ERROR::SI_ERROR>
 		void operator+(SI_ERROR) = delete;
 		template<typename SI_ERROR, typename = typename SI_ERROR::SI_ERROR>
@@ -166,138 +83,95 @@ namespace Ubpa::detail::SI {
 		using AllVBs = TypeList<>;
 	};
 
-	// =================================================
+	template<template<typename...>class Interface, typename Impl, typename ArgList>
+	using ITraits_IList = typename Instantiate_t<TypeList<Nil, Impl, ArgList>, Interface>::IList;
+
+	template<typename Void,
+		template<template<typename...>class, typename, typename>class Trait,
+		template<typename...>class Interface, typename Impl, typename ArgList>
+	struct ITraits_Have_Helper : std::false_type {};
+
+	template<template<template<typename...>class, typename, typename>class Trait,
+		template<typename...>class Interface, typename Impl, typename ArgList>
+	struct ITraits_Have_Helper<std::void_t<Trait<Interface, Impl, ArgList>>, Trait, Interface, Impl, ArgList> : std::true_type {};
+
+	template<template<template<typename...>class, typename, typename>class Trait,
+		template<typename...>class Interface, typename Impl, typename ArgList>
+	static constexpr bool ITraits_Have = ITraits_Have_Helper<void, Trait, Interface, Impl, ArgList>::value;
+
+	template<template<typename...>class Interface, typename Impl, typename ArgList>
+	static constexpr bool ITraits_Have_IList = ITraits_Have<ITraits_IList, Interface, Impl, ArgList>;
+
+	template<bool haveIList, template<typename...>class Interface, typename Impl, typename ArgList>
+	struct ITraits_Get_IList;
+	template<template<typename...>class Interface, typename Impl, typename ArgList>
+	struct ITraits_Get_IList<false, Interface, Impl, ArgList> : IType<TemplateList<>> {};
+	template<template<typename...>class Interface, typename Impl, typename ArgList>
+	struct ITraits_Get_IList<true, Interface, Impl, ArgList> : IType<ITraits_IList<Interface, Impl, ArgList>> {};
+
+	template<typename IList, typename Impl, typename ArgList>
+	struct SI;
+
+	template<typename IList, typename Impl, typename ArgList>
+	using SI_t = typename SI<IList, Impl, ArgList>::type;
+
+	template<typename Impl, typename ArgList>
+	struct SI<TemplateList<>, Impl, ArgList> {
+		using type = Nil;
+	};
+
+	template<template<typename...>class IHead, template<typename...>class... ITail,
+		typename Impl, typename ArgList>
+	struct SI<TemplateList<IHead, ITail...>, Impl, ArgList> {
+		using type = IHead<SI_t<TemplateList<ITail...>, Impl, ArgList>, Impl, ArgList>;
+	};
 
 	template<typename ArgList, template<typename...>class T>
 	struct TImpl;
 
-	// =================================================
+	template<typename IList, typename SortedIList, typename ArgList>
+	struct TopoSort;
 
-	template<bool CRTP, typename ArgList, template<typename...>class T> struct ActualInstance;
-	template<typename ArgList, template<typename...>class T>
-	struct ActualInstance<false, ArgList, T> {
-		using type = Instantiate_t<PushFront_t<ArgList, SI_Nil>, T>;
-	};
-	template<typename ArgList, template<typename...>class T>
-	struct ActualInstance<true, ArgList, T> {
-		using type = Instantiate_t<PushFront_t<PushFront_t<ArgList, TImpl<ArgList, T>>, SI_Nil>, T>;
-	};
-	template<bool CRTP, typename ArgList, template<typename...>class T>
-	using ActualInstance_t = typename ActualInstance<CRTP, ArgList, T>::type;
-
-	// =================================================
-
-	template<typename BNList, typename Base, typename ArgList>
-	struct SI_TNBList;
-
-	template<template<typename, typename...> class T, typename Base, typename ArgList>
-	struct SI_TNBList<TemplateList<T>, Base, ArgList> {
-		using type = Instantiate_t<PushFront_t<ArgList, Base>, T>;
-		using AllVBs = PushFront_t<typename Base::AllVBs, type>;
-	};
-
-	template<typename Base, typename ArgList, template<typename, typename...> class THead,
-		template<typename, typename...> class... TTail>
-	struct SI_TNBList<TemplateList<THead, TTail...>, Base, ArgList> {
-	private:
-		using SI_TNBListTTail = SI_TNBList<TemplateList<TTail...>, Base, ArgList>;
-	public:
-		using type = Instantiate_t<PushFront_t<ArgList, typename SI_TNBListTTail::type>, THead>;
-		using AllVBs = PushFront_t<typename SI_TNBListTTail::AllVBs, type>;
-	};
-
-	// =================================================
-
-	template<bool CRTP, typename ArgList, typename TNBList>
-	struct TVBList_of_TNBList;
-	template<bool CRTP, typename ArgList, typename TNBList>
-	using TVBList_of_TNBList_t = typename TVBList_of_TNBList<CRTP, ArgList, TNBList>::type;
-	template<bool CRTP, typename ArgList>
-	struct TVBList_of_TNBList<CRTP, ArgList, TemplateList<>> {
-		using type = TemplateList<>;
-	};
-	template<bool CRTP, typename ArgList,
-		template<typename, typename...> class THead,
-		template<typename, typename...> class... TTail>
-	struct TVBList_of_TNBList<CRTP, ArgList, TemplateList<THead, TTail...>> {
-		using type = TConcat_t<TVBList_of_TNBList_t<CRTP, ArgList, TemplateList<TTail...>>,
-			typename ActualInstance_t<CRTP, ArgList, THead>::TVBList>; // set
-	};
-
-	// =================================================
-
-	template<typename _TVBList, typename TNBList, typename Base, typename... Args>
-	struct SI : SI_TNBList<TNBList, Base, TypeList<Args...>>::type {
-		using SI_TNBList<TNBList, Base, TypeList<Args...>>::type::type;
-		using TVBList = TConcat_t<TVBList_of_TNBList_t<false, TypeList<Args...>, TNBList>, _TVBList>;
-		using AllVBs = typename SI_TNBList<TNBList, Base, TypeList<Args...>>::AllVBs;
-	};
-
-	template<typename _TVBList, typename Base, typename... Args>
-	struct SI<_TVBList, TemplateList<>, Base, Args...> : Base {
-		using Base::Base;
-		using TVBList = _TVBList;
-		using AllVBs = PushFront_t<typename Base::AllVBs, Base>;
-	};
-
-	/*template<typename _TVBList, typename... Args>
-	struct SI<_TVBList, TemplateList<>, SI_Nil, Args...> {
-		using TVBList = _TVBList;
-		using AllVBs = TypeList<>;
-	};*/
-
-	// =================================================
-
-
-	template<typename _TVBList, typename Base, typename Impl, typename... Args>
-	struct SI_CRTP<_TVBList, TemplateList<>, Base, Impl, Args...> : Base {
-		using Base::Base;
-		using TVBList = _TVBList;
-		using AllVBs = PushFront_t<typename Base::AllVBs, Base>;
-	};
-
-	/*template<typename _TVBList, typename Impl, typename... Args>
-	struct SI_CRTP<_TVBList, TemplateList<>, SI_Nil, Impl, Args...> {
-		using TVBList = _TVBList;
-		using AllVBs = TypeList<>;
-	};*/
-
-	template<typename _TVBList, typename TNBList, typename Base, typename Impl, typename... Args>
-	struct SI_CRTP : SI_TNBList<TNBList, Base, TypeList<Impl, Args...>>::type {
-		using SI_TNBList<TNBList, Base, TypeList<Impl, Args...>>::type::type;
-		using TVBList = TConcat_t<TVBList_of_TNBList_t<true, TypeList<Args...>, TNBList>, _TVBList>;
-		using AllVBs = typename SI_TNBList<TNBList, Base, TypeList<Impl, Args...>>::AllVBs;
-	};
-
-	// =================================================
-
-	template<typename TopoOrderBaseSet, typename ArgList, bool CRTP>
-	struct TopoSort<TemplateList<>, TopoOrderBaseSet, ArgList, CRTP> {
-		using type = TopoOrderBaseSet;
-	};
-
-	template<typename TopoOrderBaseSet, typename ArgList, bool CRTP,
-		template<typename...>class THead,
-		template<typename...>class... TTail>
-	struct TopoSort<TemplateList<THead, TTail...>, TopoOrderBaseSet, ArgList, CRTP> {
-	private:
-		using BaseList = TemplateList<THead, TTail...>;
-		using HeadInstance = ActualInstance_t<CRTP, ArgList, THead>;
-		static constexpr bool isContainHead = TExistGenericity_v<TopoOrderBaseSet, HeadInstance>;
-
-		template<bool> struct Rec;
+	template<typename SortedIList, typename ArgList>
+	struct TopoSort<TemplateList<>, SortedIList, ArgList>
+		: IType<SortedIList> {};
+	
+	template<template<typename...>class IHead,
+		template<typename...>class... ITail,
+		typename SortedIList, typename ArgList>
+	struct TopoSort<TemplateList<IHead, ITail...>, SortedIList, ArgList> {
+		template<bool is_contain> struct Rec;
 		template<>
-		struct Rec<true> { using type = TopoOrderBaseSet; };
-		template<>
-		struct Rec<false> {
-			using TVBList = typename HeadInstance::TVBList;
-			using NewTopoOrderBaseSet = typename TopoSort<TVBList, TopoOrderBaseSet, ArgList, CRTP>::type;
-			using type = TPushFront_t<NewTopoOrderBaseSet, THead>;
+		struct Rec<true> : IType<SortedIList> {};
+		template<> struct Rec<false> {
+			using HeadChildren = typename ITraits_Get_IList<ITraits_Have_IList<IHead, TImpl<ArgList, IHead>, ArgList>, IHead, TImpl<ArgList, IHead>, ArgList>::type;
+			using NewSortedIList = typename TopoSort<HeadChildren, SortedIList, ArgList>::type;
+			using type = TPushFront_t<NewSortedIList, IHead>;
 		};
-
-	public:
-		using type = typename TopoSort<TemplateList<TTail...>, typename Rec<isContainHead>::type, ArgList, CRTP>::type;
+		static constexpr bool is_coantain_head = TExistGenericity_v<SortedIList, Instantiate_t<TypeList<Nil, TImpl<ArgList, IHead>, ArgList>, IHead>>;
+		using type = typename TopoSort<TemplateList<ITail...>,
+			typename Rec<is_coantain_head>::type, ArgList>::type;
 	};
 
-	// =================================================
+	template<typename IList, typename ArgList>
+	using TopoSort_t = typename TopoSort<IList, TemplateList<>, ArgList>::type;
+}
+
+namespace Ubpa {
+	template<typename IList, typename Impl, typename... Args>
+	struct SI;
+
+	template<typename IList_, typename Impl, typename... Args>
+	struct SI : detail::SI_::SI_t<detail::SI_::TopoSort_t<IList_, TypeList<Args...>>, Impl, TypeList<Args...>> {
+		using ArgList = TypeList<Args...>;
+		using IList = detail::SI_::TopoSort_t<IList_, ArgList>;
+		using Base = detail::SI_::SI_t<IList, Impl, ArgList>;
+
+		using Base::Base;
+
+		template<template<typename...>class Interface>
+		static constexpr bool IsContain() noexcept {
+			return TExistGenericity_v<IList, Instantiate_t<TypeList<detail::SI_::Nil, Impl, ArgList>, Interface>>;
+		}
+	};
 }

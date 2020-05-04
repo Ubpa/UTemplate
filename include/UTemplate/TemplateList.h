@@ -63,10 +63,7 @@ namespace Ubpa {
 		= TCanGeneralizeFromList<TList, InstanceList>::value;
 }
 
-namespace Ubpa::detail::TemplateList_ {
-	template<typename TList, typename Instance, bool found = false>
-	struct TExistGenericity;
-}
+// ===================================================================================================
 
 namespace Ubpa {
 	template<template<typename...> class... Ts>
@@ -126,8 +123,8 @@ namespace Ubpa {
 	// template<typename TList, size_t... Indices>
 	// struct TSelect : IType<TemplateList<TAt<TList, Indices>::template Ttype...>> {};
 
-	template<typename TList, typename Instance>
-	struct TExistGenericity : detail::TemplateList_::TExistGenericity<TList, Instance> {};
+	template<template<typename...>class... Ts, typename Instance>
+	struct TExistGenericity<TemplateList<Ts...>, Instance> : IValue<bool, (is_instance_of_v<Instance, Ts>||...)> {};
 
 	template<typename ArgList, template<typename...> class... Ts>
 	struct TInstance<TemplateList<Ts...>, ArgList> : IType<TypeList<Instantiate_t<ArgList, Ts>...>> {};
@@ -139,16 +136,4 @@ namespace Ubpa {
 	template<typename InstanceList, template<typename...>class... Ts>
 	struct TCanGeneralizeFromList<TemplateList<Ts...>, InstanceList>
 		: IValue<bool, (ExistInstance_v<InstanceList, Ts>&&...)> {};
-}
-
-namespace Ubpa::detail::TemplateList_ {
-	template<typename TList, typename Instance>
-	struct TExistGenericity<TList, Instance, true> : std::true_type {};
-
-	template<typename Instance>
-	struct TExistGenericity<TemplateList<>, Instance, false> : std::false_type {};
-
-	template<typename Instance, template<typename...>class THead, template<typename...>class... TTail>
-	struct TExistGenericity<TemplateList<THead, TTail...>, Instance, false> :
-		TExistGenericity<TemplateList<TTail...>, Instance, is_instance_of_v<Instance, THead>> {};
 }

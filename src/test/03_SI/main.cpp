@@ -8,39 +8,38 @@
 using namespace std;
 using namespace Ubpa;
 
-template<typename Base>
-struct IPeople : Base {
-	using Base::Base;
-	IPeople(const string & name) :name(name) {}
-	string name;
+template<typename Base, typename Impl, typename ArgList>
+struct IA : Base {};
+template<typename Base, typename Impl, typename ArgList>
+struct IB : Base {
+	using IList = TemplateList<IA>;
 };
-template<typename Base>
-struct ISing : SIV<Base, IPeople> {
-	using SIV<Base, IPeople>::SIV;
-	void Sing() { cout << "Sing"; }
+template<typename Base, typename Impl, typename ArgList>
+struct IC : Base {
+	using IList = TemplateList<IA>;
 };
-template<typename Base>
-struct IJump : SIV<Base, ISing> {
-	using SIV<Base, ISing>::SIV;
-	void Jump() { cout << "Jump"; }
+template<typename Base, typename Impl, typename ArgList>
+struct ID : Base {
+	using IList = TemplateList<IB>;
 };
-template<typename Base>
-struct IRap : SIV<Base, IJump> {
-	using SIV<Base, IJump>::SIV;
-	void Rap() { cout << "Rap"; }
+template<typename Base, typename Impl, typename ArgList>
+struct IE : Base {
+	using IList = TemplateList<IA>;
 };
-template<typename Base>
-struct IBasketball : SIV<Base, IPeople> {
-	using SIV<Base, IPeople>::SIV;
-	void Basketball() { cout << "Basketball"; }
+template<typename Base, typename Impl, typename ArgList>
+struct IF : Base {
+	using IList = TemplateList<IC, ID>;
 };
-struct CXK : SII<IBasketball, IRap> {
-	CXK() : SI("CXK") {}
-};
+
+// MSVC: /d1reportSingleClassLayoutG
+struct G :
+	SI<TemplateList<IE, IF>, G> {};
+
 int main() {
-	CXK cxk;
-	cout << "全民制作人们，大家好，我是练习时长两年半的个人练习生 " << cxk.name << endl
-		<< "喜欢 ";
-	cxk.Sing(); cout << ", "; cxk.Jump(); cout << ", ";
-	cxk.Rap(); cout << ", "; cxk.Basketball(); cout << "!";
+	static_assert(G::IsContain<IA>());
+	static_assert(G::IsContain<IB>());
+	static_assert(G::IsContain<IC>());
+	static_assert(G::IsContain<ID>());
+	static_assert(G::IsContain<IE>());
+	static_assert(G::IsContain<IF>());
 }
