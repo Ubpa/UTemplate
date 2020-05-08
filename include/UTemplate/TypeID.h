@@ -2,40 +2,22 @@
 
 // ref: https://github.com/skypjack/entt
 
+#include "../_deps/nameof.hpp"
+
 #include <cstdint>
 #include <type_traits>
 
-#if defined _MSC_VER
-	#define UBPA_PRETTY_FUNCTION __FUNCSIG__
-	//#define UBPA_PRETTY_FUNCTION_CONSTEXPR ENTT_PRETTY_FUNCTION
-#elif defined __clang__ || (defined __GNUC__ && __GNUC__ > 8)
-	#define UBPA_PRETTY_FUNCTION __PRETTY_FUNCTION__
-	//#define UBPA_PRETTY_FUNCTION_CONSTEXPR ENTT_PRETTY_FUNCTION
-#elif defined __GNUC__
-	#define UBPA_PRETTY_FUNCTION __PRETTY_FUNCTION__
-#endif
+//#if defined _MSC_VER
+//	#define UBPA_PRETTY_FUNCTION __FUNCSIG__
+//	//#define UBPA_PRETTY_FUNCTION_CONSTEXPR ENTT_PRETTY_FUNCTION
+//#elif defined __clang__ || (defined __GNUC__ && __GNUC__ > 8)
+//	#define UBPA_PRETTY_FUNCTION __PRETTY_FUNCTION__
+//	//#define UBPA_PRETTY_FUNCTION_CONSTEXPR ENTT_PRETTY_FUNCTION
+//#elif defined __GNUC__
+//	#define UBPA_PRETTY_FUNCTION __PRETTY_FUNCTION__
+//#endif
 
-namespace Ubpa::detail::TypeID {
-    template<typename T> struct TypeID;
-}
-
-namespace Ubpa {
-    template<typename T>
-    constexpr size_t TypeID = detail::TypeID::TypeID<T>::id();
-
-    template<typename X, typename Y> struct TypeID_Less;
-    template<typename X, typename Y> constexpr bool TypeID_Less_v = TypeID_Less<X, Y>::value;
-}
-
-namespace Ubpa {
-    template<typename X, typename Y>
-    struct TypeID_Less {
-        static constexpr bool value = TypeID<X> < TypeID<Y>;
-        static_assert(std::is_same_v<X, Y> || TypeID<X> != TypeID<Y>);
-    };
-}
-
-namespace Ubpa::detail::TypeID {
+namespace Ubpa::detail::TypeID_ {
     template<typename>
     struct fnv1a_traits;
 
@@ -67,8 +49,18 @@ namespace Ubpa::detail::TypeID {
             auto value = traits_type::offset;
 
             while (*curr != 0) {
-                value = (value ^ static_cast<traits_type::type>(*(curr++)))* traits_type::prime;
+                value = (value ^ static_cast<traits_type::type>(*(curr++))) * traits_type::prime;
             }
+
+            return value;
+        }
+
+        // Fowler¨CNoll¨CVo hash function v. 1a - the good
+        static constexpr size_t helper(const char* str, size_t n) noexcept {
+            auto value = traits_type::offset;
+
+            for (size_t i = 0; i < n; i++)
+                value = (value ^ static_cast<traits_type::type>(str[i])) * traits_type::prime;
 
             return value;
         }
@@ -97,6 +89,10 @@ namespace Ubpa::detail::TypeID {
         template<size_t N>
         static constexpr hash_type value(const value_type(&str)[N]) noexcept {
             return helper(str);
+        }
+
+        static constexpr hash_type value(std::string_view str) noexcept {
+            return helper(str.data(), str.size());
         }
 
         /**
@@ -199,8 +195,27 @@ namespace Ubpa::detail::TypeID {
          * @return The numeric representation of the given type.
          */
         static constexpr size_t id() noexcept {
-            constexpr auto value = hashed_string::value(UBPA_PRETTY_FUNCTION);
+            constexpr auto value = hashed_string::value(nameof::nameof_type<T>());
             return value;
         }
+    };
+}
+
+namespace Ubpa {
+    template<typename T>
+    constexpr size_t TypeID = detail::TypeID_::TypeID<T>::id();
+    constexpr size_t RuntimeTypeID(std::string_view str) {
+        return detail::TypeID_::hashed_string::value(str);
+    }
+
+    template<typename X, typename Y> struct TypeID_Less;
+    template<typename X, typename Y> constexpr bool TypeID_Less_v = TypeID_Less<X, Y>::value;
+}
+
+namespace Ubpa {
+    template<typename X, typename Y>
+    struct TypeID_Less {
+        static constexpr bool value = TypeID<X> < TypeID<Y>;
+        static_assert(std::is_same_v<X, Y> || TypeID<X> != TypeID<Y>);
     };
 }

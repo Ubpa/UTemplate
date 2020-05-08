@@ -6,7 +6,17 @@
 
 namespace Ubpa {
 	template<typename... Ts>
-	struct TypeList { };
+	struct TypeList {};
+
+	template<template<typename...>class OtherListTemplate, typename OtherList>
+	struct ToTypeList;
+	template<template<typename...>class OtherListTemplate, typename OtherList>
+	using ToTypeList_t = typename ToTypeList<OtherListTemplate, OtherList>::type;
+
+	template<typename List, template<typename...>class OtherListTemplate>
+	struct ToOtherList;
+	template<typename List, template<typename...>class OtherListTemplate>
+	using ToOtherList_t = typename ToOtherList<List, OtherListTemplate>::type;
 
 	template<typename List> struct IsTypeList;
 	template<typename List> constexpr bool IsTypeList_v = IsTypeList<List>::value;
@@ -125,6 +135,16 @@ namespace Ubpa {
 			return os;
 		}
 	};
+
+	// =================================================
+
+	template<template<typename...>class OtherListTemplate, typename... Ts>
+	struct ToTypeList<OtherListTemplate, OtherListTemplate<Ts...>> : IType<TypeList<Ts...>> {};
+
+	// =================================================
+
+	template<typename... Ts, template<typename...>class OtherListTemplate>
+	struct ToOtherList<TypeList<Ts...>, OtherListTemplate> : IType<OtherListTemplate<Ts...>> {};
 
 	// =================================================
 

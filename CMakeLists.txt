@@ -20,6 +20,7 @@ if(NOT UCMake_FOUND)
   message(STATUS "UCMake 0.5.0 build done")
 endif()
 
+Ubpa_AddSubDirsRec(include)
 Ubpa_AddSubDirsRec(src)
 
 Ubpa_Export(DIRECTORIES "include")
