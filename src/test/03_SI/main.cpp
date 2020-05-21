@@ -33,6 +33,7 @@ struct G;
 ImplTraits_Regist(G, IE, IF);
 struct G : SI<G> {};
 
+struct A {};
 int main() {
 	static_assert(G::IsContain<IA>());
 	static_assert(G::IsContain<IB>());
@@ -40,4 +41,7 @@ int main() {
 	static_assert(G::IsContain<ID>());
 	static_assert(G::IsContain<IE>());
 	static_assert(G::IsContain<IF>());
+
+	SI_IsContain_v<G, IA>;
+	SI_IsContain_v<int, IA>;
 }
