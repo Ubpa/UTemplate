@@ -9,7 +9,12 @@ struct Data {
 	bool b;
 };
 
+struct Empty {};
+
 int main() {
+	static_assert(is_list_initializable_v<Empty>);
+	static_assert(std::is_constructible_v<Empty>);
+
 	static_assert(is_list_initializable_v<Data, Data>);
 	static_assert(is_list_initializable_v<Data, unsigned, bool>);
 	static_assert(is_list_initializable_v<Data, unsigned>);

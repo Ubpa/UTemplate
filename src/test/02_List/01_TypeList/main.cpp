@@ -43,9 +43,6 @@ int main() {
 	static_assert(is_same_v<Instantiate_t<list, TypeList>, list>);
 	static_assert(!is_same_v<Instantiate_t<list, TypeList>, TypeList<>>);
 
-	static_assert(IsSameTemplate_v<TypeList, TypeList, TypeList<>>);
-	static_assert(!IsSameTemplate_v<TypeList, is_same, TypeList<>>);
-
 	static_assert(ExistInstance_v<TypeList<list>, TypeList>);
 	static_assert(!ExistInstance_v<TypeList<list>, is_same>);
 

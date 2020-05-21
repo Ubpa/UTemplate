@@ -19,10 +19,10 @@ namespace Ubpa {
 	template<template<typename...> typename T, typename... Ts>
 	constexpr bool is_instantiable_v = is_instantiable<T, Ts...>::value;
 
-	template<template<typename...> class T, template<typename...> class U, typename... Args>
+	template<template<typename...> class TA, template<typename...> class TB>
 	struct is_same_template;
-	template<template<typename...> class T, template<typename...> class U, typename... Args>
-	constexpr bool is_same_template_v = is_same_template<T, U, Args...>::value;
+	template<template<typename...> class TA, template<typename...> class TB>
+	constexpr bool is_same_template_v = is_same_template<TA, TB>::value;
 
 	template<typename Instance, template<typename...> class T>
 	struct is_instance_of;
@@ -54,10 +54,6 @@ namespace Ubpa {
 	template<template<typename...> typename T, typename... Ts>
 	struct is_instantiable : detail::Basic_::is_instantiable<T, void, Ts...> {};
 
-	template<template<typename...> class T, template<typename...> class U, typename... Args>
-	struct is_same_template : detail::Basic_::is_same_template<T, U,
-		is_instantiable_v<T, Args...> && is_instantiable_v<U, Args...>, Args...> {};
-
 	// =================================================
 
 	template<typename Instance, template<typename...> class T>
@@ -65,10 +61,6 @@ namespace Ubpa {
 
 	template<typename... Args, template<typename...> class T>
 	struct is_instance_of<T<Args...>, T> : std::true_type {};
-
-	template<typename... Args, template<typename...> class TInstance, template<typename...> class T>
-	struct is_instance_of<TInstance<Args...>, T>
-		: IValue<bool, is_same_template_v<TInstance, T, Args...>> {};
 
 	// =================================================
 
@@ -110,6 +102,14 @@ namespace Ubpa {
 
 	template<typename T, typename... Args>
 	struct is_list_initializable : detail::Basic_::is_list_initializable<T, void, Args...> {};
+
+	// =================================================
+
+	template<template<typename...> class TA, template<typename...> class TB>
+	struct is_same_template : std::false_type {};
+
+	template<template<typename...> class T>
+	struct is_same_template<T, T> : std::true_type {};
 }
 
 namespace Ubpa::detail::Basic_ {

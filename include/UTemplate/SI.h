@@ -2,6 +2,76 @@
 
 #include "TemplateList.h"
 
+#define InterfaceTraits_Regist(Interface, ...) \
+template<> \
+struct Ubpa::InterfaceTraits<Interface> { \
+	using IList = TemplateList<__VA_ARGS__>;\
+}
+
+#define InterfaceTraits_Regist_Pro(Interface, ...) \
+template<> \
+struct Ubpa::InterfaceTraits<Interface> : Ubpa::detail::SI_::IListBase<__VA_ARGS__>
+
+#define ImplTraits_Regist(Impl, ...) \
+template<> \
+struct Ubpa::ImplTraits<Impl> { \
+	using IList = TemplateList<__VA_ARGS__>;\
+}
+
+#define ImplTraits_Regist_Pro(Impl, ...) \
+template<> \
+struct Ubpa::ImplTraits<Impl> : Ubpa::detail::SI_::IListBase<__VA_ARGS__>
+
+namespace Ubpa {
+	// IList : TemplateList<...>
+	template<typename Impl>
+	struct ImplTraits {};
+
+	// IList : TemplateList<...>
+	template<template<typename...>class Interface>
+	struct InterfaceTraits {};
+
+	// template<template<typename, typename>class Interface>
+	// static constexpr bool IsContain() noexcept;
+	template<typename Impl>
+	struct SI;
+}
+
+namespace Ubpa::detail::SI_ {
+	struct Nil;
+
+	template<typename Impl> struct ImplTrait_IList;
+	template<typename Impl> using ImplTrait_IList_t = typename ImplTrait_IList<Impl>::type;
+
+	template<template<typename, typename> class Interface>
+	struct InterfaceTrait_IList;
+	template<template<typename, typename> class Interface>
+	using InterfaceTrait_IList_t = typename InterfaceTrait_IList<Interface>::type;
+
+	template<typename IList, typename Impl> struct SI;
+	template<typename IList, typename Impl> using SI_t = typename SI<IList, Impl>::type;
+
+	template<typename IList> struct TopoSort;
+	template<typename IList> using TopoSort_t = typename TopoSort<IList>::type;
+}
+
+namespace Ubpa {
+	// template<template<typename, typename>class Interface>
+	// static constexpr bool IsContain() noexcept;
+	template<typename Impl>
+	struct SI : detail::SI_::SI_t<detail::SI_::TopoSort_t<detail::SI_::ImplTrait_IList_t<Impl>>, Impl> {
+		using IList = detail::SI_::TopoSort_t<detail::SI_::ImplTrait_IList_t<Impl>>;
+		using Base = detail::SI_::SI_t<IList, Impl>;
+
+		using Base::Base;
+
+		template<template<typename, typename>class Interface>
+		static constexpr bool IsContain() noexcept {
+			return TExistGenericity_v<IList, Instantiate_t<TypeList<detail::SI_::Nil, Impl>, Interface>>;
+		}
+	};
+}
+
 namespace Ubpa::detail::SI_ {
 	struct Nil {
 		template<typename SI_ERROR, typename = typename SI_ERROR::SI_ERROR>
@@ -78,100 +148,66 @@ namespace Ubpa::detail::SI_ {
 		void operator()(SI_ERROR) = delete;
 		template<typename SI_ERROR, typename = typename SI_ERROR::SI_ERROR>
 		void operator[](SI_ERROR) = delete;
-
-		using TVBList = TemplateList<>;
-		using AllVBs = TypeList<>;
 	};
 
-	template<template<typename...>class Interface, typename Impl, typename ArgList>
-	using ITraits_IList = typename Instantiate_t<TypeList<Nil, Impl, ArgList>, Interface>::IList;
+	template<template<typename...>class... Ts>
+	struct IListBase {
+		using IList = TemplateList<Ts...>;
+	};
 
-	template<typename Void,
-		template<template<typename...>class, typename, typename>class Trait,
-		template<typename...>class Interface, typename Impl, typename ArgList>
-	struct ITraits_Have_Helper : std::false_type {};
+	template<typename Impl, typename Enabler>
+	struct ImplTrait_IList_Helper : IType<TemplateList<>> {};
 
-	template<template<template<typename...>class, typename, typename>class Trait,
-		template<typename...>class Interface, typename Impl, typename ArgList>
-	struct ITraits_Have_Helper<std::void_t<Trait<Interface, Impl, ArgList>>, Trait, Interface, Impl, ArgList> : std::true_type {};
+	template<typename Impl>
+	struct ImplTrait_IList_Helper<Impl, std::void_t<typename ImplTraits<Impl>::IList>>
+		: IType<typename ImplTraits<Impl>::IList> {};
 
-	template<template<template<typename...>class, typename, typename>class Trait,
-		template<typename...>class Interface, typename Impl, typename ArgList>
-	static constexpr bool ITraits_Have = ITraits_Have_Helper<void, Trait, Interface, Impl, ArgList>::value;
+	template<typename Impl>
+	struct ImplTrait_IList : ImplTrait_IList_Helper<Impl, void> {};
 
-	template<template<typename...>class Interface, typename Impl, typename ArgList>
-	static constexpr bool ITraits_Have_IList = ITraits_Have<ITraits_IList, Interface, Impl, ArgList>;
+	template<template<typename, typename> class Interface, typename Enabler>
+	struct InterfaceTrait_IList_Helper : IType<TemplateList<>> {};
 
-	template<bool haveIList, template<typename...>class Interface, typename Impl, typename ArgList>
-	struct ITraits_Get_IList;
-	template<template<typename...>class Interface, typename Impl, typename ArgList>
-	struct ITraits_Get_IList<false, Interface, Impl, ArgList> : IType<TemplateList<>> {};
-	template<template<typename...>class Interface, typename Impl, typename ArgList>
-	struct ITraits_Get_IList<true, Interface, Impl, ArgList> : IType<ITraits_IList<Interface, Impl, ArgList>> {};
+	template<template<typename, typename> class Interface>
+	struct InterfaceTrait_IList_Helper<Interface, std::void_t<typename InterfaceTraits<Interface>::IList>>
+		: IType<typename InterfaceTraits<Interface>::IList> {};
 
-	template<typename IList, typename Impl, typename ArgList>
+	template<template<typename, typename> class Interface>
+	struct InterfaceTrait_IList : InterfaceTrait_IList_Helper<Interface, void> {};
+
+	template<typename IList, typename Impl>
 	struct SI;
 
-	template<typename IList, typename Impl, typename ArgList>
-	using SI_t = typename SI<IList, Impl, ArgList>::type;
+	template<typename Impl>
+	struct SI<TemplateList<>, Impl> : IType<Nil> {};
 
-	template<typename Impl, typename ArgList>
-	struct SI<TemplateList<>, Impl, ArgList> {
-		using type = Nil;
-	};
+	template<template<typename, typename>class IHead,
+		template<typename, typename>class... ITail,
+		typename Impl>
+	struct SI<TemplateList<IHead, ITail...>, Impl>
+		: IType<IHead<SI_t<TemplateList<ITail...>, Impl>, Impl>> {};
 
-	template<template<typename...>class IHead, template<typename...>class... ITail,
-		typename Impl, typename ArgList>
-	struct SI<TemplateList<IHead, ITail...>, Impl, ArgList> {
-		using type = IHead<SI_t<TemplateList<ITail...>, Impl, ArgList>, Impl, ArgList>;
-	};
+	template<typename IList, typename SortedIList>
+	struct TopoSortImpl;
+	template<typename IList, typename SortedIList>
+	using TopoSortImpl_t = typename TopoSortImpl<IList, SortedIList>::type;
 
-	template<typename ArgList, template<typename...>class T>
-	struct TImpl;
-
-	template<typename IList, typename SortedIList, typename ArgList>
-	struct TopoSort;
-
-	template<typename SortedIList, typename ArgList>
-	struct TopoSort<TemplateList<>, SortedIList, ArgList>
+	template<typename SortedIList>
+	struct TopoSortImpl<TemplateList<>, SortedIList>
 		: IType<SortedIList> {};
-	
-	template<template<typename...>class IHead,
-		template<typename...>class... ITail,
-		typename SortedIList, typename ArgList>
-	struct TopoSort<TemplateList<IHead, ITail...>, SortedIList, ArgList> {
-		template<bool is_contain> struct Rec;
-		template<>
-		struct Rec<true> : IType<SortedIList> {};
-		template<> struct Rec<false> {
-			using HeadChildren = typename ITraits_Get_IList<ITraits_Have_IList<IHead, TImpl<ArgList, IHead>, ArgList>, IHead, TImpl<ArgList, IHead>, ArgList>::type;
-			using NewSortedIList = typename TopoSort<HeadChildren, SortedIList, ArgList>::type;
-			using type = TPushFront_t<NewSortedIList, IHead>;
-		};
-		static constexpr bool is_coantain_head = TExistGenericity_v<SortedIList, Instantiate_t<TypeList<Nil, TImpl<ArgList, IHead>, ArgList>, IHead>>;
-		using type = typename TopoSort<TemplateList<ITail...>,
-			typename Rec<is_coantain_head>::type, ArgList>::type;
+
+	template<template<typename, typename>class IHead,
+		template<typename, typename>class... ITail,
+		typename SortedIList>
+	struct TopoSortImpl<TemplateList<IHead, ITail...>, SortedIList> {
+		template<bool> struct Recursion;
+		template<> struct Recursion<true> : IType<SortedIList> {};
+		template<> struct Recursion<false>
+			: IType<TPushFront_t<TopoSortImpl_t<InterfaceTrait_IList_t<IHead>, SortedIList>, IHead>> {};
+
+		using type = TopoSortImpl_t<TemplateList<ITail...>, typename Recursion<TContain_v<SortedIList, IHead>>::type>;
 	};
 
-	template<typename IList, typename ArgList>
-	using TopoSort_t = typename TopoSort<IList, TemplateList<>, ArgList>::type;
-}
-
-namespace Ubpa {
-	template<typename IList, typename Impl, typename... Args>
-	struct SI;
-
-	template<typename IList_, typename Impl, typename... Args>
-	struct SI : detail::SI_::SI_t<detail::SI_::TopoSort_t<IList_, TypeList<Args...>>, Impl, TypeList<Args...>> {
-		using ArgList = TypeList<Args...>;
-		using IList = detail::SI_::TopoSort_t<IList_, ArgList>;
-		using Base = detail::SI_::SI_t<IList, Impl, ArgList>;
-
-		using Base::Base;
-
-		template<template<typename...>class Interface>
-		static constexpr bool IsContain() noexcept {
-			return TExistGenericity_v<IList, Instantiate_t<TypeList<detail::SI_::Nil, Impl, ArgList>, Interface>>;
-		}
-	};
+	template<typename IList>
+	struct TopoSort : TopoSortImpl<IList, TemplateList<>> {};
 }

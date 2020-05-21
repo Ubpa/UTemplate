@@ -27,6 +27,11 @@ namespace Ubpa {
 	// TAt will introduce new template
 	// template<typename TList, size_t N> struct TAt;
 
+	template<typename TList, template<typename...>class T>
+	struct TContain;
+	template<typename TList, template<typename...>class T>
+	static constexpr bool TContain_v = TContain<TList, T>::value;
+
 	template<typename TList, template <typename I, template<typename...> class X> class Op, typename I>
 	struct TAccumulate;
 	template<typename TList, template <typename I, template<typename...> class X> class Op, typename I>
@@ -44,7 +49,7 @@ namespace Ubpa {
 	template<typename TList, template<template<typename...> class T> class Op>
 	using TTransform_t = typename TTransform<TList, Op>::type;
 
-	// TSelect
+	// TSelect will introduce new template
 	// template<typename TList, size_t... Indices> struct TSelect;
 
 	template<typename TList, typename Instance> struct TExistGenericity;
@@ -136,4 +141,7 @@ namespace Ubpa {
 	template<typename InstanceList, template<typename...>class... Ts>
 	struct TCanGeneralizeFromList<TemplateList<Ts...>, InstanceList>
 		: IValue<bool, (ExistInstance_v<InstanceList, Ts>&&...)> {};
+
+	template<template<typename...>class... Ts, template<typename...>class T>
+	struct TContain<TemplateList<Ts...>, T> : IValue<bool, (is_same_template_v<Ts, T>||...)> {};
 }

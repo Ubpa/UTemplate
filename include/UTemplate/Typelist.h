@@ -55,11 +55,6 @@ namespace Ubpa {
 	template<typename List, template<typename...> class T> struct Instantiate;
 	template<typename List, template<typename...> class T> using Instantiate_t = typename Instantiate<List, T>::type;
 
-	template<template<typename...> class T, template<typename...> class U, typename List>
-	struct IsSameTemplate;
-	template<template<typename...> class T, template<typename...> class U, typename List>
-	constexpr bool IsSameTemplate_v = IsSameTemplate<T, U, List>::value;
-
 	template<typename List, template<typename...>class T> struct ExistInstance;
 	template<typename List, template<typename...>class T> constexpr bool ExistInstance_v = ExistInstance<List, T>::value;
 
@@ -208,11 +203,6 @@ namespace Ubpa {
 
 	template<template<typename...> class T, typename... Args>
 	struct Instantiate<TypeList<Args...>, T> : IType<T<Args...>> {};
-
-	// =================================================
-
-	template<template<typename...> class T, template<typename...> class U, typename... Args>
-	struct IsSameTemplate<T, U, TypeList<Args...>> : is_same_template<T, U, Args...> {};
 
 	// =================================================
 

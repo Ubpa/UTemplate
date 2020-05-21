@@ -46,5 +46,7 @@ int main() {
 
 	static_assert(TCanGeneralizeFromList_v<tlist, TypeList<A<int>, B<float>, C<double>, D<long>>>);
 
+	static_assert(TContain_v<tlist, A>);
+
 	return 0;
 }

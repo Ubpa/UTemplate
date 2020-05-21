@@ -8,32 +8,30 @@
 using namespace std;
 using namespace Ubpa;
 
-template<typename Base, typename Impl, typename ArgList>
+template<typename Base, typename Impl>
 struct IA : Base {};
-template<typename Base, typename Impl, typename ArgList>
-struct IB : Base {
-	using IList = TemplateList<IA>;
-};
-template<typename Base, typename Impl, typename ArgList>
-struct IC : Base {
-	using IList = TemplateList<IA>;
-};
-template<typename Base, typename Impl, typename ArgList>
-struct ID : Base {
-	using IList = TemplateList<IB>;
-};
-template<typename Base, typename Impl, typename ArgList>
-struct IE : Base {
-	using IList = TemplateList<IA>;
-};
-template<typename Base, typename Impl, typename ArgList>
-struct IF : Base {
-	using IList = TemplateList<IC, ID>;
-};
+template<typename Base, typename Impl>
+struct IB : Base {};
+template<typename Base, typename Impl>
+struct IC : Base {};
+template<typename Base, typename Impl>
+struct ID : Base {};
+template<typename Base, typename Impl>
+struct IE : Base {};
+template<typename Base, typename Impl>
+struct IF : Base {};
+
+InterfaceTraits_Regist(IB, IA);
+InterfaceTraits_Regist(IC, IA);
+InterfaceTraits_Regist(ID, IB);
+InterfaceTraits_Regist(IE, IA);
+InterfaceTraits_Regist(IF, IC, ID);
 
 // MSVC: /d1reportSingleClassLayoutG
-struct G :
-	SI<TemplateList<IE, IF>, G> {};
+
+struct G;
+ImplTraits_Regist(G, IE, IF);
+struct G : SI<G> {};
 
 int main() {
 	static_assert(G::IsContain<IA>());
