@@ -9,29 +9,29 @@ using namespace std;
 using namespace Ubpa;
 
 template<typename Base, typename Impl>
-struct IA : Base {};
+struct IA : Base { IA(float) {} };
 template<typename Base, typename Impl>
-struct IB : Base {};
+struct IB : Base { using Base::Base; };
 template<typename Base, typename Impl>
-struct IC : Base {};
+struct IC : Base { using Base::Base; };
 template<typename Base, typename Impl>
-struct ID : Base {};
+struct ID : Base { using Base::Base; };
 template<typename Base, typename Impl>
-struct IE : Base {};
-template<typename Base, typename Impl>
-struct IF : Base {};
+struct IE : Base { using Base::Base; };
 
 InterfaceTraits_Regist(IB, IA);
 InterfaceTraits_Regist(IC, IA);
 InterfaceTraits_Regist(ID, IB);
 InterfaceTraits_Regist(IE, IA);
-InterfaceTraits_Regist(IF, IC, ID);
+CombineInterface(IF, IC, ID);
 
 // MSVC: /d1reportSingleClassLayoutG
 
 struct G;
 ImplTraits_Regist(G, IE, IF);
-struct G : SI<G> {};
+struct G : SI<G> {
+	using SI<G>::SI;
+};
 
 struct A {};
 int main() {
@@ -44,4 +44,6 @@ int main() {
 
 	SI_IsContain_v<G, IA>;
 	SI_IsContain_v<int, IA>;
+
+	G{ 1.f };
 }

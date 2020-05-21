@@ -12,6 +12,13 @@ struct Ubpa::InterfaceTraits<Interface> { \
 template<> \
 struct Ubpa::InterfaceTraits<Interface> : Ubpa::detail::SI_::IListBase<__VA_ARGS__>
 
+#define CombineInterface(Interface, ...) \
+template<typename Base, typename Impl> \
+struct Interface : Base {\
+    using Base::Base;\
+};\
+InterfaceTraits_Regist(Interface, __VA_ARGS__)
+
 #define ImplTraits_Regist(Impl, ...) \
 template<> \
 struct Ubpa::ImplTraits<Impl> { \
