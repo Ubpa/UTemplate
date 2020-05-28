@@ -112,7 +112,7 @@ namespace Ubpa::detail::SI_ {
 		template<> struct Recursion<false>
 			: IType<TPushFront_t<TopoSort_Helper_t<InterfaceTrait_IList_t<IHead>, SortedIList>, IHead>> {};
 
-			using type = TopoSort_Helper_t<TemplateList<ITail...>, typename Recursion<TContain_v<SortedIList, IHead>>::type>;
+		using type = TopoSort_Helper_t<TemplateList<ITail...>, typename Recursion<TContain_v<SortedIList, IHead>>::type>;
 	};
 
 	// [SI]
