@@ -2,15 +2,12 @@
 #include <type_traits>
 
 #include <UTemplate/TypeList.h>
-#include <UTemplate/Name.h>
 
 using namespace std;
 using namespace Ubpa;
 
 int main() {
 	using list = TypeList<int, float, bool>;
-	
-	cout << "list: " << Name<list>() << endl;
 
 	static_assert(IsTypeList_v<list>);
 	static_assert(!IsTypeList_v<float>);

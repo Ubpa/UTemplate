@@ -2,16 +2,14 @@
 #include <type_traits>
 
 #include <UTemplate/Num.h>
-#include <UTemplate/Name.h>
 
 using namespace std;
 using namespace Ubpa;
 
 
 int main() {
-	cout << Name<Bool<true>>() << endl;
-	cout << Name<Int<1>>() << endl;
-	cout << Name<Size<10>>() << endl;
-
+	Bool<true>{};
+	Int<1>{};
+	Size<10>{};
 	return 0;
 }

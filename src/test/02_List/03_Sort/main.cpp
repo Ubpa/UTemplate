@@ -2,7 +2,6 @@
 
 #include <UTemplate/TypeID.h>
 #include <UTemplate/Typelist.h>
-#include <UTemplate/Name.h>
 
 using namespace std;
 using namespace Ubpa;
@@ -14,5 +13,9 @@ int main() {
 	cout << "TypeID<double>     : " << TypeID<double> << endl;
 	cout << "TypeID<TypeList<>> : " << TypeID<TypeList<>> << endl;
 
-	cout << Name<QuickSort_t<list, TypeID_Less>>() << endl;
+	using sorted_list = QuickSort_t<list, TypeID_Less>;
+	cout << "@0 : " << TypeID<At_t<sorted_list, 0>> << endl;
+	cout << "@1 : " << TypeID<At_t<sorted_list, 1>> << endl;
+	cout << "@2 : " << TypeID<At_t<sorted_list, 2>> << endl;
+	cout << "@3 : " << TypeID<At_t<sorted_list, 3>> << endl;
 }
