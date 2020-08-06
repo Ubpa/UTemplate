@@ -44,7 +44,7 @@ namespace Ubpa::detail::TypeID_ {
             const char* str;
         };
 
-        // Fowler¨CNoll¨CVo hash function v. 1a - the good
+        // Fowlerï¿½CNollï¿½CVo hash function v. 1a - the good
         static constexpr size_t helper(const char* curr) noexcept {
             auto value = traits_type::offset;
 
@@ -55,7 +55,7 @@ namespace Ubpa::detail::TypeID_ {
             return value;
         }
 
-        // Fowler¨CNoll¨CVo hash function v. 1a - the good
+        // Fowlerï¿½CNollï¿½CVo hash function v. 1a - the good
         static constexpr size_t helper(const char* str, size_t n) noexcept {
             auto value = traits_type::offset;
 
@@ -195,7 +195,19 @@ namespace Ubpa::detail::TypeID_ {
          * @return The numeric representation of the given type.
          */
         static constexpr size_t id() noexcept {
-            constexpr auto value = hashed_string::value(nameof::nameof_type<T>());
+            std::string_view name = nameof::nameof_type<T>();
+            #if defined(_MSC_VER)
+            if (name.size() > sizeof("enum") && name[0] == 'e' && name[1] == 'n' && name[2] == 'u' && name[3] == 'm' && name[4] == ' ') {
+                name.remove_prefix(sizeof("enum"));
+            }
+            if (name.size() > sizeof("class") && name[0] == 'c' && name[1] == 'l' && name[2] == 'a' && name[3] == 's' && name[4] == 's' && name[5] == ' ') {
+                name.remove_prefix(sizeof("class"));
+            }
+            if (name.size() > sizeof("struct") && name[0] == 's' && name[1] == 't' && name[2] == 'r' && name[3] == 'u' && name[4] == 'c' && name[5] == 't' && name[6] == ' ') {
+                name.remove_prefix(sizeof("struct"));
+            }
+            #endif
+            auto value = hashed_string::value(name);
             return value;
         }
     };
