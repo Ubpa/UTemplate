@@ -1,5 +1,7 @@
 #include <UTemplate/Func.h>
 
+#include <_deps/nameof.hpp>
+
 #include <iostream>
 
 using namespace Ubpa;
@@ -25,4 +27,7 @@ int main() {
 	(a.*cfoo)();
 	bar();
 	bari(1);
+
+	constexpr auto f = DecayLambda([](int) {});
+	static_assert(std::is_same_v<decltype(f), void(* const)(int)>);
 }
