@@ -1,7 +1,5 @@
 #pragma once
 
-#include <iostream>
-
 #include "Basic.h"
 
 namespace Ubpa {
@@ -120,19 +118,6 @@ namespace Ubpa::detail::TypeList_ {
 }
 
 namespace Ubpa {
-	template<typename... Ts>
-	struct Name;
-
-	template<typename... Ts>
-	struct Name<TypeList<Ts...>> {
-		friend std::ostream& operator<<(std::ostream& os, Name<TypeList<Ts...>>) {
-			os << "[" << Name<Ts...>() << "]";
-			return os;
-		}
-	};
-
-	// =================================================
-
 	template<template<typename...>class OtherListTemplate, typename... Ts>
 	struct ToTypeList<OtherListTemplate, OtherListTemplate<Ts...>> : IType<TypeList<Ts...>> {};
 

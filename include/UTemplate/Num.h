@@ -25,7 +25,4 @@ namespace Ubpa {
 		using type = T;
 		static constexpr unsigned value = N;
 	};
-
-	template<typename... Ts>
-	struct Name;
 }

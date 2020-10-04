@@ -37,6 +37,11 @@ namespace Ubpa {
 	struct is_list_initializable;
 	template<typename T, typename... Args>
 	static constexpr bool is_list_initializable_v = is_list_initializable<T, Args...>::value;
+
+	template<typename T>
+	struct is_defined;
+	template<typename T>
+	static constexpr bool is_defined_v = is_defined<T>::value;
 }
 
 namespace Ubpa::detail::Basic_ {
@@ -48,6 +53,9 @@ namespace Ubpa::detail::Basic_ {
 
 	template<typename T, typename Enabler /*=void*/, typename... Args>
 	struct is_list_initializable;
+
+	template<typename Void, typename T>
+	struct is_defined_helper;
 }
 
 namespace Ubpa {
@@ -110,6 +118,11 @@ namespace Ubpa {
 
 	template<template<typename...> class T>
 	struct is_same_template<T, T> : std::true_type {};
+
+	// =================================================
+
+	template<typename T>
+	struct is_defined : detail::Basic_::is_defined_helper<void, T> {};
 }
 
 namespace Ubpa::detail::Basic_ {
@@ -132,5 +145,13 @@ namespace Ubpa::detail::Basic_ {
 	struct is_list_initializable : std::false_type {};
 
 	template<typename T, typename... Args>
-	struct is_list_initializable<T, std::void_t<decltype(T{ std::declval<Args>()... })> , Args...> : std::true_type {};
+	struct is_list_initializable < T, std::void_t<decltype(T{ std::declval<Args>()... }) > , Args... > : std::true_type {};
+
+	// =================================================
+
+	template<typename Void, typename T>
+	struct is_defined_helper : std::false_type {};
+
+	template<typename T>
+	struct is_defined_helper<std::void_t<decltype(sizeof(T))>, T> : std::true_type {};
 }
