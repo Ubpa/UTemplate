@@ -1,6 +1,6 @@
 #include <UTemplate/Func.h>
 
-#include <_deps/nameof.hpp>
+#include <nameof.hpp>
 
 #include <iostream>
 

@@ -2,7 +2,7 @@
 
 // ref: https://github.com/skypjack/entt
 
-#include "../_deps/nameof.hpp"
+#include <nameof.hpp>
 
 #include <cstdint>
 #include <type_traits>
