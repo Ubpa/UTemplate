@@ -215,13 +215,9 @@ namespace Ubpa::detail::SI_ {
 	struct SI_Helper<TemplateList<IHead, ITail...>, Impl>
 		: IType<IHead<SI_Helper_t<TemplateList<ITail...>, Impl>, Impl>> {};
 
-	// [is contain]
 	template<typename Enabler, typename T, template<typename...>class Interface>
 	struct SI_Contains_Helper : std::false_type {};
 	template<typename T, template<typename...>class Interface>
-	struct SI_Contains_Helper<std::enable_if_t<std::is_base_of_v<Nil<T>, T>>, T, Interface>
-		: IValue<bool, T::template Contains<Interface>()> {};
-
-	template<typename T, template<typename...>class Interface>
-	struct SI_Contains : SI_Contains_Helper<void, T, Interface> {};
+	struct SI_Contains_Helper<std::void_t<TopoSort_t<ImplTrait_IList_t<T>>>, T, Interface>
+		: IValue<bool, TContain_v<TopoSort_t<ImplTrait_IList_t<T>>, Interface>> {};
 }
