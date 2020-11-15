@@ -108,15 +108,25 @@ namespace Ubpa {
 
 	template<typename Ret, typename... Args>
 	struct FuncTraitsBase<Ret(Args...)const> : FuncTraitsBase<Ret(Args...)> {};
-
 	template<typename Ret, typename... Args>
-	struct FuncTraits<Ret(Args...)> : FuncTraitsBase<Ret(Args...)> {
+	struct FuncTraitsBase<Ret(Args...)&> : FuncTraitsBase<Ret(Args...)> {};
+	template<typename Ret, typename... Args>
+	struct FuncTraitsBase<Ret(Args...)&&> : FuncTraitsBase<Ret(Args...)> {};
+	template<typename Ret, typename... Args>
+	struct FuncTraitsBase<Ret(Args...)noexcept> : FuncTraitsBase<Ret(Args...)> {};
+	template<typename Ret, typename... Args>
+	struct FuncTraitsBase<Ret(Args...)const noexcept> : FuncTraitsBase<Ret(Args...)> {};
+	template<typename Ret, typename... Args>
+	struct FuncTraitsBase<Ret(Args...)& noexcept> : FuncTraitsBase<Ret(Args...)> {};
+	template<typename Ret, typename... Args>
+	struct FuncTraitsBase<Ret(Args...)&& noexcept> : FuncTraitsBase<Ret(Args...)> {};
+
+	template<typename Func>
+	struct FuncTraits<Func*> : FuncTraitsBase<Func> {
 		using Obj = void;
 		static constexpr bool is_member = false;
 		static constexpr bool is_const = false;
 	};
-	template<typename Func>
-	struct FuncTraits<Func*> : FuncTraits<Func> {};
 
 	template<typename T, typename Func>
 	struct FuncTraits<Func T::*> : FuncTraitsBase<Func> {
@@ -125,8 +135,21 @@ namespace Ubpa {
 		static constexpr bool is_const = false;
 	};
 
+	template<bool isFunc, typename T>
+	struct FuncTraitsDispatch;
+
 	template<typename T>
-	struct FuncTraits : FuncTraits<decltype(&std::decay_t<T>::operator())> {};
+	struct FuncTraitsDispatch<false,T> : FuncTraits<decltype(&std::decay_t<T>::operator())> {};
+
+	template<typename T>
+	struct FuncTraitsDispatch<true, T> : FuncTraitsBase<T> {
+		using Obj = void;
+		static constexpr bool is_member = false;
+		static constexpr bool is_const = false;
+	};
+
+	template<typename T>
+	struct FuncTraits : FuncTraitsDispatch<std::is_function_v<T>, T> {};
 
 	//============================================================
 
