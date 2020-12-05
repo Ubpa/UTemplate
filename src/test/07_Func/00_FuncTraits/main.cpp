@@ -1,7 +1,5 @@
 #include <UTemplate/Func.h>
 
-#include <nameof.hpp>
-
 #include <iostream>
 
 using namespace Ubpa;

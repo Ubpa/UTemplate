@@ -19,9 +19,9 @@ int main() {
 
 	static_assert(TypeID<A> != 0);
 	cout << TypeID<A> << endl;
-	cout << RuntimeTypeID("struct A") << endl;
+	cout << RuntimeTypeID("A") << endl;
 
 	static_assert(TypeID<AA> != 0);
 	cout << TypeID<AA> << endl;
-	cout << RuntimeTypeID("struct AA") << endl;
+	cout << RuntimeTypeID("AA") << endl;
 }
