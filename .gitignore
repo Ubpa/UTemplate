@@ -36,8 +36,3 @@ _deps/
 *.exe
 *.ilk
 *.pdb
-
-include/
-src/
-cmake/
-dist.info
