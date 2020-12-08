@@ -7,7 +7,6 @@
 #ifndef UBPA_TSTR
 #define UBPA_TSTR
 
-#include <utility>
 #include <string_view>
 
 namespace Ubpa {
