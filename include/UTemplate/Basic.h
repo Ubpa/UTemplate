@@ -8,11 +8,41 @@ namespace Ubpa {
 	template<typename T> struct IType { using type = T; };
 	template<typename T, T V> struct IValue { static constexpr T value = V; };
 
+	template<typename T> struct IsIValue : std::false_type {};
+	template<typename T, T v> struct IsIValue<IValue<T, v>> : std::true_type {};
+	template<typename T> constexpr bool IsIValue_v = IsIValue<T>::value;
+	template<auto V> using IValue_of = IValue<decltype(V), V>;
+
 	template<template<typename, typename...>class Op, template<typename...>class Test>
 	struct AddIf; // Ttype
 
 	template<template<typename...>class Test>
 	struct Negate; // Ttype
+
+	template<typename...> struct typename_template_type {};
+
+	template<typename T>
+	struct is_typename_template_type : std::false_type {};
+
+	template<template<typename...>class T, typename... Ts>
+	struct is_typename_template_type<T<Ts...>> : std::true_type {};
+	template<typename T>
+	static constexpr bool is_typename_template_type_v = is_typename_template_type<T>::value;
+
+	// use IValue to replace integral value in template arguments
+	template<typename T>
+	struct to_typename_template_type : IType<T> {};
+
+	template<typename T>
+	using to_typename_template_type_t = typename to_typename_template_type<T>::type;
+
+	template<typename T> struct member_pointer_traits;
+	template<typename T, typename U> struct member_pointer_traits<T U::*> {
+		using object = U;
+		using value = T;
+	};
+	template<typename T> using member_pointer_traits_object = typename member_pointer_traits<T>::object;
+	template<typename T> using member_pointer_traits_value = typename member_pointer_traits<T>::value;
 
 	template<template<typename...> typename T, typename... Ts>
 	struct is_instantiable;
@@ -155,3 +185,5 @@ namespace Ubpa::detail::Basic_ {
 	template<typename T>
 	struct is_defined_helper<std::void_t<decltype(sizeof(T))>, T> : std::true_type {};
 }
+
+#include "details/ToTTType.inl"

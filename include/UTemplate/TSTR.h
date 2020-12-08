@@ -283,6 +283,28 @@ namespace Ubpa {
 	constexpr auto substr(Str = {}) {
 		return get_prefix<Cnt>(remove_prefix<Idx, Str>());
 	}
+
+	template<auto V, std::enable_if_t<std::is_integral_v<decltype(V)>, int> = 0>
+	constexpr auto int_to_TSTR() {
+		if constexpr (V == 0)
+			return TStr<char, '0'>{};
+		else { // not zero
+			using T = decltype(V);
+			if constexpr (std::is_signed_v<T>) {
+				if constexpr (V < 0)
+					return concat(TStr<char, '-'>{}, int_to_TSTR<static_cast<std::make_unsigned_t<T>>(-V)>());
+				else
+					return int_to_TSTR<static_cast<std::make_unsigned_t<T>>(V)>();
+			}
+			else { // unsigned
+				if constexpr (V < 10) {
+					return TStr<char, '0' + V>{};
+				}
+				else
+					return concat(int_to_TSTR<V / 10>(), int_to_TSTR<V % 10>());
+			}
+		}
+	}
 }
 
 #endif // !UBPA_TSTR_UTIL
