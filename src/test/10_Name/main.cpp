@@ -63,16 +63,58 @@ struct Ubpa::details::type_namespace_name<C<decltype(&C<float>::f)>::D> {
 	}
 };
 
+struct BH {
+	void f() {};
+};
+template<>
+struct Ubpa::details::member_pointer_name<BH, void(), &BH::f> {
+	static constexpr auto get() noexcept {
+		return TSTR("f");
+	}
+};
+template<auto>
+struct B1 {};
+template<auto...>
+struct B2 {};
+template<auto,auto>
+struct B3 {};
+template<auto, auto, auto>
+struct B3_1 {};
+template<decltype(&BH::f), decltype(&BH::f)>
+struct B4 {};
+template<int, decltype(&BH::f), decltype(&BH::f)>
+struct B4_1 {};
+template<decltype(&BH::f)...>
+struct B4_2 {};
+template<int, decltype(&BH::f)...>
+struct B4_3 {};
+template<decltype(&BH::f)>
+struct B5 {};
+template<decltype(&BH::f), typename T>
+struct B6 {};
+template<decltype(&BH::f), typename... T>
+struct B7 {};
+template<typename T, decltype(&BH::f)>
+struct B8 {};
+template<typename T, decltype(&BH::f), decltype(&BH::f)>
+struct B9 {};
+template<typename T, decltype(&BH::f), decltype(&BH::f)...>
+struct B9_1 {};
+template<typename T, decltype(&BH::f)...>
+struct B10 {};
+template<decltype(&BH::f), typename, typename>
+struct B11 {};
+
 int main() {
-	{
+	{ // basic
+		std::cout
+			<< "//" << std::endl
+			<< "// basic" << std::endl
+			<< "//////////" << std::endl;
+
 		auto f = []() {};
-		std::cout << "|" << details::func_signature<E<&C<int>::g>>().name << "|" << std::endl;
-		std::cout << "|" << details::raw_type_name<E<&C<int>::g>>().name << "|" << std::endl;
 		std::cout << "|" << type_name<E<&C<int>::g>>().name << "|" << std::endl;
 		std::cout << "|" << type_name<decltype(f)>().name << "|" << std::endl;
-		std::cout << "|" << details::raw_type_name<const volatile A<2, int>* const&>().name << "|" << std::endl;
-		std::cout << "|" << details::raw_type_name<const A<2, int>* const&>().name << "|" << std::endl;
-		std::cout << "|" << details::raw_type_name<A2<int, 2>>().name << "|" << std::endl;
 		std::cout << "|" << type_name<A2<int, 2>>().name << "|" << std::endl;
 		std::cout << "|" << type_name<const volatile A<2, int>*const&>().name << "|" << std::endl;
 		std::cout << "|" << type_name<decltype(&f)>().name << "|" << std::endl;
@@ -81,5 +123,35 @@ int main() {
 		std::cout << "|" << type_name<decltype(&C<A<2, int>>::g)>().name << "|" << std::endl;
 		std::cout << "|" << type_name<A<2, int>[][8]>().name << "|" << std::endl;
 		std::cout << "|" << type_name<const AA<A<-2, int>, 2, 4, 5, 126>* const&>().name << "|" << std::endl;
+	}
+	{ // to_typename_template_type
+		std::cout
+			<< "//" << std::endl
+			<< "// to_typename_template_type" << std::endl
+			<< "//////////////////////////////" << std::endl;
+
+		std::cout << "|" << type_name<B1<&BH::f>>().name << "|" << std::endl; // 1...
+		std::cout << "|" << type_name<B2<&BH::f, &BH::f, &BH::f, &BH::f>>().name << "|" << std::endl; // 1...
+		std::cout << "|" << type_name<B3<&BH::f, &BH::f>>().name << "|" << std::endl; // 1 1
+		std::cout << "|" << type_name<B3_1<&BH::f, &BH::f, &BH::f>>().name << "|" << std::endl; // 1...
+		std::cout << "|" << type_name<B4<&BH::f, &BH::f>>().name << "|" << std::endl; // 1 1
+		std::cout << "|" << type_name<B4_1<1, &BH::f, &BH::f>>().name << "|" << std::endl; // 1 1 1
+		std::cout << "|" << type_name<B4_2<&BH::f, &BH::f, &BH::f, &BH::f>>().name << "|" << std::endl; // 1...
+		std::cout << "|" << type_name<B4_3<1, &BH::f, &BH::f, &BH::f>>().name << "|" << std::endl; // 1...
+		std::cout << "|" << type_name<B5<&BH::f>>().name << "|" << std::endl; // 1...
+
+		std::cout << "|" << type_name<B6<&BH::f, decltype(&BH::f)>>().name << "|" << std::endl; // 1 0
+
+		std::cout << "|" << type_name<B7<&BH::f, decltype(&BH::f)>>().name << "|" << std::endl; // 1 0...
+		std::cout << "|" << type_name<B7<&BH::f, decltype(&BH::f), decltype(&BH::f)>>().name << "|" << std::endl; // 1 0...
+
+		std::cout << "|" << type_name<B8<decltype(&BH::f), &BH::f>>().name << "|" << std::endl; // 0 1
+		std::cout << "|" << type_name<B9<decltype(&BH::f), &BH::f, &BH::f>>().name << "|" << std::endl; // 0 1 1
+		std::cout << "|" << type_name<B9_1<decltype(&BH::f), &BH::f, &BH::f>>().name << "|" << std::endl; // 0 1 1
+		std::cout << "|" << type_name<B10<decltype(&BH::f), &BH::f, &BH::f, &BH::f>>().name << "|" << std::endl; // 0 1...
+		std::cout << "|" << type_name<B11<&BH::f, decltype(&BH::f), decltype(&BH::f)>>().name << "|" << std::endl; // 1 0 0
+
+		std::cout << "|" << type_name<B8<std::array<decltype(&BH::f), 3>, &BH::f>>().name << "|" << std::endl; // 1 0 0
+
 	}
 }
