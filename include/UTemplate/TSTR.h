@@ -35,6 +35,25 @@ namespace Ubpa::details {
 		}
 	};
 
+	template<typename Char>
+	struct TSTRSizeof<const Char*> {
+		static constexpr size_t get(const Char* curr) noexcept {
+			if (curr == nullptr)
+				return 0;
+
+			size_t size = 0;
+			while (*curr != 0) {
+				++size;
+				++curr;
+			}
+			
+			return size;
+		}
+	};
+
+	template<typename Char>
+	struct TSTRSizeof<const Char* const&> : TSTRSizeof<const Char*> {};
+
 	template <typename Char, typename T, size_t ...N>
 	constexpr decltype(auto) TSTRHelperImpl(std::index_sequence<N...>) {
 		return TStr<Char, T::get()[N]...>{};

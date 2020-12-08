@@ -152,6 +152,5 @@ int main() {
 		std::cout << "|" << type_name<B11<&BH::f, decltype(&BH::f), decltype(&BH::f)>>().name << "|" << std::endl; // 1 0 0
 
 		std::cout << "|" << type_name<B8<std::array<decltype(&BH::f), 3>, &BH::f>>().name << "|" << std::endl; // 1 0 0
-
 	}
 }

@@ -10,6 +10,10 @@
 #endif
 
 namespace Ubpa::details {
+	//
+	// core
+	/////////
+
 #if defined(_MSC_VER)
 	template <typename T>
 	struct identity {
@@ -37,15 +41,11 @@ namespace Ubpa::details {
 	}
 
 	//
-	// decode
+	// custom
 	///////////
 
 	template<typename Obj, typename T, T Obj::* MemPtr>
-	struct member_pointer_name {
-		static constexpr auto get() noexcept {
-			return TSTR("UNKNOWN");
-		}
-	};
+	struct member_pointer_name;
 
 	template<auto MemPtr>
 	constexpr auto member_pointer_name_v = member_pointer_name<
@@ -56,6 +56,10 @@ namespace Ubpa::details {
 
 	template<typename T> struct type_namespace_name;
 	template<typename T> constexpr auto type_namespace_name_v = type_namespace_name<T>::get();
+
+	//
+	// decode
+	///////////
 
 	template<typename Str>
 	constexpr auto remove_class_key(Str = {}) {
@@ -174,8 +178,15 @@ constexpr auto Ubpa::constexpr_name() noexcept {
 	else if constexpr (std::is_member_pointer_v<T>) {
 		if constexpr (V == nullptr)
 			return TSTR("nullptr");
-		else
-			return concat_seq(TSTR("&"), type_name<FuncTraits_Object<T>>(), TSTR("::"), details::member_pointer_name_v<V>);
+		else {
+			using Object = member_pointer_traits_object<T>;
+			using Value = member_pointer_traits_value<T>;
+			if constexpr (is_defined_v<details::member_pointer_name<Object, Value, V>>) {
+				return concat_seq(TSTR("&"), type_name<Object>(), TSTR("::"), details::member_pointer_name_v<V>);
+			}
+			else
+				return concat_seq(TSTR("&"), type_name<Object>(), TSTR("::#UNKNOWN"));
+		}
 	}
 	else if constexpr (std::is_integral_v<T>) {
 		if constexpr (std::is_same_v<T, bool>) {
