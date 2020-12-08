@@ -153,4 +153,14 @@ int main() {
 
 		std::cout << "|" << type_name<B8<std::array<decltype(&BH::f), 3>, &BH::f>>().name << "|" << std::endl; // 1 0 0
 	}
+	{ // UBPA_NAME_X_INT
+		std::cout << "|" << type_name<int8_t>().name << "|" << std::endl;
+		std::cout << "|" << type_name<int16_t>().name << "|" << std::endl;
+		std::cout << "|" << type_name<int32_t>().name << "|" << std::endl;
+		std::cout << "|" << type_name<int64_t>().name << "|" << std::endl;
+		std::cout << "|" << type_name<uint8_t>().name << "|" << std::endl;
+		std::cout << "|" << type_name<uint16_t>().name << "|" << std::endl;
+		std::cout << "|" << type_name<uint32_t>().name << "|" << std::endl;
+		std::cout << "|" << type_name<uint64_t>().name << "|" << std::endl;
+	}
 }
