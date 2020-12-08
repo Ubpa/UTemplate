@@ -16,8 +16,8 @@ struct A {
 int main() {
 	constexpr auto foo = MemFuncOf<void()>::run<A>(&A::Foo);
 	constexpr auto cfoo = MemFuncOf<void()const>::run(&A::Foo);
-	constexpr auto bar = MemFuncOf<void()>::run(&A::Bar);
-	constexpr auto bari = MemFuncOf<void(int)>::run(&A::Bar);
+	constexpr auto bar = StaticMemFuncOf<void()>::run(&A::Bar);
+	constexpr auto bari = StaticMemFuncOf<void(int)>::run(&A::Bar);
 	// constexpr auto cat = MemFuncOf<void(int)>::run(&A::Cat);
 	// constexpr auto err_foo = MemFuncOf<void(int)>::run(&A::Foo);
 	A a;
