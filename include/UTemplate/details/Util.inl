@@ -36,6 +36,12 @@ namespace Ubpa::details {
 		static constexpr std::uint64_t offset = 14695981039346656037ull;
 		static constexpr std::uint64_t prime = 1099511628211ull;
 	};
+
+	template<typename Void, typename T>
+	struct is_function_pointer : std::false_type {};
+
+	template<typename T>
+	struct is_function_pointer<std::enable_if_t<std::is_pointer_v<T>&& std::is_function_v<std::remove_pointer_t<T>>>, T> : std::true_type {};
 }
 
 template<template<typename...> typename T, typename... Ts>
@@ -114,3 +120,6 @@ constexpr size_t Ubpa::string_hash(const char* curr) noexcept {
 
 	return value;
 }
+
+template<typename T>
+struct Ubpa::is_function_pointer : Ubpa::details::is_function_pointer<void, T> {};

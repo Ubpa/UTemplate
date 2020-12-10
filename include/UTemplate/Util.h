@@ -67,6 +67,9 @@ namespace Ubpa {
 	template<size_t N>
 	constexpr size_t string_hash(const char(&str)[N]) noexcept { return string_hash(str, N); }
 	constexpr size_t string_hash(const char* str) noexcept;
+
+	template<typename T> struct is_function_pointer;
+	template<typename T> constexpr bool is_function_pointer_v = is_function_pointer<T>::value;
 }
 
 #include "details/ToTTType.inl"
