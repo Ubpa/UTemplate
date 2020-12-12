@@ -113,16 +113,16 @@ int main() {
 			<< "//////////" << std::endl;
 
 		auto f = []() {};
-		std::cout << "|" << type_name<E<&C<int>::g>>().name << "|" << std::endl;
-		std::cout << "|" << type_name<decltype(f)>().name << "|" << std::endl;
-		std::cout << "|" << type_name<A2<int, 2>>().name << "|" << std::endl;
-		std::cout << "|" << type_name<const volatile A<2, int>*const&>().name << "|" << std::endl;
-		std::cout << "|" << type_name<decltype(&f)>().name << "|" << std::endl;
-		std::cout << "|" << type_name<decltype(&C<float>::f)>().name << "|" << std::endl;
-		std::cout << "|" << type_name<C<decltype(&C<float>::f)>::D>().name << "|" << std::endl;
-		std::cout << "|" << type_name<decltype(&C<A<2, int>>::g)>().name << "|" << std::endl;
-		std::cout << "|" << type_name<A<2, int>[][8]>().name << "|" << std::endl;
-		std::cout << "|" << type_name<const AA<A<-2, int>, 2, 4, 5, 126>* const&>().name << "|" << std::endl;
+		std::cout << "|" << type_name<E<&C<int>::g>>().value << "|" << std::endl;
+		std::cout << "|" << type_name<decltype(f)>().value << "|" << std::endl;
+		std::cout << "|" << type_name<A2<int, 2>>().value << "|" << std::endl;
+		std::cout << "|" << type_name<const volatile A<2, int>*const&>().value << "|" << std::endl;
+		std::cout << "|" << type_name<decltype(&f)>().value << "|" << std::endl;
+		std::cout << "|" << type_name<decltype(&C<float>::f)>().value << "|" << std::endl;
+		std::cout << "|" << type_name<C<decltype(&C<float>::f)>::D>().value << "|" << std::endl;
+		std::cout << "|" << type_name<decltype(&C<A<2, int>>::g)>().value << "|" << std::endl;
+		std::cout << "|" << type_name<A<2, int>[][8]>().value << "|" << std::endl;
+		std::cout << "|" << type_name<const AA<A<-2, int>, 2, 4, 5, 126>* const&>().value << "|" << std::endl;
 	}
 	{ // to_typename_template_type
 		std::cout
@@ -130,37 +130,42 @@ int main() {
 			<< "// to_typename_template_type" << std::endl
 			<< "//////////////////////////////" << std::endl;
 
-		std::cout << "|" << type_name<B1<&BH::f>>().name << "|" << std::endl; // 1...
-		std::cout << "|" << type_name<B2<&BH::f, &BH::f, &BH::f, &BH::f>>().name << "|" << std::endl; // 1...
-		std::cout << "|" << type_name<B3<&BH::f, &BH::f>>().name << "|" << std::endl; // 1 1
-		std::cout << "|" << type_name<B3_1<&BH::f, &BH::f, &BH::f>>().name << "|" << std::endl; // 1...
-		std::cout << "|" << type_name<B4<&BH::f, &BH::f>>().name << "|" << std::endl; // 1 1
-		std::cout << "|" << type_name<B4_1<1, &BH::f, &BH::f>>().name << "|" << std::endl; // 1 1 1
-		std::cout << "|" << type_name<B4_2<&BH::f, &BH::f, &BH::f, &BH::f>>().name << "|" << std::endl; // 1...
-		std::cout << "|" << type_name<B4_3<1, &BH::f, &BH::f, &BH::f>>().name << "|" << std::endl; // 1...
-		std::cout << "|" << type_name<B5<&BH::f>>().name << "|" << std::endl; // 1...
+		std::cout << "|" << type_name<B1<&BH::f>>().value << "|" << std::endl; // 1...
+		std::cout << "|" << type_name<B2<&BH::f, &BH::f, &BH::f, &BH::f>>().value << "|" << std::endl; // 1...
+		std::cout << "|" << type_name<B3<&BH::f, &BH::f>>().value << "|" << std::endl; // 1 1
+		std::cout << "|" << type_name<B3_1<&BH::f, &BH::f, &BH::f>>().value << "|" << std::endl; // 1...
+		std::cout << "|" << type_name<B4<&BH::f, &BH::f>>().value << "|" << std::endl; // 1 1
+		std::cout << "|" << type_name<B4_1<1, &BH::f, &BH::f>>().value << "|" << std::endl; // 1 1 1
+		std::cout << "|" << type_name<B4_2<&BH::f, &BH::f, &BH::f, &BH::f>>().value << "|" << std::endl; // 1...
+		std::cout << "|" << type_name<B4_3<1, &BH::f, &BH::f, &BH::f>>().value << "|" << std::endl; // 1...
+		std::cout << "|" << type_name<B5<&BH::f>>().value << "|" << std::endl; // 1...
 
-		std::cout << "|" << type_name<B6<&BH::f, decltype(&BH::f)>>().name << "|" << std::endl; // 1 0
+		std::cout << "|" << type_name<B6<&BH::f, decltype(&BH::f)>>().value << "|" << std::endl; // 1 0
 
-		std::cout << "|" << type_name<B7<&BH::f, decltype(&BH::f)>>().name << "|" << std::endl; // 1 0...
-		std::cout << "|" << type_name<B7<&BH::f, decltype(&BH::f), decltype(&BH::f)>>().name << "|" << std::endl; // 1 0...
+		std::cout << "|" << type_name<B7<&BH::f, decltype(&BH::f)>>().value << "|" << std::endl; // 1 0...
+		std::cout << "|" << type_name<B7<&BH::f, decltype(&BH::f), decltype(&BH::f)>>().value << "|" << std::endl; // 1 0...
 
-		std::cout << "|" << type_name<B8<decltype(&BH::f), &BH::f>>().name << "|" << std::endl; // 0 1
-		std::cout << "|" << type_name<B9<decltype(&BH::f), &BH::f, &BH::f>>().name << "|" << std::endl; // 0 1 1
-		std::cout << "|" << type_name<B9_1<decltype(&BH::f), &BH::f, &BH::f>>().name << "|" << std::endl; // 0 1 1
-		std::cout << "|" << type_name<B10<decltype(&BH::f), &BH::f, &BH::f, &BH::f>>().name << "|" << std::endl; // 0 1...
-		std::cout << "|" << type_name<B11<&BH::f, decltype(&BH::f), decltype(&BH::f)>>().name << "|" << std::endl; // 1 0 0
+		std::cout << "|" << type_name<B8<decltype(&BH::f), &BH::f>>().value << "|" << std::endl; // 0 1
+		std::cout << "|" << type_name<B9<decltype(&BH::f), &BH::f, &BH::f>>().value << "|" << std::endl; // 0 1 1
+		std::cout << "|" << type_name<B9_1<decltype(&BH::f), &BH::f, &BH::f>>().value << "|" << std::endl; // 0 1 1
+		std::cout << "|" << type_name<B10<decltype(&BH::f), &BH::f, &BH::f, &BH::f>>().value << "|" << std::endl; // 0 1...
+		std::cout << "|" << type_name<B11<&BH::f, decltype(&BH::f), decltype(&BH::f)>>().value << "|" << std::endl; // 1 0 0
 
-		std::cout << "|" << type_name<B8<std::array<decltype(&BH::f), 3>, &BH::f>>().name << "|" << std::endl; // 1 0 0
+		std::cout << "|" << type_name<B8<std::array<decltype(&BH::f), 3>, &BH::f>>().value << "|" << std::endl; // 1 0 0
 	}
 	{ // UBPA_NAME_X_INT
-		std::cout << "|" << type_name<int8_t>().name << "|" << std::endl;
-		std::cout << "|" << type_name<int16_t>().name << "|" << std::endl;
-		std::cout << "|" << type_name<int32_t>().name << "|" << std::endl;
-		std::cout << "|" << type_name<int64_t>().name << "|" << std::endl;
-		std::cout << "|" << type_name<uint8_t>().name << "|" << std::endl;
-		std::cout << "|" << type_name<uint16_t>().name << "|" << std::endl;
-		std::cout << "|" << type_name<uint32_t>().name << "|" << std::endl;
-		std::cout << "|" << type_name<uint64_t>().name << "|" << std::endl;
+		std::cout << "|" << type_name<int8_t>().value << "|" << std::endl;
+		std::cout << "|" << type_name<int16_t>().value << "|" << std::endl;
+		std::cout << "|" << type_name<int32_t>().value << "|" << std::endl;
+		std::cout << "|" << type_name<int64_t>().value << "|" << std::endl;
+		std::cout << "|" << type_name<uint8_t>().value << "|" << std::endl;
+		std::cout << "|" << type_name<uint16_t>().value << "|" << std::endl;
+		std::cout << "|" << type_name<uint32_t>().value << "|" << std::endl;
+		std::cout << "|" << type_name<uint64_t>().value << "|" << std::endl;
+	}
+	{ // UBPA_NAME_X_FLOAT
+		std::cout << "|" << type_name<float>().value << "|" << std::endl;
+		std::cout << "|" << type_name<double>().value << "|" << std::endl;
+		std::cout << "|" << type_name<long double>().value << "|" << std::endl;
 	}
 }

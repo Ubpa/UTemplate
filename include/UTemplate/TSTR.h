@@ -76,14 +76,14 @@ namespace Ubpa::details {
 }()))
 
 namespace Ubpa {
-	template<typename Char_, Char_... chars>
+	template<typename C_, C_... chars>
 	struct TStr {
-		using Tag = TStr;
-		using Char = Char_;
+		using Char = C_;
 		template<typename T>
-		static constexpr bool NameIs(T = {}) noexcept { return std::is_same_v<T, Tag>; }
-		static constexpr char name_data[]{ chars...,Char(0) };
-		static constexpr std::basic_string_view<Char> name{ name_data };
+		static constexpr bool Is(T = {}) noexcept { return std::is_same_v<T, TStr>; }
+		static constexpr char data[]{ chars...,Char(0) };
+		static constexpr std::basic_string_view<Char> value{ data };
+		constexpr operator std::basic_string_view<Char>() { return value; }
 	};
 
 	template<typename T>
@@ -154,11 +154,11 @@ namespace Ubpa {
 	template<typename Str, typename X>
 	constexpr size_t find(Str = {}, X = {}) noexcept {
 		static_assert(IsTStr<Str>::value && IsTStr<X>::value);
-		if constexpr (Str::name.size() >= X::name.size()) {
-			for (size_t i = 0; i < Str::name.size() - X::name.size() + 1; i++) {
+		if constexpr (Str::value.size() >= X::value.size()) {
+			for (size_t i = 0; i < Str::value.size() - X::value.size() + 1; i++) {
 				bool flag = true;
-				for (size_t k = 0; k < X::name.size(); k++) {
-					if (Str::name[i + k] != X::name[k]) {
+				for (size_t k = 0; k < X::value.size(); k++) {
+					if (Str::value[i + k] != X::value[k]) {
 						flag = false;
 						break;
 					}
@@ -173,12 +173,12 @@ namespace Ubpa {
 	template<typename Str, typename X>
 	constexpr size_t find_last(Str = {}, X = {}) noexcept {
 		static_assert(IsTStr<Str>::value && IsTStr<X>::value);
-		if constexpr (Str::name.size() >= X::name.size()) {
-			for (size_t i = 0; i < Str::name.size() - X::name.size() + 1; i++) {
-				size_t idx = Str::name.size() - X::name.size() - i;
+		if constexpr (Str::value.size() >= X::value.size()) {
+			for (size_t i = 0; i < Str::value.size() - X::value.size() + 1; i++) {
+				size_t idx = Str::value.size() - X::value.size() - i;
 				bool flag = true;
-				for (size_t k = 0; k < X::name.size(); k++) {
-					if (Str::name[idx + k] != X::name[k]) {
+				for (size_t k = 0; k < X::value.size(); k++) {
+					if (Str::value[idx + k] != X::value[k]) {
 						flag = false;
 						break;
 					}
@@ -193,10 +193,10 @@ namespace Ubpa {
 	template<typename Str, typename X>
 	constexpr bool starts_with(Str = {}, X = {}) noexcept {
 		static_assert(IsTStr<Str>::value && IsTStr<X>::value);
-		if (Str::name.size() < X::name.size())
+		if (Str::value.size() < X::value.size())
 			return false;
-		for (size_t i = 0; i < X::name.size(); i++) {
-			if (Str::name[i] != X::name[i])
+		for (size_t i = 0; i < X::value.size(); i++) {
+			if (Str::value[i] != X::value[i])
 				return false;
 		}
 		return true;
@@ -205,10 +205,10 @@ namespace Ubpa {
 	template<typename Str, typename X>
 	constexpr bool ends_with(Str = {}, X = {}) noexcept {
 		static_assert(IsTStr<Str>::value && IsTStr<X>::value);
-		if (Str::name.size() < X::name.size())
+		if (Str::value.size() < X::value.size())
 			return false;
-		for (size_t i = 0; i < X::name.size(); i++) {
-			if (Str::name[Str::name.size() - X::name.size() + i] != X::name[i])
+		for (size_t i = 0; i < X::value.size(); i++) {
+			if (Str::value[Str::value.size() - X::value.size() + i] != X::value[i])
 				return false;
 		}
 		return true;
@@ -217,8 +217,8 @@ namespace Ubpa {
 	template<size_t N, typename Str>
 	constexpr auto remove_prefix(Str = {}) {
 		static_assert(IsTStr<Str>::value);
-		if constexpr (Str::name.size() >= N)
-			return TSTR(decltype(Str::name){Str::name.data() + N});
+		if constexpr (Str::value.size() >= N)
+			return TSTR(decltype(Str::value){Str::value.data() + N});
 		else
 			return TSTR("");
 	}
@@ -228,7 +228,7 @@ namespace Ubpa {
 		static_assert(IsTStr<Str>::value);
 		static_assert(IsTStr<X>::value);
 		if constexpr (starts_with<Str, X>())
-			return remove_prefix<X::name.size(), Str>();
+			return remove_prefix<X::value.size(), Str>();
 		else
 			return Str{};
 	}
@@ -236,8 +236,8 @@ namespace Ubpa {
 	template<size_t N, typename Str>
 	constexpr auto remove_suffix(Str = {}) {
 		static_assert(IsTStr<Str>::value);
-		if constexpr (Str::name.size() >= N)
-			return TSTR((decltype(Str::name){Str::name.data(), Str::name.size() - N}));
+		if constexpr (Str::value.size() >= N)
+			return TSTR((decltype(Str::value){Str::value.data(), Str::value.size() - N}));
 		else
 			return TSTR("");
 	}
@@ -246,7 +246,7 @@ namespace Ubpa {
 	constexpr auto remove_suffix(Str = {}, X = {}) {
 		static_assert(IsTStr<Str>::value);
 		if constexpr (ends_with<Str, X>())
-			return remove_suffix<X::name.size(), Str>();
+			return remove_suffix<X::value.size(), Str>();
 		else
 			return Str{};
 	}
@@ -254,8 +254,8 @@ namespace Ubpa {
 	template<size_t N, typename Str>
 	constexpr auto get_prefix(Str = {}) {
 		static_assert(IsTStr<Str>::value);
-		if constexpr (Str::name.size() >= N)
-			return TSTR((decltype(Str::name){Str::name.data(), N}));
+		if constexpr (Str::value.size() >= N)
+			return TSTR((decltype(Str::value){Str::value.data(), N}));
 		else
 			return Str{};
 	}
@@ -263,8 +263,8 @@ namespace Ubpa {
 	template<size_t N, typename Str>
 	constexpr auto get_suffix(Str = {}) {
 		static_assert(IsTStr<Str>::value);
-		if constexpr (Str::name.size() >= N)
-			return TSTR(decltype(Str::name){Str::name.data() + Str::name.size() - N});
+		if constexpr (Str::value.size() >= N)
+			return TSTR(decltype(Str::value){Str::value.data() + Str::value.size() - N});
 		else
 			return Str{};
 	}
@@ -274,7 +274,7 @@ namespace Ubpa {
 	constexpr auto replace(Str = {}, X = {}) {
 		static_assert(IsTStr<Str>::value);
 		static_assert(IsTStr<X>::value);
-		constexpr auto prefix = remove_suffix<Str::name.size() - Idx>(Str{});
+		constexpr auto prefix = remove_suffix<Str::value.size() - Idx>(Str{});
 		constexpr auto suffix = remove_prefix<Idx + Cnt>(Str{});
 
 		return concat(concat(prefix, X{}), suffix);
@@ -287,7 +287,7 @@ namespace Ubpa {
 		static_assert(IsTStr<To>::value);
 		constexpr size_t idx = find(Str{}, From{});
 		if constexpr (idx != static_cast<size_t>(-1))
-			return replace(replace<idx, From::name.size()>(Str{}, To{}), From{}, To{});
+			return replace(replace<idx, From::value.size()>(Str{}, To{}), From{}, To{});
 		else
 			return Str{};
 	}
