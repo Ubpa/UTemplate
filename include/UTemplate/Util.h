@@ -65,7 +65,7 @@ namespace Ubpa {
 	constexpr size_t string_hash(const char* str, size_t N) noexcept;
 	constexpr size_t string_hash(std::string_view str) noexcept { return string_hash(str.data(), str.size()); }
 	template<size_t N>
-	constexpr size_t string_hash(const char(&str)[N]) noexcept { return string_hash(str, N); }
+	constexpr size_t string_hash(const char(&str)[N]) noexcept { return string_hash(str, N - 1); }
 	constexpr size_t string_hash(const char* str) noexcept;
 
 	template<typename T> struct is_function_pointer;
