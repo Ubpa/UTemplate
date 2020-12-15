@@ -14,12 +14,12 @@ struct A {
 };
 
 int main() {
-	constexpr auto foo = MemFuncOf<void()>::run<A>(&A::Foo);
-	constexpr auto cfoo = MemFuncOf<void()const>::run(&A::Foo);
-	constexpr auto bar = FuncOf<void()>::run(&A::Bar);
-	constexpr auto bari = FuncOf<void(int)>::run(&A::Bar);
-	// constexpr auto cat = MemFuncOf<void(int)>::run(&A::Cat);
-	// constexpr auto err_foo = MemFuncOf<void(int)>::run(&A::Foo);
+	constexpr auto foo = MemFuncOf<void()>::get<A>(&A::Foo);
+	constexpr auto cfoo = MemFuncOf<void()const>::get(&A::Foo);
+	constexpr auto bar = FuncOf<void()>::get(&A::Bar);
+	constexpr auto bari = FuncOf<void(int)>::get(&A::Bar);
+	// constexpr auto cat = MemFuncOf<void(int)>::get(&A::Cat);
+	// constexpr auto err_foo = MemFuncOf<void(int)>::get(&A::Foo);
 	A a;
 	(a.*foo)();
 	(a.*cfoo)();

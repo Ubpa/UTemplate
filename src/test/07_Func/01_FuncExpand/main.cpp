@@ -7,7 +7,7 @@ using namespace std;
 
 int main() {
 	{ // basic
-		auto expandedFunc = FuncExpand<void(int&, int&, float&)>::run([](int& sum, int n) {
+		auto expandedFunc = FuncExpand<void(int&, int&, float&)>::get([](int& sum, int n) {
 			sum += n;
 			});
 		int sum = 0;
@@ -17,7 +17,7 @@ int main() {
 		cout << sum << endl;
 	}
 	{ // return
-		auto expandedFunc = FuncExpand<float(int)>::run([](int n) -> int {
+		auto expandedFunc = FuncExpand<float(int)>::get([](int n) -> int {
 			return n+1;
 			});
 		cout << expandedFunc(3) << endl;

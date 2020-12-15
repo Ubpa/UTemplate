@@ -3,7 +3,7 @@
 namespace Ubpa::details {
 	//
 	// SI_ImplTraits_IList
-	/////////////////////
+	////////////////////////
 
 	template<typename Enabler, typename Impl>
 	struct SI_ImplTraits_IList_Helper : IType<TemplateList<>> {};
@@ -17,7 +17,7 @@ namespace Ubpa::details {
 
 	//
 	// SI_InterfaceTraits_IList
-	//////////////////////////
+	/////////////////////////////
 
 	template<typename Void, template<typename Base, typename Impl>class Interface>
 	struct SI_InterfaceTraits_IList_Helper : IType<TemplateList<>> {};
@@ -67,6 +67,8 @@ namespace Ubpa::details {
 
 	template<typename Impl>
 	struct Nil {
+		// for using Base::operatorXX in Interface
+
 		template<typename SI_ERROR, typename = typename SI_ERROR::SI_ERROR>
 		void operator+(SI_ERROR) = delete;
 		template<typename SI_ERROR, typename = typename SI_ERROR::SI_ERROR>
@@ -160,7 +162,6 @@ namespace Ubpa::details {
 	>
 	struct SI_Helper<TemplateList<IHead, ITail...>, Impl>
 		: IType<IHead<SI_Helper_t<TemplateList<ITail...>, Impl>, Impl>> {};
-
 
 	//
 	// SI_Contains

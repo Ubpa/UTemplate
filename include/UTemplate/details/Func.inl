@@ -51,23 +51,25 @@ namespace Ubpa::details {
 }
 
 namespace Ubpa::details {
-	template<bool IsConst, bool IsVolatile, ReferenceMode Ref, bool IsNoexcept, typename Func>
+	template<bool IsConst, bool IsVolatile, ReferenceMode Ref, bool IsNoexcept, typename Sig>
 	struct FuncTraitsBase;
 
-	template<bool IsConst, bool IsVolatile, ReferenceMode Ref, bool IsNoexcept, typename _Ret, typename... Args>
-	struct FuncTraitsBase<IsConst, IsVolatile, Ref, IsNoexcept, _Ret(Args...)> {
+	template<bool IsConst, bool IsVolatile, ReferenceMode Ref, bool IsNoexcept, typename Ret, typename... Args>
+	struct FuncTraitsBase<IsConst, IsVolatile, Ref, IsNoexcept, Ret(Args...)> {
 		using ArgList = TypeList<Args...>;
-		using Return = _Ret;
-		using Signature = _Ret(Args...);
+		using Return = Ret;
+		using Signature = Ret(Args...);
 		static constexpr bool is_const = IsConst;
 		static constexpr bool is_volatile = IsVolatile;
 		static constexpr ReferenceMode ref = Ref;
 		static constexpr bool is_noexcept = IsNoexcept;
 	};
 
-	template<bool isFunc, typename T> struct FuncTraitsDispatch;
+	template<bool IsFunc, typename T> struct FuncTraitsDispatch;
 	template<typename T> struct FuncTraitsDispatch<false, T> : FuncTraits<decltype(&std::decay_t<T>::operator())> {};
-	template<typename T> struct FuncTraitsDispatch<true, T> : FuncTraits<T> {};
+	template<typename T> struct FuncTraitsDispatch<true, T> : FuncTraits<T> {
+		using Function = T;
+	};
 }
 
 // 2*2*3*2 = 24
@@ -171,11 +173,13 @@ struct Ubpa::FuncTraits<Ret(Args...)const volatile&& noexcept>
 template<typename Func>
 struct Ubpa::FuncTraits<Func*> : FuncTraits<Func> {
 	using Object = void;
+	using Function = Func;
 };
 
 template<typename T, typename Func>
 struct Ubpa::FuncTraits<Func T::*> : FuncTraits<Func> {
 	using Object = T;
+	using Function = Func;
 };
 
 template<typename T>
@@ -184,16 +188,16 @@ struct Ubpa::FuncTraits : details::FuncTraitsDispatch<std::is_function_v<T>, T> 
 template<typename Ret, typename... Args>
 struct Ubpa::FuncExpand<Ret(Args...)> {
 	template<typename Func>
-	static auto run(Func&& func) noexcept {
+	static auto get(Func&& func) noexcept {
 		static_assert(std::is_void_v<Ret> || std::is_convertible_v<FuncTraits_Return<Func>, Ret>,
 			"Func's return can't convert to Ret");
 		constexpr size_t N = Length_v<typename FuncTraits<Func>::ArgList>;
-		return run(std::forward<Func>(func), std::make_index_sequence<N>{});
+		return get(std::forward<Func>(func), std::make_index_sequence<N>{});
 	}
 
 private:
 	template<typename Func, size_t... Ns>
-	static auto run(Func&& func, std::index_sequence<Ns...>) {
+	static auto get(Func&& func, std::index_sequence<Ns...>) {
 		using FromArgList = typename FuncTraits<Func>::ArgList;
 		using ToArgList = TypeList<Args...>;
 		return[func = std::forward<Func>(func)](Args... args) {
@@ -210,20 +214,22 @@ private:
 
 template<typename Lambda>
 constexpr auto Ubpa::DecayLambda(Lambda&& lambda) noexcept {
-	return static_cast<std::add_pointer_t<FuncTraits_Signature<std::remove_reference_t<Lambda>>>>(lambda);
+	return static_cast<std::add_pointer_t<FuncTraits_Signature<std::remove_reference_t<Lambda>>>>(std::forward<Lambda>(lambda));
 }
 
 template<typename Func>
 struct Ubpa::MemFuncOf {
+	static_assert(std::is_function_v<Func>);
 	template<typename Obj>
-	static constexpr auto run(Func Obj::* func) noexcept {
+	static constexpr auto get(Func Obj::* func) noexcept {
 		return func;
 	}
 };
 
 template<typename Func>
 struct Ubpa::FuncOf {
-	static constexpr auto run(Func* func) noexcept {
+	static_assert(std::is_function_v<Func>);
+	static constexpr auto get(Func* func) noexcept {
 		return func;
 	}
 };
