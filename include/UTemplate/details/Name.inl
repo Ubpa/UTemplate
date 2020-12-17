@@ -633,6 +633,77 @@ constexpr std::string_view Ubpa::type_name_remove_all_extents(std::string_view n
 	return type_name_remove_all_extents(type_name_remove_extent(name));
 }
 
+constexpr size_t Ubpa::type_name_add_const_hash(std::string_view name) noexcept {
+	if (type_name_is_reference(name))
+		return string_hash(name);
+
+	if (type_name_is_const(name))
+		return string_hash(name);
+
+	if (type_name_is_volatile(name))
+		return string_hash_seed(string_hash("const "), name);
+	else
+		return string_hash_seed(string_hash_seed(string_hash("const{"), name), "}");
+}
+
+constexpr size_t Ubpa::type_name_add_volatile_hash(std::string_view name) noexcept {
+	if (type_name_is_reference(name))
+		return string_hash(name);
+
+	if (type_name_is_volatile(name))
+		return string_hash(name);
+
+	if (type_name_is_const(name)) {
+		name.remove_prefix(5); // {...}
+		return string_hash_seed(string_hash("const volatile"), name);
+	}
+	else
+		return string_hash_seed(string_hash_seed(string_hash("volatile{"), name), "}");
+}
+
+constexpr size_t Ubpa::type_name_add_cv_hash(std::string_view name) noexcept {
+	if (type_name_is_reference(name))
+		return string_hash(name);
+
+	if (type_name_is_cv(name))
+		return string_hash(name);
+	
+	if (type_name_is_const(name)) {
+		name.remove_prefix(5); // {...}
+		return string_hash_seed(string_hash("const volatile"), name);
+	}
+	else if (type_name_is_volatile(name))
+		return string_hash_seed(string_hash("const "), name);
+	else
+		return string_hash_seed(string_hash_seed(string_hash("const volatile{"), name), "}");
+}
+
+constexpr size_t Ubpa::type_name_add_lvalue_reference_hash(std::string_view name) noexcept {
+	if (type_name_is_lvalue_reference(name))
+		return string_hash(name);
+
+	if (type_name_is_rvalue_reference(name)) {
+		name.remove_prefix(1);
+		return string_hash(name);
+	}
+	else
+		return string_hash_seed(string_hash_seed(string_hash("&{"), name), "}");
+}
+
+constexpr size_t Ubpa::type_name_add_rvalue_reference_hash(std::string_view name) noexcept {
+	if(type_name_is_reference(name))
+		return string_hash(name);
+
+	return string_hash_seed(string_hash_seed(string_hash("&&{"), name), "}");
+}
+
+constexpr size_t Ubpa::type_name_add_pointer_hash(std::string_view name) noexcept {
+	if (type_name_is_reference(name))
+		return string_hash_seed(string_hash_seed(string_hash("*{"), type_name_remove_reference(name)), "}");
+
+	return string_hash_seed(string_hash_seed(string_hash("*{"), type_name_remove_reference(name)), "}");
+}
+
 // composite
 
 constexpr bool Ubpa::type_name_is_arithmetic(std::string_view name) noexcept {

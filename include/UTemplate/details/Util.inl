@@ -57,6 +57,11 @@ namespace Ubpa::details {
 	struct is_virtual_base_of_helper<
 		std::void_t<decltype(static_cast<Derived*>(std::declval<Base*>()))>,
 		Base, Derived> : std::false_type {};
+
+	template <class Void, template<class...> class Op, class... Args>
+	struct is_valid : std::false_type {};
+	template <template<class...> class Op, class... Args>
+	struct is_valid<std::void_t<Op<Args...>>, Op, Args...> : std::true_type {};
 }
 
 template<template<typename...> typename T, typename... Ts>
@@ -115,9 +120,9 @@ struct Ubpa::is_typename_template_type<T<Ts...>> : std::true_type {};
 template<typename T> struct Ubpa::IsIValue : std::false_type {};
 template<typename T, T v> struct Ubpa::IsIValue<Ubpa::IValue<T, v>> : std::true_type {};
 
-constexpr size_t Ubpa::string_hash(const char* str, size_t N) noexcept {
+constexpr size_t Ubpa::string_hash_seed(size_t seed, const char* str, size_t N) noexcept {
 	using Traits = details::fnv1a_traits<size_t>;
-	auto value = Traits::offset;
+	size_t value = seed;
 
 	for (size_t i = 0; i < N; i++)
 		value = (value ^ static_cast<Traits::type>(str[i])) * Traits::prime;
@@ -125,15 +130,25 @@ constexpr size_t Ubpa::string_hash(const char* str, size_t N) noexcept {
 	return value;
 }
 
-constexpr size_t Ubpa::string_hash(const char* curr) noexcept {
+constexpr size_t Ubpa::string_hash_seed(size_t seed, const char* curr) noexcept {
 	using Traits = details::fnv1a_traits<size_t>;
-	auto value = Traits::offset;
+	size_t value = seed;
 
-	while (*curr != 0) {
+	while (*curr) {
 		value = (value ^ static_cast<Traits::type>(*(curr++))) * Traits::prime;
 	}
 
 	return value;
+}
+
+constexpr size_t Ubpa::string_hash(const char* str, size_t N) noexcept {
+	using Traits = details::fnv1a_traits<size_t>;
+	return string_hash_seed(Traits::offset, str, N);
+}
+
+constexpr size_t Ubpa::string_hash(const char* str) noexcept {
+	using Traits = details::fnv1a_traits<size_t>;
+	return string_hash_seed(Traits::offset, str);
 }
 
 template<typename T>
@@ -144,3 +159,6 @@ struct Ubpa::has_virtual_base : Ubpa::details::has_virtual_base_helper<void, T> 
 
 template<typename Base, typename Derived>
 struct Ubpa::is_virtual_base_of : Ubpa::details::is_virtual_base_of_helper<void, Base, Derived> {};
+
+template <template<class...> class Op, class... Args>
+struct Ubpa::is_valid : Ubpa::details::is_valid<void, Op, Args...> {};

@@ -63,6 +63,39 @@ int main() {
 
 	assert(type_name_remove_all_extents(type_name<int[][3]>()) == type_name<int>());
 
+	// modification (add, hash)
+	static_assert(type_name_add_const_hash(type_name<int>()) == string_hash(type_name<std::add_const_t<int>>()));
+	static_assert(type_name_add_const_hash(type_name<int&>()) == string_hash(type_name<std::add_const_t<int&>>()));
+	static_assert(type_name_add_const_hash(type_name<int&&>()) == string_hash(type_name<std::add_const_t<int&&>>()));
+	static_assert(type_name_add_const_hash(type_name<const int>()) == string_hash(type_name<std::add_const_t<const int>>()));
+	static_assert(type_name_add_const_hash(type_name<const volatile int>()) == string_hash(type_name<std::add_const_t<const volatile int>>()));
+	static_assert(type_name_add_const_hash(type_name<volatile int>()) == string_hash(type_name<std::add_const_t<volatile int>>()));
+
+	static_assert(type_name_add_volatile_hash(type_name<int&>()) == string_hash(type_name<std::add_volatile_t<int&>>()));
+	static_assert(type_name_add_volatile_hash(type_name<int&&>()) == string_hash(type_name<std::add_volatile_t<int&&>>()));
+	static_assert(type_name_add_volatile_hash(type_name<volatile int>()) == string_hash(type_name<std::add_volatile_t<volatile int>>()));
+	static_assert(type_name_add_volatile_hash(type_name<const int>()) == string_hash(type_name<std::add_volatile_t<const int>>()));
+	static_assert(type_name_add_volatile_hash(type_name<int>()) == string_hash(type_name<std::add_volatile_t<int>>()));
+
+	static_assert(type_name_add_cv_hash(type_name<int&>()) == string_hash(type_name<std::add_cv_t<int&>>()));
+	static_assert(type_name_add_cv_hash(type_name<int&&>()) == string_hash(type_name<std::add_cv_t<int&&>>()));
+	static_assert(type_name_add_cv_hash(type_name<const volatile int>()) == string_hash(type_name<std::add_cv_t<const volatile int>>()));
+	static_assert(type_name_add_cv_hash(type_name<const int>()) == string_hash(type_name<std::add_cv_t<const int>>()));
+	static_assert(type_name_add_cv_hash(type_name<volatile int>()) == string_hash(type_name<std::add_cv_t<volatile int>>()));
+	static_assert(type_name_add_cv_hash(type_name<int>()) == string_hash(type_name<std::add_cv_t<int>>()));
+
+	static_assert(type_name_add_lvalue_reference_hash(type_name<int&>()) == string_hash(type_name<std::add_lvalue_reference_t<int&>>()));
+	static_assert(type_name_add_lvalue_reference_hash(type_name<int&&>()) == string_hash(type_name<std::add_lvalue_reference_t<int&&>>()));
+	static_assert(type_name_add_lvalue_reference_hash(type_name<int>()) == string_hash(type_name<std::add_lvalue_reference_t<int>>()));
+
+	static_assert(type_name_add_rvalue_reference_hash(type_name<int&>()) == string_hash(type_name<std::add_rvalue_reference_t<int&>>()));
+	static_assert(type_name_add_rvalue_reference_hash(type_name<int&&>()) == string_hash(type_name<std::add_rvalue_reference_t<int&&>>()));
+	static_assert(type_name_add_rvalue_reference_hash(type_name<int>()) == string_hash(type_name<std::add_rvalue_reference_t<int>>()));
+
+	static_assert(type_name_add_pointer_hash(type_name<int&>()) == string_hash(type_name<std::add_pointer_t<int&>>()));
+	static_assert(type_name_add_pointer_hash(type_name<int&&>()) == string_hash(type_name<std::add_pointer_t<int&&>>()));
+	static_assert(type_name_add_pointer_hash(type_name<int>()) == string_hash(type_name<std::add_pointer_t<int>>()));
+
 	// composite
 
 	static_assert(type_name_is_arithmetic(type_name<int>()));

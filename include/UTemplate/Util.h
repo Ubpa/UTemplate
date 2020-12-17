@@ -66,6 +66,12 @@ namespace Ubpa {
 	template<typename Base, typename Derived> struct is_virtual_base_of;
 	template<typename Base, typename Derived> constexpr bool is_virtual_base_of_v = is_virtual_base_of<Base, Derived>::value;
 
+	constexpr size_t string_hash_seed(size_t seed, const char* str, size_t N) noexcept;
+	constexpr size_t string_hash_seed(size_t seed, std::string_view str) noexcept { return string_hash_seed(seed, str.data(), str.size()); }
+	template<size_t N>
+	constexpr size_t string_hash_seed(size_t seed, const char(&str)[N]) noexcept { return string_hash_seed(seed, str, N - 1); }
+	constexpr size_t string_hash_seed(size_t seed, const char* str) noexcept;
+
 	constexpr size_t string_hash(const char* str, size_t N) noexcept;
 	constexpr size_t string_hash(std::string_view str) noexcept { return string_hash(str.data(), str.size()); }
 	template<size_t N>
@@ -74,6 +80,11 @@ namespace Ubpa {
 
 	template<typename T> struct is_function_pointer;
 	template<typename T> constexpr bool is_function_pointer_v = is_function_pointer<T>::value;
+
+	template <template<class...> class Op, class... Args>
+	struct is_valid;
+	template <template<class...> class Op, class... Args>
+	constexpr bool is_valid_v = is_valid<Op, Args...>::value;
 }
 
 #include "details/ToTTType.inl"
