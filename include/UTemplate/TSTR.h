@@ -8,6 +8,7 @@
 #define UBPA_TSTR
 
 #include <string_view>
+#include <utility>
 
 namespace Ubpa {
 	template<typename Char, Char... chars>

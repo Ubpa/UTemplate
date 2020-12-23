@@ -7,6 +7,9 @@ namespace Ubpa {
 	template<typename T> struct IType { using type = T; };
 	template<typename T, T V> struct IValue { static constexpr T value = V; };
 
+	template<typename T>
+	constexpr bool always_false = false;
+
 	template<typename T> struct IsIValue;
 	template<typename T> constexpr bool IsIValue_v = IsIValue<T>::value;
 	template<auto V> using IValue_of = IValue<decltype(V), V>;
@@ -85,6 +88,9 @@ namespace Ubpa {
 	struct is_valid;
 	template <template<class...> class Op, class... Args>
 	constexpr bool is_valid_v = is_valid<Op, Args...>::value;
+
+	template<typename V1, typename Obj1, typename V2, typename Obj2>
+	constexpr bool member_pointer_equal(V1 Obj1::* p1, V2 Obj2::* p2) noexcept;
 }
 
 #include "details/ToTTType.inl"

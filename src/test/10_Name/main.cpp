@@ -36,23 +36,15 @@ struct C {
 template<auto>
 struct E {};
 
-template<typename V1, typename Obj1, typename V2, typename Obj2>
-constexpr bool member_pointer_equal(V1 Obj1::* p1, V2 Obj2::* p2) {
-	if constexpr (!std::is_same_v<Obj1, Obj2> || !std::is_same_v<V1, V2>)
-		return false;
-	else
-		return p1 == p2;
-}
-
 template<typename Value, typename T, Value C<T>::* ptr>
-struct Ubpa::details::member_pointer_name<C<T>, Value, ptr> {
+struct Ubpa::details::member_pointer_name<ptr> {
 	static constexpr auto get() noexcept {
 		if constexpr (member_pointer_equal(ptr, &C<T>::f))
 			return TSTR("f");
 		else if constexpr (member_pointer_equal(ptr, &C<T>::g))
 			return TSTR("g");
 		else
-			static_assert(false);
+			static_assert(always_false<decltype(ptr)>);
 	}
 };
 
@@ -67,7 +59,7 @@ struct BH {
 	void f() {};
 };
 template<>
-struct Ubpa::details::member_pointer_name<BH, void(), &BH::f> {
+struct Ubpa::details::member_pointer_name<&BH::f> {
 	static constexpr auto get() noexcept {
 		return TSTR("f");
 	}

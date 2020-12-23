@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstddef>
+
 namespace Ubpa {
 	template<typename... Ts>
 	struct TypeList {};
@@ -18,7 +20,7 @@ namespace Ubpa {
 	template<typename List> constexpr bool IsTypeList_v = IsTypeList<List>::value;
 
 	template<typename List> struct Length;
-	template<typename List> constexpr size_t Length_v = Length<List>::value;
+	template<typename List> constexpr std::size_t Length_v = Length<List>::value;
 
 	template<typename List> struct IsEmpty;
 	template<typename List> constexpr bool IsEmpty_v = IsEmpty<List>::value;
@@ -26,15 +28,15 @@ namespace Ubpa {
 	template<typename List> struct Front;
 	template<typename List> using Front_t = typename Front<List>::type;
 
-	template<typename List, size_t N> struct At;
-	template<typename List, size_t N> using At_t = typename At<List, N>::type;
+	template<typename List, std::size_t N> struct At;
+	template<typename List, std::size_t N> using At_t = typename At<List, N>::type;
 
-	template<typename List, size_t... Indices> struct Select;
-	template<typename List, size_t... Indices> using Select_t = typename Select<List, Indices...>::type;
+	template<typename List, std::size_t... Indices> struct Select;
+	template<typename List, std::size_t... Indices> using Select_t = typename Select<List, Indices...>::type;
 
 	template<typename List, typename T> struct Find;
-	template<typename List, typename T> constexpr size_t Find_v = Find<List, T>::value;
-	constexpr size_t Find_fail = static_cast<size_t>(-1);
+	template<typename List, typename T> constexpr std::size_t Find_v = Find<List, T>::value;
+	constexpr std::size_t Find_fail = static_cast<std::size_t>(-1);
 
 	template<typename List, typename T> struct Contain;
 	template<typename List, typename T> constexpr bool Contain_v = Contain<List, T>::value;

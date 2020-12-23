@@ -9,6 +9,8 @@ struct A{};
 struct AA {};
 
 int main() {
+	cout << details::raw_type_name<float>().value << endl;
+
 	cout << TypeID::of<int>.GetValue() << endl;
 #ifdef UBPA_NAME_X_INT
 	cout << TypeID("int32").GetValue() << endl;

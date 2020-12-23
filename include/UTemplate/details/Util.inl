@@ -162,3 +162,11 @@ struct Ubpa::is_virtual_base_of : Ubpa::details::is_virtual_base_of_helper<void,
 
 template <template<class...> class Op, class... Args>
 struct Ubpa::is_valid : Ubpa::details::is_valid<void, Op, Args...> {};
+
+template<typename V1, typename Obj1, typename V2, typename Obj2>
+constexpr bool Ubpa::member_pointer_equal(V1 Obj1::* p1, V2 Obj2::* p2) noexcept {
+	if constexpr (std::is_same_v<Obj1, Obj2> && std::is_same_v<V1, V2>)
+		return p1 == p2;
+	else
+		return false;
+}

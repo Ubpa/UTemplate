@@ -46,15 +46,11 @@ namespace Ubpa::details {
 	// custom
 	///////////
 
-	template<typename Obj, typename T, T Obj::* MemPtr>
+	template<auto MemPtr>
 	struct member_pointer_name;
 
 	template<auto MemPtr>
-	constexpr auto member_pointer_name_v = member_pointer_name<
-		member_pointer_traits_object<decltype(MemPtr)>,
-		member_pointer_traits_value<decltype(MemPtr)>,
-		MemPtr
-	>::get();
+	constexpr auto member_pointer_name_v = member_pointer_name<MemPtr>::get();
 
 	template<typename T> struct type_namespace_name;
 	template<typename T> constexpr auto type_namespace_name_v = type_namespace_name<T>::get();
@@ -116,7 +112,7 @@ namespace Ubpa::details {
 #  if defined(__clang__)
 		return remove_suffix<1>(remove_prefix<39>(sig));
 #  elif defined(__GNUC__)
-		return remove_suffix<1>(remove_prefix<54>(sig));
+		return remove_suffix<1>(remove_prefix<62>(sig));
 #  elif defined(_MSC_VER)
 		return remove_suffix(remove_suffix<17>(remove_prefix<79>(sig)), TSTR(" "));
 #  endif
@@ -209,7 +205,7 @@ constexpr auto Ubpa::constexpr_name() noexcept {
 		else {
 			using Object = member_pointer_traits_object<T>;
 			using Value = member_pointer_traits_value<T>;
-			if constexpr (is_defined_v<details::member_pointer_name<Object, Value, V>>) {
+			if constexpr (is_defined_v<details::member_pointer_name<V>>) {
 				return concat_seq(TSTR("&"), type_name<Object>(), TSTR("::"), details::member_pointer_name_v<V>);
 			}
 			else
