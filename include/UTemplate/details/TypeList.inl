@@ -3,7 +3,7 @@
 #include "../Util.h"
 
 namespace Ubpa::details {
-	template<typename List, typename T, size_t N = 0, bool found = false>
+	template<typename List, typename T, std::size_t N = 0, bool found = false>
 	struct Find;
 
 	template<typename List, template <typename I, typename X> class Op, typename I, bool = IsEmpty_v<List>>
@@ -36,7 +36,7 @@ namespace Ubpa {
 	// =================================================
 
 	template<typename... Ts>
-	struct Length<TypeList<Ts...>> : IValue<size_t, sizeof...(Ts)> {};
+	struct Length<TypeList<Ts...>> : IValue<std::size_t, sizeof...(Ts)> {};
 
 	// =================================================
 
@@ -53,12 +53,12 @@ namespace Ubpa {
 	template<typename List>
 	struct At<List, 0> : IType<Front_t<List>> {};
 
-	template<typename List, size_t N>
+	template<typename List, std::size_t N>
 	struct At : At<PopFront_t<List>, N - 1> {};
 
 	// =================================================
 
-	template<typename List, size_t... Indices>
+	template<typename List, std::size_t... Indices>
 	struct Select : IType<TypeList<At_t<List, Indices>...>> {};
 
 	// =================================================
@@ -179,13 +179,13 @@ namespace Ubpa {
 }
 
 namespace Ubpa::details {
-	template<typename List, typename T, size_t N, bool found>
+	template<typename List, typename T, std::size_t N, bool found>
 	struct Find;
-	template<typename T, size_t N, typename... Ts>
-	struct Find<TypeList<Ts...>, T, N, true> : IValue<size_t, N - 1> {};
-	template<typename T, size_t N>
-	struct Find<TypeList<>, T, N, false> : IValue<size_t, Find_fail> {};
-	template<typename T, typename Head, size_t N, typename... Tail>
+	template<typename T, std::size_t N, typename... Ts>
+	struct Find<TypeList<Ts...>, T, N, true> : IValue<std::size_t, N - 1> {};
+	template<typename T, std::size_t N>
+	struct Find<TypeList<>, T, N, false> : IValue<std::size_t, Find_fail> {};
+	template<typename T, typename Head, std::size_t N, typename... Tail>
 	struct Find<TypeList<Head, Tail...>, T, N, false>
 		: Find<TypeList<Tail...>, T, N + 1, std::is_same_v<T, Head>> {};
 

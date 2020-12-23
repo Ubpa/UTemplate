@@ -7,7 +7,7 @@ namespace Ubpa {
 	struct TemplateList { };
 
 	template<typename TList> struct TLength;
-	template<typename TList> constexpr size_t TLength_v = TLength<TList>::value;
+	template<typename TList> constexpr std::size_t TLength_v = TLength<TList>::value;
 
 	template<typename TList> struct TIsEmpty;
 	template<typename TList> constexpr bool TIsEmpty_v = TIsEmpty<TList>::value;
@@ -25,7 +25,7 @@ namespace Ubpa {
 	template<typename TList> using TPopFront_t = typename TPopFront<TList>::type;
 
 	// TAt will introduce new template
-	// template<typename TList, size_t N> struct TAt;
+	// template<typename TList, std::size_t N> struct TAt;
 
 	template<typename TList, template<typename...>class T>
 	struct TContain;
@@ -50,7 +50,7 @@ namespace Ubpa {
 	using TTransform_t = typename TTransform<TList, Op>::type;
 
 	// TSelect will introduce new template
-	// template<typename TList, size_t... Indices> struct TSelect;
+	// template<typename TList, std::size_t... Indices> struct TSelect;
 
 	template<typename TList, typename Instance> struct TExistGenericity;
 	template<typename TList, typename Instance> constexpr bool TExistGenericity_v

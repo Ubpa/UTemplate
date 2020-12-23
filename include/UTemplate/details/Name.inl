@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../TSTR.h"
+#include "../TStr.h"
 #include "../Func.h"
 
 #include <cassert>

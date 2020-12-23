@@ -28,9 +28,9 @@ namespace Ubpa {
 	// use IValue to replace integral value in template arguments
 	// we provide some partial template specializations (see details/ToTTType.inl for more details)
 	// [example]
-	// template<typename T, size_t N>
+	// template<typename T, std::size_t N>
 	// struct Array;
-	// to_typename_template_type_t<Array<T, N>> == typename_template_type<T, IValue<size_t, N>>
+	// to_typename_template_type_t<Array<T, N>> == typename_template_type<T, IValue<std::size_t, N>>
 	template<typename T> struct to_typename_template_type : IType<T> {};
 	template<typename T> using to_typename_template_type_t = typename to_typename_template_type<T>::type;
 
@@ -69,17 +69,17 @@ namespace Ubpa {
 	template<typename Base, typename Derived> struct is_virtual_base_of;
 	template<typename Base, typename Derived> constexpr bool is_virtual_base_of_v = is_virtual_base_of<Base, Derived>::value;
 
-	constexpr size_t string_hash_seed(size_t seed, const char* str, size_t N) noexcept;
-	constexpr size_t string_hash_seed(size_t seed, std::string_view str) noexcept { return string_hash_seed(seed, str.data(), str.size()); }
-	template<size_t N>
-	constexpr size_t string_hash_seed(size_t seed, const char(&str)[N]) noexcept { return string_hash_seed(seed, str, N - 1); }
-	constexpr size_t string_hash_seed(size_t seed, const char* str) noexcept;
+	constexpr std::size_t string_hash_seed(std::size_t seed, const char* str, std::size_t N) noexcept;
+	constexpr std::size_t string_hash_seed(std::size_t seed, std::string_view str) noexcept { return string_hash_seed(seed, str.data(), str.size()); }
+	template<std::size_t N>
+	constexpr std::size_t string_hash_seed(std::size_t seed, const char(&str)[N]) noexcept { return string_hash_seed(seed, str, N - 1); }
+	constexpr std::size_t string_hash_seed(std::size_t seed, const char* str) noexcept;
 
-	constexpr size_t string_hash(const char* str, size_t N) noexcept;
-	constexpr size_t string_hash(std::string_view str) noexcept { return string_hash(str.data(), str.size()); }
-	template<size_t N>
-	constexpr size_t string_hash(const char(&str)[N]) noexcept { return string_hash(str, N - 1); }
-	constexpr size_t string_hash(const char* str) noexcept;
+	constexpr std::size_t string_hash(const char* str, std::size_t N) noexcept;
+	constexpr std::size_t string_hash(std::string_view str) noexcept { return string_hash(str.data(), str.size()); }
+	template<std::size_t N>
+	constexpr std::size_t string_hash(const char(&str)[N]) noexcept { return string_hash(str, N - 1); }
+	constexpr std::size_t string_hash(const char* str) noexcept;
 
 	template<typename T> struct is_function_pointer;
 	template<typename T> constexpr bool is_function_pointer_v = is_function_pointer<T>::value;

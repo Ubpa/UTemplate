@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include <UTemplate/TSTR.h>
+#include <UTemplate/TStr.h>
 
 using namespace std;
 using namespace Ubpa;

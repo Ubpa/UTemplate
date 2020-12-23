@@ -20,7 +20,7 @@ namespace Ubpa::details {
 	struct TSTRSizeof;
 	template<typename Char>
 	struct TSTRSizeof<std::basic_string_view<Char>> {
-		static constexpr size_t get(const std::basic_string_view<Char>& str) noexcept {
+		static constexpr std::size_t get(const std::basic_string_view<Char>& str) noexcept {
 			return str.size();
 		}
 	};
@@ -29,20 +29,20 @@ namespace Ubpa::details {
 	template<typename Char>
 	struct TSTRSizeof<const std::basic_string_view<Char>> : TSTRSizeof<std::basic_string_view<Char>> {};
 
-	template<typename Char, size_t N>
+	template<typename Char, std::size_t N>
 	struct TSTRSizeof<const Char(&)[N]> {
-		static constexpr size_t get(const Char(&str)[N]) noexcept {
+		static constexpr std::size_t get(const Char(&str)[N]) noexcept {
 			return N - 1;
 		}
 	};
 
 	template<typename Char>
 	struct TSTRSizeof<const Char*> {
-		static constexpr size_t get(const Char* curr) noexcept {
+		static constexpr std::size_t get(const Char* curr) noexcept {
 			if (curr == nullptr)
 				return 0;
 
-			size_t size = 0;
+			std::size_t size = 0;
 			while (*curr != 0) {
 				++size;
 				++curr;
@@ -55,7 +55,7 @@ namespace Ubpa::details {
 	template<typename Char>
 	struct TSTRSizeof<const Char* const&> : TSTRSizeof<const Char*> {};
 
-	template <typename Char, typename T, size_t ...N>
+	template <typename Char, typename T, std::size_t ...N>
 	constexpr decltype(auto) TSTRHelperImpl(std::index_sequence<N...>) {
 		return TStr<Char, T::get()[N]...>{};
 	}
@@ -153,12 +153,12 @@ namespace Ubpa {
 	}
 
 	template<typename Str, typename X>
-	constexpr size_t find(Str = {}, X = {}) noexcept {
+	constexpr std::size_t find(Str = {}, X = {}) noexcept {
 		static_assert(IsTStr<Str>::value && IsTStr<X>::value);
 		if constexpr (Str::value.size() >= X::value.size()) {
-			for (size_t i = 0; i < Str::value.size() - X::value.size() + 1; i++) {
+			for (std::size_t i = 0; i < Str::value.size() - X::value.size() + 1; i++) {
 				bool flag = true;
-				for (size_t k = 0; k < X::value.size(); k++) {
+				for (std::size_t k = 0; k < X::value.size(); k++) {
 					if (Str::value[i + k] != X::value[k]) {
 						flag = false;
 						break;
@@ -168,17 +168,17 @@ namespace Ubpa {
 					return i;
 			}
 		}
-		return static_cast<size_t>(-1);
+		return static_cast<std::size_t>(-1);
 	}
 
 	template<typename Str, typename X>
-	constexpr size_t find_last(Str = {}, X = {}) noexcept {
+	constexpr std::size_t find_last(Str = {}, X = {}) noexcept {
 		static_assert(IsTStr<Str>::value && IsTStr<X>::value);
 		if constexpr (Str::value.size() >= X::value.size()) {
-			for (size_t i = 0; i < Str::value.size() - X::value.size() + 1; i++) {
-				size_t idx = Str::value.size() - X::value.size() - i;
+			for (std::size_t i = 0; i < Str::value.size() - X::value.size() + 1; i++) {
+				std::size_t idx = Str::value.size() - X::value.size() - i;
 				bool flag = true;
-				for (size_t k = 0; k < X::value.size(); k++) {
+				for (std::size_t k = 0; k < X::value.size(); k++) {
 					if (Str::value[idx + k] != X::value[k]) {
 						flag = false;
 						break;
@@ -188,7 +188,7 @@ namespace Ubpa {
 					return idx;
 			}
 		}
-		return static_cast<size_t>(-1);
+		return static_cast<std::size_t>(-1);
 	}
 
 	template<typename Str, typename X>
@@ -196,7 +196,7 @@ namespace Ubpa {
 		static_assert(IsTStr<Str>::value && IsTStr<X>::value);
 		if (Str::value.size() < X::value.size())
 			return false;
-		for (size_t i = 0; i < X::value.size(); i++) {
+		for (std::size_t i = 0; i < X::value.size(); i++) {
 			if (Str::value[i] != X::value[i])
 				return false;
 		}
@@ -208,14 +208,14 @@ namespace Ubpa {
 		static_assert(IsTStr<Str>::value && IsTStr<X>::value);
 		if (Str::value.size() < X::value.size())
 			return false;
-		for (size_t i = 0; i < X::value.size(); i++) {
+		for (std::size_t i = 0; i < X::value.size(); i++) {
 			if (Str::value[Str::value.size() - X::value.size() + i] != X::value[i])
 				return false;
 		}
 		return true;
 	}
 
-	template<size_t N, typename Str>
+	template<std::size_t N, typename Str>
 	constexpr auto remove_prefix(Str = {}) {
 		static_assert(IsTStr<Str>::value);
 		if constexpr (Str::value.size() >= N)
@@ -234,7 +234,7 @@ namespace Ubpa {
 			return Str{};
 	}
 
-	template<size_t N, typename Str>
+	template<std::size_t N, typename Str>
 	constexpr auto remove_suffix(Str = {}) {
 		static_assert(IsTStr<Str>::value);
 		if constexpr (Str::value.size() >= N)
@@ -252,7 +252,7 @@ namespace Ubpa {
 			return Str{};
 	}
 
-	template<size_t N, typename Str>
+	template<std::size_t N, typename Str>
 	constexpr auto get_prefix(Str = {}) {
 		static_assert(IsTStr<Str>::value);
 		if constexpr (Str::value.size() >= N)
@@ -261,7 +261,7 @@ namespace Ubpa {
 			return Str{};
 	}
 
-	template<size_t N, typename Str>
+	template<std::size_t N, typename Str>
 	constexpr auto get_suffix(Str = {}) {
 		static_assert(IsTStr<Str>::value);
 		if constexpr (Str::value.size() >= N)
@@ -271,7 +271,7 @@ namespace Ubpa {
 	}
 
 	// [Left, Right)
-	template<size_t Idx, size_t Cnt, typename Str, typename X>
+	template<std::size_t Idx, std::size_t Cnt, typename Str, typename X>
 	constexpr auto replace(Str = {}, X = {}) {
 		static_assert(IsTStr<Str>::value);
 		static_assert(IsTStr<X>::value);
@@ -286,8 +286,8 @@ namespace Ubpa {
 		static_assert(IsTStr<Str>::value);
 		static_assert(IsTStr<From>::value);
 		static_assert(IsTStr<To>::value);
-		constexpr size_t idx = find(Str{}, From{});
-		if constexpr (idx != static_cast<size_t>(-1))
+		constexpr std::size_t idx = find(Str{}, From{});
+		if constexpr (idx != static_cast<std::size_t>(-1))
 			return replace(replace<idx, From::value.size()>(Str{}, To{}), From{}, To{});
 		else
 			return Str{};
@@ -298,7 +298,7 @@ namespace Ubpa {
 		return replace(Str{}, X{}, TSTR(""));
 	}
 
-	template<size_t Idx, size_t Cnt, typename Str>
+	template<std::size_t Idx, std::size_t Cnt, typename Str>
 	constexpr auto substr(Str = {}) {
 		return get_prefix<Cnt>(remove_prefix<Idx, Str>());
 	}
