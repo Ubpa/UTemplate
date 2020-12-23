@@ -16,73 +16,35 @@ namespace Ubpa {
 }
 
 namespace Ubpa::details {
-	template<typename STR>
-	struct TSTRSizeof;
-	template<typename Char>
-	struct TSTRSizeof<std::basic_string_view<Char>> {
-		static constexpr std::size_t get(const std::basic_string_view<Char>& str) noexcept {
-			return str.size();
-		}
-	};
-	template<typename Char>
-	struct TSTRSizeof<const std::basic_string_view<Char>&> : TSTRSizeof<std::basic_string_view<Char>> {};
-	template<typename Char>
-	struct TSTRSizeof<const std::basic_string_view<Char>> : TSTRSizeof<std::basic_string_view<Char>> {};
-
-	template<typename Char, std::size_t N>
-	struct TSTRSizeof<const Char(&)[N]> {
-		static constexpr std::size_t get(const Char(&str)[N]) noexcept {
-			return N - 1;
-		}
-	};
-
-	template<typename Char>
-	struct TSTRSizeof<const Char*> {
-		static constexpr std::size_t get(const Char* curr) noexcept {
-			if (curr == nullptr)
-				return 0;
-
-			std::size_t size = 0;
-			while (*curr != 0) {
-				++size;
-				++curr;
-			}
-			
-			return size;
-		}
-	};
-
-	template<typename Char>
-	struct TSTRSizeof<const Char* const&> : TSTRSizeof<const Char*> {};
-
 	template <typename Char, typename T, std::size_t ...N>
-	constexpr decltype(auto) TSTRHelperImpl(std::index_sequence<N...>) {
+	constexpr auto TSTRHelperImpl(std::index_sequence<N...>) {
 		return TStr<Char, T::get()[N]...>{};
 	}
 
 	template <typename T>
-	constexpr decltype(auto) TSTRHelper(T) {
-		using Char = std::decay_t<decltype(T::get()[0])>;
-		return TSTRHelperImpl<Char, T>(std::make_index_sequence<TSTRSizeof<decltype(T::get())>::get(T::get())>());
+	constexpr auto TSTRHelper(T) {
+		using SV = decltype(T::get());
+		using Char = typename SV::value_type;
+		return TSTRHelperImpl<Char, T>(std::make_index_sequence<T::get().size()>{});
 	}
 }
 
 // [C-style string type (value)]
 // in C++20, we can easily put a string into template parameter list
 // but in C++17, we just can use this disgusting trick
-#define TSTR(s)                                                           \
-(Ubpa::details::TSTRHelper([] {                                           \
-    struct tmp { static constexpr decltype(auto) get() { return (s); } }; \
-    return tmp{};                                                         \
+#define TSTR(s)                                                                       \
+(Ubpa::details::TSTRHelper([] {                                                       \
+    struct tmp { static constexpr auto get() { return std::basic_string_view{s}; } }; \
+    return tmp{};                                                                     \
 }()))
 
 namespace Ubpa {
-	template<typename C_, C_... chars>
+	template<typename C, C... chars>
 	struct TStr {
-		using Char = C_;
+		using Char = C;
 		template<typename T>
 		static constexpr bool Is(T = {}) noexcept { return std::is_same_v<T, TStr>; }
-		static constexpr char data[]{ chars...,Char(0) };
+		static constexpr Char data[]{ chars...,Char(0) };
 		static constexpr std::basic_string_view<Char> value{ data };
 		constexpr operator std::basic_string_view<Char>() { return value; }
 	};
