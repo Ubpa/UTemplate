@@ -14,12 +14,6 @@ namespace Ubpa {
 	template<typename T> constexpr bool IsIValue_v = IsIValue<T>::value;
 	template<auto V> using IValue_of = IValue<decltype(V), V>;
 
-	template<template<typename, typename...>class Op, template<typename...>class Test>
-	struct AddIf; // Ttype
-
-	template<template<typename...>class Test>
-	struct Negate; // Ttype
-
 	template<typename...> struct typename_template_type;
 
 	template<typename T> struct is_typename_template_type;

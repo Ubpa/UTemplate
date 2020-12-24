@@ -73,26 +73,6 @@ struct Ubpa::is_instance_of : std::false_type {};
 template<typename... Args, template<typename...> class T>
 struct Ubpa::is_instance_of<T<Args...>, T> : std::true_type {};
 
-template<template<typename, typename...>class Op, template<typename...>class Test>
-struct Ubpa::AddIf {
-private:
-	template<bool test, typename I, typename... Args>
-	struct Choose;
-	template<typename I, typename... Args>
-	struct Choose<true, I, Args...> : Op<I, Args...> {};
-	template<typename I, typename... Args>
-	struct Choose<false, I, Args...> : IType<I> {};
-public:
-	template<typename I, typename... Args>
-	struct Ttype : Choose<Test<Args...>::value, I, Args...> {};
-};
-
-template<template<typename...>class Test>
-struct Ubpa::Negate {
-	template<typename... Args>
-	struct Ttype : IValue<bool, !Test<Args...>::value> {};
-};
-
 template<typename T, typename... Args>
 struct Ubpa::is_list_initializable : details::is_list_initializable<T, void, Args...> {};
 
