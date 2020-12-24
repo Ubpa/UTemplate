@@ -123,51 +123,51 @@ DECODE_TSTR_256(n##0,x), DECODE_TSTR_256(n##1,x), DECODE_TSTR_256(n##2,x) \
 #ifdef USE_DECODE_TSTR
 #if USE_DECODE_TSTR == 0
 #define DECODE_TSTR(x) \
-Ubpa::details::ShrinkTStr_t<TStr<decltype(DECODE_TSTR_1(,x)), DECODE_TSTR_1(,x)>>
+Ubpa::details::ShrinkTStr_t<Ubpa::TStr<decltype(DECODE_TSTR_1(,x)), DECODE_TSTR_1(,x)>>
 #elif USE_DECODE_TSTR == 1
 #define DECODE_TSTR(x) \
-Ubpa::details::ShrinkTStr_t<TStr<decltype(DECODE_TSTR_1(,x)), DECODE_TSTR_2(,x)>>
+Ubpa::details::ShrinkTStr_t<Ubpa::TStr<decltype(DECODE_TSTR_1(,x)), DECODE_TSTR_2(,x)>>
 #elif USE_DECODE_TSTR == 2
 #define DECODE_TSTR(x) \
-Ubpa::details::ShrinkTStr_t<TStr<decltype(DECODE_TSTR_1(,x)), DECODE_TSTR_4(,x)>>
+Ubpa::details::ShrinkTStr_t<Ubpa::TStr<decltype(DECODE_TSTR_1(,x)), DECODE_TSTR_4(,x)>>
 #elif USE_DECODE_TSTR == 3
 #define DECODE_TSTR(x) \
-Ubpa::details::ShrinkTStr_t<TStr<decltype(DECODE_TSTR_1(,x)), DECODE_TSTR_8(,x)>>
+Ubpa::details::ShrinkTStr_t<Ubpa::TStr<decltype(DECODE_TSTR_1(,x)), DECODE_TSTR_8(,x)>>
 #elif USE_DECODE_TSTR == 4
 #define DECODE_TSTR(x) \
-Ubpa::details::ShrinkTStr_t<TStr<decltype(DECODE_TSTR_1(,x)), DECODE_TSTR_16(,x)>>
+Ubpa::details::ShrinkTStr_t<Ubpa::TStr<decltype(DECODE_TSTR_1(,x)), DECODE_TSTR_16(,x)>>
 #elif USE_DECODE_TSTR == 5
 #define DECODE_TSTR(x) \
-Ubpa::details::ShrinkTStr_t<TStr<decltype(DECODE_TSTR_1(,x)), DECODE_TSTR_32(,x)>>
+Ubpa::details::ShrinkTStr_t<Ubpa::TStr<decltype(DECODE_TSTR_1(,x)), DECODE_TSTR_32(,x)>>
 #elif USE_DECODE_TSTR == 6
 #define DECODE_TSTR(x) \
-Ubpa::details::ShrinkTStr_t<TStr<decltype(DECODE_TSTR_1(,x)), DECODE_TSTR_64(,x)>>
+Ubpa::details::ShrinkTStr_t<Ubpa::TStr<decltype(DECODE_TSTR_1(,x)), DECODE_TSTR_64(,x)>>
 #elif USE_DECODE_TSTR == 7
 #define DECODE_TSTR(x) \
-Ubpa::details::ShrinkTStr_t<TStr<decltype(DECODE_TSTR_1(,x)), DECODE_TSTR_128(,x)>>
+Ubpa::details::ShrinkTStr_t<Ubpa::TStr<decltype(DECODE_TSTR_1(,x)), DECODE_TSTR_128(,x)>>
 #elif USE_DECODE_TSTR == 8
 #define DECODE_TSTR(x) \
-Ubpa::details::ShrinkTStr_t<TStr<decltype(DECODE_TSTR_1(,x)), DECODE_TSTR_256(,x)>>
+Ubpa::details::ShrinkTStr_t<Ubpa::TStr<decltype(DECODE_TSTR_1(,x)), DECODE_TSTR_256(,x)>>
 #elif USE_DECODE_TSTR == 9
 #define DECODE_TSTR(x) \
-Ubpa::details::ShrinkTStr_t<TStr<decltype(DECODE_TSTR_1(,x)), DECODE_TSTR_512(,x)>>
+Ubpa::details::ShrinkTStr_t<Ubpa::TStr<decltype(DECODE_TSTR_1(,x)), DECODE_TSTR_512(,x)>>
 #elif USE_DECODE_TSTR == 10
 #define DECODE_TSTR(x) \
-Ubpa::details::ShrinkTStr_t<TStr<decltype(DECODE_TSTR_1(,x)), DECODE_TSTR_1024(,x)>>
+Ubpa::details::ShrinkTStr_t<Ubpa::TStr<decltype(DECODE_TSTR_1(,x)), DECODE_TSTR_1024(,x)>>
 #elif USE_DECODE_TSTR > 10
 #warning !!!: custom TStr length exceeded allowed(1024) !!!
 #warning !!!: all TStrs to default maximum typestring length of 64 !!!
 #warning !!!: you can use - DUSE_DECODE_TSTR = <power of two> to set length !!!
 #define DECODE_TSTR(x) \
-Ubpa::details::ShrinkTStr_t<TStr<decltype(DECODE_TSTR_1(,x)), DECODE_TSTR_64(,x)>>
+Ubpa::details::ShrinkTStr_t<Ubpa::TStr<decltype(DECODE_TSTR_1(,x)), DECODE_TSTR_64(,x)>>
 #elif USE_DECODE_TSTR < 0
 #warning !!!: You used USE_DECODE_TSTR with a negative size specified !!!
 #warning !!!: all TStrs to default maximum typestring length of 64 !!!
 #warning !!!: you can use - DUSE_DECODE_TSTR = <power of two> to set length !!!
 #define DECODE_TSTR(x) \
-Ubpa::details::ShrinkTStr_t<TStr<decltype(DECODE_TSTR_1(,x)), DECODE_TSTR_64(,x)>>
+Ubpa::details::ShrinkTStr_t<Ubpa::TStr<decltype(DECODE_TSTR_1(,x)), DECODE_TSTR_64(,x)>>
 #endif
 #else
 #define DECODE_TSTR(x) \
-Ubpa::details::ShrinkTStr_t<TStr<decltype(DECODE_TSTR_1(,x)), DECODE_TSTR_64(,x)>>
+Ubpa::details::ShrinkTStr_t<Ubpa::TStr<decltype(DECODE_TSTR_1(,x)), DECODE_TSTR_64(,x)>>
 #endif
