@@ -9,6 +9,11 @@ static constexpr const std::string_view gs_sv = "sv";
 static constexpr const char gs_ca[] = "gs_ca";
 static constexpr const char* gs_cptr = "gs_cptr";
 
+struct A {
+	static constexpr auto str = TSTR("hello");
+	static_assert(std::is_same_v<decltype(str), const TStr<char, 'h', 'e', 'l', 'l', 'o'>>);
+};
+
 int main() {
 	constexpr auto str0 = TSTR("hello world");
 	static_assert(std::is_same_v<decltype(str0), const TStr<char, 'h', 'e', 'l', 'l', 'o', ' ', 'w', 'o', 'r', 'l', 'd'>>);

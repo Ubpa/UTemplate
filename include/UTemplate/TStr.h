@@ -29,14 +29,22 @@ namespace Ubpa::details {
 	}
 }
 
+#ifdef __GNUC__
+#define USE_DECODE_TSTR 8
+#include "details/DecodeTStr.inl"
+// [C-style string type (value)]
+// use irqus's type_string for GCC
+#define TSTR(s) DECODE_TSTR(s){}
+#else
 // [C-style string type (value)]
 // in C++20, we can easily put a string into template parameter list
 // but in C++17, we just can use this disgusting trick
 #define TSTR(s)                                                                       \
-(Ubpa::details::TSTRHelper([] {                                                       \
+([] {                                                                                 \
     struct tmp { static constexpr auto get() { return std::basic_string_view{s}; } }; \
-    return tmp{};                                                                     \
-}()))
+    return Ubpa::details::TSTRHelper(tmp{});                                          \
+}())
+#endif
 
 namespace Ubpa {
 	template<typename C, C... chars>
@@ -54,6 +62,11 @@ namespace Ubpa {
 
 	template<typename Char, Char... chars>
 	struct IsTStr<TStr<Char, chars...>> : std::true_type {};
+
+	template<char... chars>
+	constexpr auto TStrC_of = TStr<char, chars...>{};
+	template<auto c>
+	constexpr auto TStr_of = TStr<decltype(c), c>{};
 }
 
 #endif // UBPA_TSTR
@@ -113,6 +126,9 @@ namespace Ubpa {
 	constexpr auto concat_seq_seperator(Seperator, Strs...) noexcept {
 		return concat_seq_seperator_helper_t<Seperator, Strs...>{};
 	}
+
+	template<typename Char, Char... chars>
+	constexpr TStr<Char> empty_of(TStr<Char, chars...>) noexcept { return {}; }
 
 	template<typename Str, typename X>
 	constexpr std::size_t find(Str = {}, X = {}) noexcept {
@@ -183,7 +199,7 @@ namespace Ubpa {
 		if constexpr (Str::value.size() >= N)
 			return TSTR(decltype(Str::value){Str::value.data() + N});
 		else
-			return TSTR("");
+			return empty_of(Str{});
 	}
 
 	template<typename Str, typename X>
@@ -202,7 +218,7 @@ namespace Ubpa {
 		if constexpr (Str::value.size() >= N)
 			return TSTR((decltype(Str::value){Str::value.data(), Str::value.size() - N}));
 		else
-			return TSTR("");
+			return empty_of(Str{});
 	}
 
 	template<typename Str, typename X>
@@ -257,7 +273,7 @@ namespace Ubpa {
 
 	template<typename Str, typename X>
 	constexpr auto remove(Str = {}, X = {}) {
-		return replace(Str{}, X{}, TSTR(""));
+		return replace(Str{}, X{}, empty_of(Str{}));
 	}
 
 	template<std::size_t Idx, std::size_t Cnt, typename Str>

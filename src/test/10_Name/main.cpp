@@ -160,4 +160,6 @@ int main() {
 		std::cout << "|" << type_name<double>().value << "|" << std::endl;
 		std::cout << "|" << type_name<long double>().value << "|" << std::endl;
 	}
+
+	return 0;
 }
