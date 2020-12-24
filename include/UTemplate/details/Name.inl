@@ -369,7 +369,7 @@ constexpr bool Ubpa::type_name_is_void(std::string_view name) noexcept {
 }
 
 constexpr bool Ubpa::type_name_is_null_pointer(std::string_view name) noexcept {
-	return type_name_remove_cv(name) == type_name<nullptr_t>().value;
+	return type_name_remove_cv(name) == type_name<std::nullptr_t>().value;
 }
 
 constexpr bool Ubpa::type_name_is_integral(std::string_view name) noexcept {

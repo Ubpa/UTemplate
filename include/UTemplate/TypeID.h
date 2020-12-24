@@ -47,10 +47,7 @@ namespace Ubpa {
 		using StrID::Is;
 
 		template<typename T>
-		constexpr bool Is() const noexcept { return operator==(TypeID::of<T>); }
-
-		template<typename T>
-		static constexpr TypeID of = TypeID{ type_name<T>().value };
+		constexpr bool Is() const noexcept { return operator==(TypeID{ type_name<T>().value }); }
 
 		constexpr bool operator< (const TypeID& rhs) const noexcept { return StrID::operator< (rhs); }
 		constexpr bool operator<=(const TypeID& rhs) const noexcept { return StrID::operator<=(rhs); }
@@ -60,8 +57,11 @@ namespace Ubpa {
 		constexpr bool operator!=(const TypeID& rhs) const noexcept { return StrID::operator!=(rhs); }
 	};
 
-	template<typename X, typename Y> struct TypeID_Less : IValue<bool, TypeID::of<X> < TypeID::of<Y> >
-	{ static_assert(std::is_same_v<X, Y> || TypeID::of<X> != TypeID::of<Y>); };
+	template<typename T>
+	constexpr TypeID TypeID_of = TypeID{ type_name<T>().value };
+
+	template<typename X, typename Y> struct TypeID_Less : IValue<bool, TypeID_of<X> < TypeID_of<Y> >
+	{ static_assert(std::is_same_v<X, Y> || TypeID_of<X> != TypeID_of<Y>); };
 
 	template<typename X, typename Y> constexpr bool TypeID_Less_v = TypeID_Less<X, Y>::value;
 }

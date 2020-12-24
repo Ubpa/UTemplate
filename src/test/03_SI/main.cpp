@@ -42,8 +42,5 @@ int main() {
 	static_assert(SI_Contains_v<G, IE>);
 	static_assert(SI_Contains_v<G, IF>);
 
-	SI_Contains_v<G, IA>;
-	SI_Contains_v<int, IA>;
-
 	G{ 1.f };
 }

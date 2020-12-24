@@ -23,7 +23,7 @@ int main() {
 	// primary
 
 	static_assert(type_name_is_void(type_name<void>()));
-	static_assert(type_name_is_null_pointer(type_name<nullptr_t>()));
+	static_assert(type_name_is_null_pointer(type_name<std::nullptr_t>()));
 	static_assert(type_name_is_integral(type_name<std::uint64_t>()));
 	static_assert(type_name_is_floating_point(type_name<long double>()));
 	static_assert(type_name_is_array(type_name<int[][3]>()));

@@ -129,7 +129,13 @@ namespace Ubpa {
 	// =================================================
 
 	template<typename List, template<typename>class Test>
-	struct Filter : Accumulate<List, AddIf<PushFront, Test>::template Ttype, TypeList<>> {};
+	struct Filter {
+	private:
+		template<typename I, typename X>
+		struct PushFrontIf : std::conditional<Test<X>::value, PushFront_t<I, X>, I> {};
+	public:
+		using type = Accumulate_t<List, PushFrontIf, TypeList<>>;
+	};
 
 	// =================================================
 
@@ -164,8 +170,10 @@ namespace Ubpa {
 	private:
 		template<typename X>
 		using LessThanHead = Less<X, Head>;
+		template<typename X>
+		using GEThanHead = std::integral_constant<bool, !Less<X, Head>::value>;
 		using LessList = Filter_t<TypeList<Tail...>, LessThanHead>;
-		using GEList = Filter_t<TypeList<Tail...>, Negate<LessThanHead>::template Ttype>;
+		using GEList = Filter_t<TypeList<Tail...>, GEThanHead>;
 	public:
 		using type = Concat_t<
 			typename QuickSort<LessList, Less>::type,
