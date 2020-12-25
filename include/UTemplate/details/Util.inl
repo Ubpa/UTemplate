@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdint>
+#include <cassert>
 
 namespace Ubpa::details {
 	template<typename Void, template<typename...> typename T, typename... Ts>
@@ -99,6 +100,13 @@ struct Ubpa::is_typename_template_type<T<Ts...>> : std::true_type {};
 
 template<typename T> struct Ubpa::IsIValue : std::false_type {};
 template<typename T, T v> struct Ubpa::IsIValue<Ubpa::IValue<T, v>> : std::true_type {};
+
+template<size_t N>
+constexpr std::size_t Ubpa::lengthof(const char(&str)[N]) noexcept {
+	static_assert(N > 0);
+	assert(str[N - 1] == 0); // c-style string
+	return N - 1;
+}
 
 constexpr std::size_t Ubpa::string_hash_seed(std::size_t seed, const char* str, std::size_t N) noexcept {
 	using Traits = details::fnv1a_traits<std::size_t>;
