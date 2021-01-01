@@ -90,6 +90,7 @@ namespace Ubpa {
 	constexpr std::size_t type_name_add_rvalue_reference_hash(std::string_view name) noexcept;
 	constexpr std::size_t type_name_add_pointer_hash(std::string_view name) noexcept;
 	constexpr std::size_t type_name_add_const_lvalue_reference_hash(std::string_view name) noexcept;
+	constexpr std::size_t type_name_add_const_rvalue_reference_hash(std::string_view name) noexcept;
 
 	// modification (add, alloc)
 
@@ -110,6 +111,8 @@ namespace Ubpa {
 	constexpr std::string_view type_name_add_pointer(std::string_view name, Alloc alloc);
 	template<typename Alloc>
 	constexpr std::string_view type_name_add_const_lvalue_reference(std::string_view name, Alloc alloc);
+	template<typename Alloc>
+	constexpr std::string_view type_name_add_const_rvalue_reference(std::string_view name, Alloc alloc);
 
 	// composite
 

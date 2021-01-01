@@ -102,6 +102,12 @@ int main() {
 	static_assert(type_name_add_const_lvalue_reference_hash(type_name<volatile int>()) == string_hash(type_name<std::add_lvalue_reference_t<std::add_const_t<volatile int>>>()));
 	static_assert(type_name_add_const_lvalue_reference_hash(type_name<int>()) == string_hash(type_name<std::add_lvalue_reference_t<std::add_const_t<int>>>()));
 
+	static_assert(type_name_add_const_rvalue_reference_hash(type_name<int&>()) == string_hash(type_name<std::add_rvalue_reference_t<std::add_const_t<int&>>>()));
+	static_assert(type_name_add_const_rvalue_reference_hash(type_name<int&&>()) == string_hash(type_name<std::add_rvalue_reference_t<std::add_const_t<int&&>>>()));
+	static_assert(type_name_add_const_rvalue_reference_hash(type_name<const int>()) == string_hash(type_name<std::add_rvalue_reference_t<std::add_const_t<const int>>>()));
+	static_assert(type_name_add_const_rvalue_reference_hash(type_name<volatile int>()) == string_hash(type_name<std::add_rvalue_reference_t<std::add_const_t<volatile int>>>()));
+	static_assert(type_name_add_const_rvalue_reference_hash(type_name<int>()) == string_hash(type_name<std::add_rvalue_reference_t<std::add_const_t<int>>>()));
+
 	// modification (add, alloc)
 	std::allocator<char> alloc;
 	assert(type_name_add_const(type_name<int&>(), alloc).data() == type_name<int&>().value.data());
@@ -211,6 +217,24 @@ int main() {
 	{
 		const auto str = type_name_add_const_lvalue_reference(type_name<int>(), alloc);
 		assert(str == type_name<const int&>().value);
+		alloc.deallocate(const_cast<char*>(str.data()), str.size());
+	}
+
+	assert(type_name_add_const_rvalue_reference(type_name<int&>(), alloc).data() == type_name<int&>().value.data());
+	assert(type_name_add_const_rvalue_reference(type_name<int&&>(), alloc).data() == type_name<int&&>().value.data());
+	{
+		const auto str = type_name_add_const_rvalue_reference(type_name<const int>(), alloc);
+		assert(str == type_name<const int&&>().value);
+		alloc.deallocate(const_cast<char*>(str.data()), str.size());
+	}
+	{
+		const auto str = type_name_add_const_rvalue_reference(type_name<volatile int>(), alloc);
+		assert(str == type_name<const volatile int&&>().value);
+		alloc.deallocate(const_cast<char*>(str.data()), str.size());
+	}
+	{
+		const auto str = type_name_add_const_rvalue_reference(type_name<int>(), alloc);
+		assert(str == type_name<const int&&>().value);
 		alloc.deallocate(const_cast<char*>(str.data()), str.size());
 	}
 
