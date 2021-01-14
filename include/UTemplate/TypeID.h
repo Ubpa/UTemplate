@@ -17,7 +17,7 @@ namespace Ubpa {
 
 		constexpr bool Valid() const noexcept { return value != InvalidValue(); }
 
-		constexpr bool Is(std::string_view str) const noexcept { return value == IDBase{ str }.value; }
+		constexpr bool Is(std::string_view str) const noexcept { return value == IDBase{ str }.GetValue(); }
 
 		constexpr void Reset() noexcept { value = InvalidValue(); }
 
@@ -45,7 +45,7 @@ namespace Ubpa {
 		using IDBase::Is;
 
 		template<typename T>
-		constexpr bool Is() const noexcept { return IDBase::Is(type_name<T>().value); }
+		constexpr bool Is() const noexcept { return IDBase::Is(type_name<T>().View()); }
 		
 		constexpr bool operator< (const TypeID& rhs) const noexcept { return GetValue() <  rhs.GetValue(); }
 		constexpr bool operator<=(const TypeID& rhs) const noexcept { return GetValue() <= rhs.GetValue(); }
@@ -56,7 +56,7 @@ namespace Ubpa {
 	};
 
 	template<typename T>
-	constexpr TypeID TypeID_of = TypeID{ type_name<T>().value };
+	constexpr TypeID TypeID_of = TypeID{ type_name<T>().View() };
 
 	template<typename X, typename Y> struct TypeID_Less : IValue<bool, TypeID_of<X> < TypeID_of<Y> >
 	{ static_assert(std::is_same_v<X, Y> || TypeID_of<X> != TypeID_of<Y>); };

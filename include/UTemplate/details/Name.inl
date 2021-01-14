@@ -67,30 +67,30 @@ namespace Ubpa::details {
 #elif defined(__GNUC__)
 		return Str{};
 #elif defined(_MSC_VER)
-		constexpr auto n0 = remove_prefix(Str{}, TStrC_of<'s','t','r','u','c','t',' '>);
-		constexpr auto n1 = remove_prefix(n0, TStrC_of<'e','n','u','m',' '>);
-		constexpr auto n2 = remove_prefix(n1, TStrC_of<'c','l','a','s','s',' '>);
+		constexpr auto n0 = remove_prefix(Str{}, TStrC_of<'s','t','r','u','c','t',' '>{});
+		constexpr auto n1 = remove_prefix(n0, TStrC_of<'e','n','u','m',' '>{});
+		constexpr auto n2 = remove_prefix(n1, TStrC_of<'c','l','a','s','s',' '>{});
 		return n2;
 #endif
 	}
 
 	template<typename Str>
 	constexpr std::size_t get_template_idx(Str = {}) {
-		if constexpr (Str::value.size() == 0)
+		if constexpr (Str::Size() == 0)
 			return static_cast<std::size_t>(-1);
-		else if constexpr (Str::value.back() != '>')
+		else if constexpr (Str::View().back() != '>')
 			return static_cast<std::size_t>(-1);
 		else {
 			std::size_t k = 0;
-			std::size_t i = Str::value.size();
+			std::size_t i = Str::Size();
 			while (i > 0) {
 				--i;
-				if (Str::value[i] == '<') {
+				if (Str::View()[i] == '<') {
 					k--;
 					if (k == 0)
 						return i;
 				}
-				else if (Str::value[i] == '>')
+				else if (Str::View()[i] == '>')
 					k++;
 			}
 			return static_cast<std::size_t>(-1);
@@ -115,7 +115,7 @@ namespace Ubpa::details {
 #  elif defined(__GNUC__)
 		return remove_suffix<1>(remove_prefix<62>(sig));
 #  elif defined(_MSC_VER)
-		return remove_suffix(remove_suffix<17>(remove_prefix<79>(sig)), TStr_of<' '>);
+		return remove_suffix(remove_suffix<17>(remove_prefix<79>(sig)), TStr_of<' '>{});
 #  endif
 #else
 		return TStr<char>{}; // Unsupported compiler.
@@ -127,9 +127,9 @@ namespace Ubpa::details {
 		constexpr auto name0 = raw_type_name<T>();
 		constexpr auto name1 = remove_class_key(name0);
 		constexpr auto name2 = remove_template(name1);
-		constexpr auto idx = find_last(name2, TStr_of<':'>);
+		constexpr auto idx = find_last(name2, TStr_of<':'>{});
 		if constexpr (idx != static_cast<std::size_t>(-1) && is_defined_v<type_namespace_name<T>>)
-			return concat_seq(type_namespace_name_v<T>, TStrC_of<':',':'>, remove_prefix<idx + 1>(name2));
+			return concat_seq(type_namespace_name_v<T>, TStrC_of<':',':'>{}, remove_prefix<idx + 1>(name2));
 		else
 			return name2;
 	}
@@ -139,8 +139,8 @@ namespace Ubpa::details {
 	template<template<typename...>class T, typename... Ts>
 	struct template_args_name_impl<T<Ts...>> {
 		constexpr static auto get() noexcept {
-			return concat_seq_seperator(TStr_of<','>,
-				concat_seq(TStr_of<'{'>, type_name<Ts>(), TStr_of<'}'>)...);
+			return concat_seq_seperator(TStr_of<','>{},
+				concat_seq(TStr_of<'{'>{}, type_name<Ts>(), TStr_of<'}'>{})...);
 		}
 	};
 
@@ -154,8 +154,8 @@ namespace Ubpa::details {
 	template<typename... Ts>
 	struct function_args_name_impl<TypeList<Ts...>> {
 		constexpr static auto get() noexcept {
-			return concat_seq_seperator(TStr_of<','>,
-				concat_seq(TStr_of<'{'>, type_name<Ts>(), TStr_of<'}'>)...);
+			return concat_seq_seperator(TStr_of<','>{},
+				concat_seq(TStr_of<'{'>{}, type_name<Ts>(), TStr_of<'}'>{})...);
 		}
 	};
 
@@ -193,32 +193,32 @@ template<auto V>
 constexpr auto Ubpa::constexpr_name() noexcept {
 	using T = decltype(V);
 	if constexpr (std::is_null_pointer_v<T>)
-		return TStrC_of<'n','u','l','l','p','t','r'>;
+		return TStrC_of<'n','u','l','l','p','t','r'>{};
 	else if constexpr (std::is_pointer_v<T>) {
 		if constexpr (V == nullptr)
-			return TStrC_of<'n','u','l','l','p','t','r'>;
+			return TStrC_of<'n','u','l','l','p','t','r'>{};
 		else
 			static_assert("not support");
 	}
 	else if constexpr (std::is_member_pointer_v<T>) {
 		if constexpr (V == nullptr)
-			return TStrC_of<'n','u','l','l','p','t','r'>;
+			return TStrC_of<'n','u','l','l','p','t','r'>{};
 		else {
 			using Object = member_pointer_traits_object<T>;
 			using Value = member_pointer_traits_value<T>;
 			if constexpr (is_defined_v<details::member_pointer_name<V>>) {
-				return concat_seq(TStr_of<'&'>, type_name<Object>(), TStrC_of<':',':'>, details::member_pointer_name_v<V>);
+				return concat_seq(TStr_of<'&'>{}, type_name<Object>(), TStrC_of<':',':'>{}, details::member_pointer_name_v<V>);
 			}
 			else
-				return concat_seq(TStr_of<'&'>, type_name<Object>(), TSTR("::#UNKNOWN"));
+				return concat_seq(TStr_of<'&'>{}, type_name<Object>(), TSTR("::#UNKNOWN"));
 		}
 	}
 	else if constexpr (std::is_integral_v<T>) {
 		if constexpr (std::is_same_v<T, bool>) {
 			if constexpr (V == true)
-				return TStrC_of<'t','r','u','e'>;
+				return TStrC_of<'t','r','u','e'>{};
 			else
-				return TStrC_of<'f','a','l','s','e'>;
+				return TStrC_of<'f','a','l','s','e'>{};
 		}
 		else
 			return int_to_TSTR<V>();
@@ -230,45 +230,45 @@ constexpr auto Ubpa::constexpr_name() noexcept {
 template<typename T>
 constexpr auto Ubpa::type_name() noexcept {
 	if constexpr (std::is_lvalue_reference_v<T>)
-		return concat_seq(TStrC_of<'&','{'>, type_name<std::remove_reference_t<T>>(), TStr_of<'}'>);
+		return concat_seq(TStrC_of<'&','{'>{}, type_name<std::remove_reference_t<T>>(), TStr_of<'}'>{});
 	else if constexpr (std::is_rvalue_reference_v<T>)
-		return concat_seq(TStrC_of<'&','&','{'>, type_name<std::remove_reference_t<T>>(), TStr_of<'}'>);
+		return concat_seq(TStrC_of<'&','&','{'>{}, type_name<std::remove_reference_t<T>>(), TStr_of<'}'>{});
 	else if constexpr (std::is_const_v<T> && std::is_volatile_v<T>)
-		return concat_seq(TSTR("const volatile{"), type_name<std::remove_cv_t<T>>(), TStr_of<'}'>);
+		return concat_seq(TSTR("const volatile{"), type_name<std::remove_cv_t<T>>(), TStr_of<'}'>{});
 	else if constexpr (std::is_const_v<T> && !std::is_volatile_v<T>)
-		return concat_seq(TStrC_of<'c','o','n','s','t','{'>, type_name<std::remove_const_t<T>>(), TStr_of<'}'>);
+		return concat_seq(TStrC_of<'c','o','n','s','t','{'>{}, type_name<std::remove_const_t<T>>(), TStr_of<'}'>{});
 	else if constexpr (!std::is_const_v<T> && std::is_volatile_v<T>)
-		return concat_seq(TSTR("volatile{"), type_name<std::remove_volatile_t<T>>(), TStr_of<'}'>);
+		return concat_seq(TSTR("volatile{"), type_name<std::remove_volatile_t<T>>(), TStr_of<'}'>{});
 	else if constexpr (std::is_member_pointer_v<T>)
-		return concat_seq(TStr_of<'{'>, type_name<member_pointer_traits_object<T>>(), TStrC_of<'}',':',':','*','{'>, type_name<member_pointer_traits_value<T>>(), TStr_of<'}'>);
+		return concat_seq(TStr_of<'{'>{}, type_name<member_pointer_traits_object<T>>(), TStrC_of<'}',':',':','*','{'>{}, type_name<member_pointer_traits_value<T>>(), TStr_of<'}'>{});
 	else if constexpr (std::is_pointer_v<T>)
-		return concat_seq(TStrC_of<'*','{'>, type_name<std::remove_pointer_t<T>>(), TStr_of<'}'>);
+		return concat_seq(TStrC_of<'*','{'>{}, type_name<std::remove_pointer_t<T>>(), TStr_of<'}'>{});
 	else if constexpr (std::is_array_v<T>) {
 		constexpr auto r = std::rank_v<T>;
 		constexpr auto ex = std::extent_v<T, 0>;
 		if constexpr (r == 1) {
 			if constexpr (ex == 0)
-				return concat_seq(TStrC_of<'[',']','{'>, type_name<std::remove_extent_t<T>>(), TStr_of<'}'>);
+				return concat_seq(TStrC_of<'[',']','{'>{}, type_name<std::remove_extent_t<T>>(), TStr_of<'}'>{});
 			else
-				return concat_seq(TStr_of<'['>, constexpr_name<ex>(), TStrC_of<']','{'>, type_name<std::remove_extent_t<T>>(), TStr_of<'}'>);
+				return concat_seq(TStr_of<'['>{}, constexpr_name<ex>(), TStrC_of<']','{'>{}, type_name<std::remove_extent_t<T>>(), TStr_of<'}'>{});
 		}
 		else { // r > 1
 			static_assert(r > 1);
 			if constexpr (ex == 0)
-				return concat_seq(TStrC_of<'[',']'>, type_name<std::remove_extent_t<T>>());
+				return concat_seq(TStrC_of<'[',']'>{}, type_name<std::remove_extent_t<T>>());
 			else
-				return concat_seq(TStr_of<'['>, constexpr_name<ex>(), TStr_of<']'>, type_name<std::remove_extent_t<T>>());
+				return concat_seq(TStr_of<'['>{}, constexpr_name<ex>(), TStr_of<']'>{}, type_name<std::remove_extent_t<T>>());
 		}
 	}
 	else if constexpr (std::is_function_v<T>) {
 		using Traits = FuncTraits<T>;
 		using Return = FuncTraits_Return<T>;
 		using ArgList = FuncTraits_ArgList<T>;
-		constexpr auto ArgsName = concat_seq(TStr_of<'('>, details::function_args_name<ArgList>(), TStr_of<')'>);
-		constexpr auto RetName = concat_seq(TStr_of<'{'>, type_name<Return>(), TStr_of<'}'>);
+		constexpr auto ArgsName = concat_seq(TStr_of<'('>{}, details::function_args_name<ArgList>(), TStr_of<')'>{});
+		constexpr auto RetName = concat_seq(TStr_of<'{'>{}, type_name<Return>(), TStr_of<'}'>{});
 		// const, volatile, &/&&, noexcept : 24
 		if constexpr (!Traits::is_const && !Traits::is_volatile && Traits::ref == ReferenceMode::NONE && !Traits::is_noexcept) // 0000
-			return concat_seq(ArgsName, TStrC_of<'-','-','>'>, RetName);
+			return concat_seq(ArgsName, TStrC_of<'-','-','>', '{', '}'>{}, RetName);
 		else if constexpr (Traits::is_const && !Traits::is_volatile && Traits::ref == ReferenceMode::NONE && !Traits::is_noexcept) // 1000
 			return concat_seq(ArgsName, TSTR("-{const}->"), RetName);
 		else if constexpr (!Traits::is_const && Traits::is_volatile && Traits::ref == ReferenceMode::NONE && !Traits::is_noexcept) // 0100
@@ -276,7 +276,7 @@ constexpr auto Ubpa::type_name() noexcept {
 		else if constexpr (Traits::is_const && Traits::is_volatile && Traits::ref == ReferenceMode::NONE && !Traits::is_noexcept) // 1100
 			return concat_seq(ArgsName, TSTR("-{const volatile}->"), RetName);
 		else if constexpr (!Traits::is_const && !Traits::is_volatile && Traits::ref == ReferenceMode::LEFT && !Traits::is_noexcept) // 0010
-			return concat_seq(ArgsName, TStrC_of<'-','{','&','}','-','>'>, RetName);
+			return concat_seq(ArgsName, TStrC_of<'-','{','&','}','-','>', '{', '}'>{}, RetName);
 		else if constexpr (Traits::is_const && !Traits::is_volatile && Traits::ref == ReferenceMode::LEFT && !Traits::is_noexcept) // 1010
 			return concat_seq(ArgsName, TSTR("-{const &}->"), RetName);
 		else if constexpr (!Traits::is_const && Traits::is_volatile && Traits::ref == ReferenceMode::LEFT && !Traits::is_noexcept) // 0110
@@ -284,7 +284,7 @@ constexpr auto Ubpa::type_name() noexcept {
 		else if constexpr (Traits::is_const && Traits::is_volatile && Traits::ref == ReferenceMode::RIGHT && !Traits::is_noexcept) // 1110
 			return concat_seq(ArgsName, TSTR("-{const volatile &}->"), RetName);
 		else if constexpr (!Traits::is_const && !Traits::is_volatile && Traits::ref == ReferenceMode::RIGHT && !Traits::is_noexcept) // 0020
-			return concat_seq(ArgsName, TStrC_of<'-','{','&','&','}','-','>'>, RetName);
+			return concat_seq(ArgsName, TStrC_of<'-','{','&','&','}','-','>', '{', '}'>{}, RetName);
 		else if constexpr (Traits::is_const && !Traits::is_volatile && Traits::ref == ReferenceMode::RIGHT && !Traits::is_noexcept) // 1020
 			return concat_seq(ArgsName, TSTR("-{const &&}->"), RetName);
 		else if constexpr (!Traits::is_const && Traits::is_volatile && Traits::ref == ReferenceMode::RIGHT && !Traits::is_noexcept) // 0120
@@ -325,24 +325,24 @@ constexpr auto Ubpa::type_name() noexcept {
 		static_assert(sizeof(T) <= 8);
 		constexpr auto BitName = constexpr_name<8 * sizeof(T)>();
 		if constexpr (std::is_signed_v<T>)
-			return concat(TStrC_of<'i','n','t'>, BitName);
+			return concat(TStrC_of<'i','n','t'>{}, BitName);
 		else
-			return concat(TStrC_of<'u','i','n','t'>, BitName);
+			return concat(TStrC_of<'u','i','n','t'>{}, BitName);
 	}
 #endif // UBPA_NAME_X_INT
 #ifdef UBPA_NAME_X_FLOAT
 	else if constexpr (std::is_floating_point_v<T>)
-		return concat(TStrC_of<'f','l','o','a','t'>, constexpr_name<8 * sizeof(T)>());
+		return concat(TStrC_of<'f','l','o','a','t'>{}, constexpr_name<8 * sizeof(T)>());
 #endif // UBPA_NAME_X_FLOAT
 	else {
 		using U = to_typename_template_type_t<T>;
 		if constexpr (is_typename_template_type_v<U>)
-			return concat_seq(details::no_template_type_name<T>(), TStr_of<'<'>, details::template_args_name<U>(), TStr_of<'>'>);
+			return concat_seq(details::no_template_type_name<T>(), TStr_of<'<'>{}, details::template_args_name<U>(), TStrC_of<'>', '{', '}'>{});
 		else {
 			constexpr auto name = details::remove_class_key(details::raw_type_name<T>());
-			constexpr auto idx = find_last(name, TStr_of<':'>);
+			constexpr auto idx = find_last(name, TStr_of<':'>{});
 			if constexpr (idx != static_cast<std::size_t>(-1) && is_defined_v<details::type_namespace_name<T>>)
-				return concat_seq(details::type_namespace_name_v<T>, TStrC_of<':',':'>, remove_prefix<idx + 1>(name));
+				return concat_seq(details::type_namespace_name_v<T>, TStrC_of<':',':'>{}, remove_prefix<idx + 1>(name));
 			else
 				return name;
 		}
@@ -350,7 +350,7 @@ constexpr auto Ubpa::type_name() noexcept {
 }
 
 constexpr bool Ubpa::constexpr_name_is_null_pointer(std::string_view name) noexcept {
-	return name == constexpr_name<nullptr>().value;
+	return name == constexpr_name<nullptr>().View();
 }
 
 constexpr bool Ubpa::constexpr_name_is_integral(std::string_view name) noexcept {
@@ -366,24 +366,24 @@ constexpr bool Ubpa::constexpr_name_is_integral(std::string_view name) noexcept 
 }
 
 constexpr bool Ubpa::type_name_is_void(std::string_view name) noexcept {
-	return name == type_name<void>().value;
+	return name == type_name<void>().View();
 }
 
 constexpr bool Ubpa::type_name_is_null_pointer(std::string_view name) noexcept {
-	return type_name_remove_cv(name) == type_name<std::nullptr_t>().value;
+	return type_name_remove_cv(name) == type_name<std::nullptr_t>().View();
 }
 
 constexpr bool Ubpa::type_name_is_integral(std::string_view name) noexcept {
 	switch (string_hash(type_name_remove_cv(name)))
 	{
-	case string_hash(type_name<int8_t>().value):
-	case string_hash(type_name<int16_t>().value):
-	case string_hash(type_name<int32_t>().value):
-	case string_hash(type_name<int64_t>().value):
-	case string_hash(type_name<uint8_t>().value):
-	case string_hash(type_name<uint16_t>().value):
-	case string_hash(type_name<uint32_t>().value):
-	case string_hash(type_name<uint64_t>().value):
+	case string_hash(type_name<int8_t>().View()):
+	case string_hash(type_name<int16_t>().View()):
+	case string_hash(type_name<int32_t>().View()):
+	case string_hash(type_name<int64_t>().View()):
+	case string_hash(type_name<uint8_t>().View()):
+	case string_hash(type_name<uint16_t>().View()):
+	case string_hash(type_name<uint32_t>().View()):
+	case string_hash(type_name<uint64_t>().View()):
 		return true;
 	default:
 		return false;
@@ -392,15 +392,15 @@ constexpr bool Ubpa::type_name_is_integral(std::string_view name) noexcept {
 
 constexpr bool Ubpa::type_name_is_floating_point(std::string_view name) noexcept {
 	auto rmcv_name = type_name_remove_cv(name);
-	if (rmcv_name == type_name<float>().value)
+	if (rmcv_name == type_name<float>().View())
 		return true;
-	else if (rmcv_name == type_name<double>().value)
+	else if (rmcv_name == type_name<double>().View())
 		return true;
 	else {
-		if constexpr (type_name<double>().value == type_name<long double>().value)
+		if constexpr (type_name<double>().View() == type_name<long double>().View())
 			return false;
 		else {
-			return rmcv_name == type_name<long double>().value;
+			return rmcv_name == type_name<long double>().View();
 		}
 	}
 }
@@ -456,10 +456,10 @@ constexpr bool Ubpa::type_name_is_signed(std::string_view name) noexcept {
 constexpr bool Ubpa::type_name_is_unsigned(std::string_view name) noexcept {
 	switch (string_hash(name))
 	{
-	case string_hash(type_name<uint8_t>().value):
-	case string_hash(type_name<uint16_t>().value):
-	case string_hash(type_name<uint32_t>().value):
-	case string_hash(type_name<uint64_t>().value):
+	case string_hash(type_name<uint8_t>().View()):
+	case string_hash(type_name<uint16_t>().View()):
+	case string_hash(type_name<uint32_t>().View()):
+	case string_hash(type_name<uint64_t>().View()):
 		return true;
 	default:
 		return false;

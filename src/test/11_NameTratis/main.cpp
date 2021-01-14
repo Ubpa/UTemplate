@@ -110,131 +110,131 @@ int main() {
 
 	// modification (add, alloc)
 	std::allocator<char> alloc;
-	assert(type_name_add_const(type_name<int&>(), alloc).data() == type_name<int&>().value.data());
-	assert(type_name_add_const(type_name<int&&>(), alloc).data() == type_name<int&&>().value.data());
-	assert(type_name_add_const(type_name<const int>(), alloc).data() == type_name<const int>().value.data());
+	assert(type_name_add_const(type_name<int&>(), alloc).data() == type_name<int&>().View().data());
+	assert(type_name_add_const(type_name<int&&>(), alloc).data() == type_name<int&&>().View().data());
+	assert(type_name_add_const(type_name<const int>(), alloc).data() == type_name<const int>().View().data());
 	{
 		const auto str = type_name_add_const(type_name<volatile int>(), alloc);
-		assert(str == type_name<const volatile int>().value);
+		assert(str == type_name<const volatile int>().View());
 		alloc.deallocate(const_cast<char*>(str.data()), str.size());
 	}
 	{
 		const auto str = type_name_add_const(type_name<int>(), alloc);
-		assert(str == type_name<const int>().value);
+		assert(str == type_name<const int>().View());
 		alloc.deallocate(const_cast<char*>(str.data()), str.size());
 	}
 
-	assert(type_name_add_volatile(type_name<int&>(), alloc).data() == type_name<int&>().value.data());
-	assert(type_name_add_volatile(type_name<int&&>(), alloc).data() == type_name<int&&>().value.data());
-	assert(type_name_add_volatile(type_name<volatile int>(), alloc).data() == type_name<volatile int>().value.data());
+	assert(type_name_add_volatile(type_name<int&>(), alloc).data() == type_name<int&>().View().data());
+	assert(type_name_add_volatile(type_name<int&&>(), alloc).data() == type_name<int&&>().View().data());
+	assert(type_name_add_volatile(type_name<volatile int>(), alloc).data() == type_name<volatile int>().View().data());
 	{
 		const auto str = type_name_add_volatile(type_name<const int>(), alloc);
-		assert(str == type_name<const volatile int>().value);
+		assert(str == type_name<const volatile int>().View());
 		alloc.deallocate(const_cast<char*>(str.data()), str.size());
 	}
 	{
 		const auto str = type_name_add_volatile(type_name<int>(), alloc);
-		assert(str == type_name<volatile int>().value);
+		assert(str == type_name<volatile int>().View());
 		alloc.deallocate(const_cast<char*>(str.data()), str.size());
 	}
 
-	assert(type_name_add_cv(type_name<int&>(), alloc).data() == type_name<int&>().value.data());
-	assert(type_name_add_cv(type_name<int&&>(), alloc).data() == type_name<int&&>().value.data());
-	assert(type_name_add_cv(type_name<const volatile int>(), alloc).data() == type_name<const volatile int>().value.data());
+	assert(type_name_add_cv(type_name<int&>(), alloc).data() == type_name<int&>().View().data());
+	assert(type_name_add_cv(type_name<int&&>(), alloc).data() == type_name<int&&>().View().data());
+	assert(type_name_add_cv(type_name<const volatile int>(), alloc).data() == type_name<const volatile int>().View().data());
 	{
 		const auto str = type_name_add_cv(type_name<const int>(), alloc);
-		assert(str == type_name<const volatile int>().value);
+		assert(str == type_name<const volatile int>().View());
 		alloc.deallocate(const_cast<char*>(str.data()), str.size());
 	}
 	{
 		const auto str = type_name_add_cv(type_name<volatile int>(), alloc);
-		assert(str == type_name<const volatile int>().value);
+		assert(str == type_name<const volatile int>().View());
 		alloc.deallocate(const_cast<char*>(str.data()), str.size());
 	}
 	{
 		const auto str = type_name_add_cv(type_name<int>(), alloc);
-		assert(str == type_name<const volatile int>().value);
+		assert(str == type_name<const volatile int>().View());
 		alloc.deallocate(const_cast<char*>(str.data()), str.size());
 	}
 
-	assert(type_name_add_lvalue_reference(type_name<int&>(), alloc).data() == type_name<int&>().value.data());
+	assert(type_name_add_lvalue_reference(type_name<int&>(), alloc).data() == type_name<int&>().View().data());
 	{
 		const auto str = type_name_add_lvalue_reference(type_name<int&&>(), alloc);
-		assert(str == type_name<int&>().value);
+		assert(str == type_name<int&>().View());
 		alloc.deallocate(const_cast<char*>(str.data()), str.size());
 	}
 	{
 		const auto str = type_name_add_volatile(type_name<int>(), alloc);
-		assert(str == type_name<volatile int>().value);
+		assert(str == type_name<volatile int>().View());
 		alloc.deallocate(const_cast<char*>(str.data()), str.size());
 	}
 
-	assert(type_name_add_rvalue_reference(type_name<int&>(), alloc).data() == type_name<int&>().value.data());
-	assert(type_name_add_rvalue_reference(type_name<int&&>(), alloc).data() == type_name<int&&>().value.data());
+	assert(type_name_add_rvalue_reference(type_name<int&>(), alloc).data() == type_name<int&>().View().data());
+	assert(type_name_add_rvalue_reference(type_name<int&&>(), alloc).data() == type_name<int&&>().View().data());
 	{
 		const auto str = type_name_add_rvalue_reference(type_name<int>(), alloc);
-		assert(str == type_name<int&&>().value);
+		assert(str == type_name<int&&>().View());
 		alloc.deallocate(const_cast<char*>(str.data()), str.size());
 	}
 
 	{
 		const auto str = type_name_add_pointer(type_name<int&>(), alloc);
-		assert(str == type_name<int*>().value);
+		assert(str == type_name<int*>().View());
 		alloc.deallocate(const_cast<char*>(str.data()), str.size());
 	}
 	{
 		const auto str = type_name_add_pointer(type_name<int&&>(), alloc);
-		assert(str == type_name<int*>().value);
+		assert(str == type_name<int*>().View());
 		alloc.deallocate(const_cast<char*>(str.data()), str.size());
 	}
 	{
 		const auto str = type_name_add_pointer(type_name<int>(), alloc);
-		assert(str == type_name<int*>().value);
+		assert(str == type_name<int*>().View());
 		alloc.deallocate(const_cast<char*>(str.data()), str.size());
 	}
 	{
 		const auto str = type_name_add_pointer(type_name<int>(), alloc);
-		assert(str == type_name<int*>().value);
+		assert(str == type_name<int*>().View());
 		alloc.deallocate(const_cast<char*>(str.data()), str.size());
 	}
 
-	assert(type_name_add_const_lvalue_reference(type_name<int&>(), alloc).data() == type_name<int&>().value.data());
+	assert(type_name_add_const_lvalue_reference(type_name<int&>(), alloc).data() == type_name<int&>().View().data());
 	{
 		const auto str = type_name_add_const_lvalue_reference(type_name<int&&>(), alloc);
-		assert(str == type_name<int&>().value);
+		assert(str == type_name<int&>().View());
 		alloc.deallocate(const_cast<char*>(str.data()), str.size());
 	}
 	{
 		const auto str = type_name_add_const_lvalue_reference(type_name<const int>(), alloc);
-		assert(str == type_name<const int&>().value);
+		assert(str == type_name<const int&>().View());
 		alloc.deallocate(const_cast<char*>(str.data()), str.size());
 	}
 	{
 		const auto str = type_name_add_const_lvalue_reference(type_name<volatile int>(), alloc);
-		assert(str == type_name<const volatile int&>().value);
+		assert(str == type_name<const volatile int&>().View());
 		alloc.deallocate(const_cast<char*>(str.data()), str.size());
 	}
 	{
 		const auto str = type_name_add_const_lvalue_reference(type_name<int>(), alloc);
-		assert(str == type_name<const int&>().value);
+		assert(str == type_name<const int&>().View());
 		alloc.deallocate(const_cast<char*>(str.data()), str.size());
 	}
 
-	assert(type_name_add_const_rvalue_reference(type_name<int&>(), alloc).data() == type_name<int&>().value.data());
-	assert(type_name_add_const_rvalue_reference(type_name<int&&>(), alloc).data() == type_name<int&&>().value.data());
+	assert(type_name_add_const_rvalue_reference(type_name<int&>(), alloc).data() == type_name<int&>().View().data());
+	assert(type_name_add_const_rvalue_reference(type_name<int&&>(), alloc).data() == type_name<int&&>().View().data());
 	{
 		const auto str = type_name_add_const_rvalue_reference(type_name<const int>(), alloc);
-		assert(str == type_name<const int&&>().value);
+		assert(str == type_name<const int&&>().View());
 		alloc.deallocate(const_cast<char*>(str.data()), str.size());
 	}
 	{
 		const auto str = type_name_add_const_rvalue_reference(type_name<volatile int>(), alloc);
-		assert(str == type_name<const volatile int&&>().value);
+		assert(str == type_name<const volatile int&&>().View());
 		alloc.deallocate(const_cast<char*>(str.data()), str.size());
 	}
 	{
 		const auto str = type_name_add_const_rvalue_reference(type_name<int>(), alloc);
-		assert(str == type_name<const int&&>().value);
+		assert(str == type_name<const int&&>().View());
 		alloc.deallocate(const_cast<char*>(str.data()), str.size());
 	}
 

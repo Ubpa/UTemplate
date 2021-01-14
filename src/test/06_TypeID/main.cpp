@@ -9,7 +9,7 @@ struct A{};
 struct AA {};
 
 int main() {
-	cout << details::raw_type_name<float>().value << endl;
+	cout << details::raw_type_name<float>().View() << endl;
 
 	cout << TypeID_of<int>.GetValue() << endl;
 #ifdef UBPA_NAME_X_INT

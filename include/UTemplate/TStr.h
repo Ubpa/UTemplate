@@ -7,9 +7,84 @@
 #ifndef UBPA_TSTR
 #define UBPA_TSTR
 
+#ifdef __cpp_nontype_template_parameter_class
+#define UBPA_TSTR_NTTPC 1
+#else
+  #if defined(_MSC_VER) && _MSC_VER >= 1926
+    #define UBPA_TSTR_NTTPC 1
+  #endif
+#endif
+
 #include <string_view>
 #include <utility>
+#include <cassert>
 
+#include <iostream>
+
+namespace Ubpa {
+	template<typename C, std::size_t N>
+	struct fixed_cstring {
+		using Char = C;
+
+		constexpr fixed_cstring(const Char(&str)[N + 1]) noexcept {
+			for (std::size_t i{ 0 }; i < size; ++i) {
+				data[i] = str[i];
+			}
+			data[size] = 0;
+		}
+
+		constexpr fixed_cstring(std::basic_string_view<Char> str) noexcept {
+			for (std::size_t i{ 0 }; i < size; ++i) {
+				data[i] = str[i];
+			}
+			data[size] = 0;
+		}
+
+		template<std::size_t N_ = N, std::enable_if_t<N_ == 0, int> = 0>
+		constexpr fixed_cstring() noexcept : data{ 0 } {}
+
+		template<std::size_t N_ = N, std::enable_if_t<N_ == 1, int> = 0>
+		constexpr fixed_cstring(Char c) noexcept : data{ c, 0 } {}
+		
+		template<typename... Chars>
+		constexpr fixed_cstring(std::in_place_t, Chars... chars) noexcept : data{ chars..., 0 }
+		{
+			static_assert(sizeof...(chars) == size);
+		}
+
+		Char data[N + 1]{};
+		static constexpr std::size_t size = N;
+	};
+}
+
+#ifdef UBPA_TSTR_NTTPC
+
+namespace Ubpa {
+	template<fixed_cstring str>
+	struct TStr {
+		using Char = typename decltype(str)::Char;
+
+		template<typename T>
+		static constexpr bool Is(T = {}) noexcept { return std::is_same_v<T, TStr>; }
+		static constexpr const Char* Data() noexcept { return str.data; }
+		static constexpr std::size_t Size() noexcept { return str.size; }
+		static constexpr std::basic_string_view<Char> View() noexcept { return str.data; }
+		constexpr operator std::basic_string_view<Char>() { return View(); }
+	};
+
+	template<char... chars>
+	using TStrC_of = TStr < fixed_cstring<char, sizeof...(chars)>{ std::in_place, chars... } > ;
+	template<auto c>
+	using TStr_of = TStr< fixed_cstring<decltype(c), 1>{ c } >;
+}
+
+#define TSTR(s)                                                                                \
+([] {                                                                                          \
+	constexpr std::basic_string_view str{s};                                                   \
+    return Ubpa::TStr<fixed_cstring<typename decltype(str)::value_type, str.size()>{ str }>{}; \
+}())
+
+#else
 namespace Ubpa {
 	template<typename Char, Char... chars>
 	struct TStr;
@@ -53,37 +128,57 @@ namespace Ubpa {
 		using Char = C;
 		template<typename T>
 		static constexpr bool Is(T = {}) noexcept { return std::is_same_v<T, TStr>; }
+		static constexpr const Char* Data() noexcept { data; }
+		static constexpr std::size_t Size() noexcept { sizeof...(chars); }
+		static constexpr std::basic_string_view<Char> View() noexcept { return data; }
+		constexpr operator std::basic_string_view<Char>() { return View(); }
+	private:
 		static constexpr Char data[]{ chars...,Char(0) };
-		static constexpr std::basic_string_view<Char> value{ data };
-		constexpr operator std::basic_string_view<Char>() { return value; }
 	};
 
-	template<typename T>
-	struct IsTStr : std::false_type {};
-
-	template<typename Char, Char... chars>
-	struct IsTStr<TStr<Char, chars...>> : std::true_type {};
-
 	template<char... chars>
-	constexpr auto TStrC_of = TStr<char, chars...>{};
+	using TStrC_of = TStr<char, chars...>;
 	template<auto c>
-	constexpr auto TStr_of = TStr<decltype(c), c>{};
+	using TStr_of = TStr<decltype(c), c>;
 }
 
+#endif // UBPA_TSTR_NTTPC
 #endif // UBPA_TSTR
 
 #ifndef UBPA_TSTR_UTIL
 #define UBPA_TSTR_UTIL
 
 namespace Ubpa {
+#ifdef UBPA_TSTR_NTTPC
+	template<typename Str>
+	constexpr auto empty_of(Str = {}) noexcept { return TStr < fixed_cstring<typename Str::Char, 0>{} > {}; }
+#else
+	template<typename Str>
+	constexpr auto empty_of(Str = {}) noexcept { return TStr < typename Str::Char > {}; }
+#endif
+
 	template<typename Str0, typename Str1>
 	struct concat_helper;
 	template<typename Str0, typename Str1>
 	using concat_helper_t = typename concat_helper<Str0, Str1>::type;
+
+#ifdef UBPA_TSTR_NTTPC
+	template<typename Str0, typename Str1>
+	struct concat_helper {
+	private:
+		template<std::size_t... LNs, std::size_t... RNs>
+		static constexpr auto get(std::index_sequence<LNs...>, std::index_sequence<RNs...>) noexcept {
+			return TStrC_of<Str0::View()[LNs]..., Str1::View()[RNs]...>{};
+		}
+	public:
+		using type = decltype(get(std::make_index_sequence<Str0::Size()>{}, std::make_index_sequence<Str1::Size()>{}));
+	};
+#else
 	template<typename Char, Char... c0, Char... c1>
 	struct concat_helper<TStr<Char, c0...>, TStr<Char, c1...>> {
 		using type = TStr<Char, c0..., c1...>;
 	};
+#endif // UBPA_TSTR_NTTPC
 
 	template<typename Str0, typename Str1>
 	constexpr auto concat(Str0 = {}, Str1 = {}) noexcept {
@@ -113,7 +208,7 @@ namespace Ubpa {
 	using concat_seq_seperator_helper_t = typename concat_seq_seperator_helper<Seperator, Strs...>::type;
 	template<typename Seperator>
 	struct concat_seq_seperator_helper<Seperator> {
-		using type = TStr<typename Seperator::Char>;
+		using type = decltype(empty_of<Seperator>());
 	};
 	template<typename Seperator, typename Str>
 	struct concat_seq_seperator_helper<Seperator, Str> {
@@ -128,17 +223,13 @@ namespace Ubpa {
 		return concat_seq_seperator_helper_t<Seperator, Strs...>{};
 	}
 
-	template<typename Char, Char... chars>
-	constexpr TStr<Char> empty_of(TStr<Char, chars...>) noexcept { return {}; }
-
 	template<typename Str, typename X>
 	constexpr std::size_t find(Str = {}, X = {}) noexcept {
-		static_assert(IsTStr<Str>::value && IsTStr<X>::value);
-		if constexpr (Str::value.size() >= X::value.size()) {
-			for (std::size_t i = 0; i < Str::value.size() - X::value.size() + 1; i++) {
+		if constexpr (Str::Size() >= X::Size()) {
+			for (std::size_t i = 0; i < Str::Size() - X::Size() + 1; i++) {
 				bool flag = true;
-				for (std::size_t k = 0; k < X::value.size(); k++) {
-					if (Str::value[i + k] != X::value[k]) {
+				for (std::size_t k = 0; k < X::Size(); k++) {
+					if (Str::View()[i + k] != X::View()[k]) {
 						flag = false;
 						break;
 					}
@@ -152,13 +243,12 @@ namespace Ubpa {
 
 	template<typename Str, typename X>
 	constexpr std::size_t find_last(Str = {}, X = {}) noexcept {
-		static_assert(IsTStr<Str>::value && IsTStr<X>::value);
-		if constexpr (Str::value.size() >= X::value.size()) {
-			for (std::size_t i = 0; i < Str::value.size() - X::value.size() + 1; i++) {
-				std::size_t idx = Str::value.size() - X::value.size() - i;
+		if constexpr (Str::Size() >= X::Size()) {
+			for (std::size_t i = 0; i < Str::Size() - X::Size() + 1; i++) {
+				std::size_t idx = Str::Size() - X::Size() - i;
 				bool flag = true;
-				for (std::size_t k = 0; k < X::value.size(); k++) {
-					if (Str::value[idx + k] != X::value[k]) {
+				for (std::size_t k = 0; k < X::Size(); k++) {
+					if (Str::View()[idx + k] != X::View()[k]) {
 						flag = false;
 						break;
 					}
@@ -172,11 +262,10 @@ namespace Ubpa {
 
 	template<typename Str, typename X>
 	constexpr bool starts_with(Str = {}, X = {}) noexcept {
-		static_assert(IsTStr<Str>::value && IsTStr<X>::value);
-		if (Str::value.size() < X::value.size())
+		if (Str::Size() < X::Size())
 			return false;
-		for (std::size_t i = 0; i < X::value.size(); i++) {
-			if (Str::value[i] != X::value[i])
+		for (std::size_t i = 0; i < X::Size(); i++) {
+			if (Str::View()[i] != X::View()[i])
 				return false;
 		}
 		return true;
@@ -184,11 +273,10 @@ namespace Ubpa {
 
 	template<typename Str, typename X>
 	constexpr bool ends_with(Str = {}, X = {}) noexcept {
-		static_assert(IsTStr<Str>::value && IsTStr<X>::value);
-		if (Str::value.size() < X::value.size())
+		if (Str::Size() < X::Size())
 			return false;
-		for (std::size_t i = 0; i < X::value.size(); i++) {
-			if (Str::value[Str::value.size() - X::value.size() + i] != X::value[i])
+		for (std::size_t i = 0; i < X::Size(); i++) {
+			if (Str::View()[Str::Size() - X::Size() + i] != X::View()[i])
 				return false;
 		}
 		return true;
@@ -196,55 +284,55 @@ namespace Ubpa {
 
 	template<std::size_t N, typename Str>
 	constexpr auto remove_prefix(Str = {}) {
-		static_assert(IsTStr<Str>::value);
-		if constexpr (Str::value.size() >= N)
-			return TSTR(decltype(Str::value){Str::value.data() + N});
+		if constexpr (Str::Size() >= N) {
+			return TSTR(Str::Data() + N);
+		}
 		else
 			return empty_of(Str{});
 	}
 
 	template<typename Str, typename X>
 	constexpr auto remove_prefix(Str = {}, X = {}) {
-		static_assert(IsTStr<Str>::value);
-		static_assert(IsTStr<X>::value);
 		if constexpr (starts_with<Str, X>())
-			return remove_prefix<X::value.size(), Str>();
+			return remove_prefix<X::Size(), Str>();
 		else
 			return Str{};
 	}
 
+	template<std::size_t N, typename Char>
+	constexpr std::basic_string_view<Char> detail_remove_suffix(std::basic_string_view<Char> str) {
+		str.remove_prefix(N);
+		return str;
+	}
+
 	template<std::size_t N, typename Str>
 	constexpr auto remove_suffix(Str = {}) {
-		static_assert(IsTStr<Str>::value);
-		if constexpr (Str::value.size() >= N)
-			return TSTR((decltype(Str::value){Str::value.data(), Str::value.size() - N}));
+		if constexpr (Str::Size() >= N)
+			return TSTR(detail_remove_suffix<N>(Str::View()));
 		else
 			return empty_of(Str{});
 	}
 
 	template<typename Str, typename X>
 	constexpr auto remove_suffix(Str = {}, X = {}) {
-		static_assert(IsTStr<Str>::value);
 		if constexpr (ends_with<Str, X>())
-			return remove_suffix<X::value.size(), Str>();
+			return remove_suffix<X::Size(), Str>();
 		else
 			return Str{};
 	}
 
 	template<std::size_t N, typename Str>
 	constexpr auto get_prefix(Str = {}) {
-		static_assert(IsTStr<Str>::value);
-		if constexpr (Str::value.size() >= N)
-			return TSTR((decltype(Str::value){Str::value.data(), N}));
+		if constexpr (Str::Size() >= N)
+			return TSTR((decltype(Str::View()){Str::Data(), N}));
 		else
 			return Str{};
 	}
 
 	template<std::size_t N, typename Str>
 	constexpr auto get_suffix(Str = {}) {
-		static_assert(IsTStr<Str>::value);
-		if constexpr (Str::value.size() >= N)
-			return TSTR(decltype(Str::value){Str::value.data() + Str::value.size() - N});
+		if constexpr (Str::Size() >= N)
+			return TSTR(decltype(Str::View()){Str::Data() + Str::Size() - N});
 		else
 			return Str{};
 	}
@@ -252,9 +340,7 @@ namespace Ubpa {
 	// [Left, Right)
 	template<std::size_t Idx, std::size_t Cnt, typename Str, typename X>
 	constexpr auto replace(Str = {}, X = {}) {
-		static_assert(IsTStr<Str>::value);
-		static_assert(IsTStr<X>::value);
-		constexpr auto prefix = remove_suffix<Str::value.size() - Idx>(Str{});
+		constexpr auto prefix = remove_suffix<Str::Size() - Idx>(Str{});
 		constexpr auto suffix = remove_prefix<Idx + Cnt>(Str{});
 
 		return concat(concat(prefix, X{}), suffix);
@@ -262,12 +348,9 @@ namespace Ubpa {
 
 	template<typename Str, typename From, typename To>
 	constexpr auto replace(Str = {}, From = {}, To = {}) {
-		static_assert(IsTStr<Str>::value);
-		static_assert(IsTStr<From>::value);
-		static_assert(IsTStr<To>::value);
 		constexpr std::size_t idx = find(Str{}, From{});
 		if constexpr (idx != static_cast<std::size_t>(-1))
-			return replace(replace<idx, From::value.size()>(Str{}, To{}), From{}, To{});
+			return replace(replace<idx, From::Size()>(Str{}, To{}), From{}, To{});
 		else
 			return Str{};
 	}
@@ -285,18 +368,18 @@ namespace Ubpa {
 	template<auto V, std::enable_if_t<std::is_integral_v<decltype(V)>, int> = 0>
 	constexpr auto int_to_TSTR() {
 		if constexpr (V == 0)
-			return TStr<char, '0'>{};
+			return TStr_of<'0'>{};
 		else { // not zero
 			using T = decltype(V);
 			if constexpr (std::is_signed_v<T>) {
 				if constexpr (V < 0)
-					return concat(TStr<char, '-'>{}, int_to_TSTR<static_cast<std::make_unsigned_t<T>>(-V)>());
+					return concat(TStr_of<'-'>{}, int_to_TSTR<static_cast<std::make_unsigned_t<T>>(-V)>());
 				else
 					return int_to_TSTR<static_cast<std::make_unsigned_t<T>>(V)>();
 			}
 			else { // unsigned
 				if constexpr (V < 10) {
-					return TStr<char, '0' + V>{};
+					return TStr_of<'0' + static_cast<char>(V)>{};
 				}
 				else
 					return concat(int_to_TSTR<V / 10>(), int_to_TSTR<V % 10>());
