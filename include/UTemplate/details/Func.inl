@@ -75,99 +75,99 @@ namespace Ubpa::details {
 // 2*2*3*2 = 24
 template<typename Ret, typename... Args> // 0000
 struct Ubpa::FuncTraits<Ret(Args...)> 
-	: details::FuncTraitsBase<false, false, ReferenceMode::NONE, false, Ret(Args...)> {};
+	: details::FuncTraitsBase<false, false, ReferenceMode::None, false, Ret(Args...)> {};
 
 template<typename Ret, typename... Args> // 1000
 struct Ubpa::FuncTraits<Ret(Args...)const>
-	: details::FuncTraitsBase<true, false, ReferenceMode::NONE, false, Ret(Args...)> {};
+	: details::FuncTraitsBase<true, false, ReferenceMode::None, false, Ret(Args...)> {};
 
 template<typename Ret, typename... Args> // 0100
 struct Ubpa::FuncTraits<Ret(Args...)volatile>
-	: details::FuncTraitsBase<false, true, ReferenceMode::NONE, false, Ret(Args...)> {};
+	: details::FuncTraitsBase<false, true, ReferenceMode::None, false, Ret(Args...)> {};
 
 template<typename Ret, typename... Args> // 1100
 struct Ubpa::FuncTraits<Ret(Args...)const volatile>
-	: details::FuncTraitsBase<true, true, ReferenceMode::NONE, false, Ret(Args...)> {};
+	: details::FuncTraitsBase<true, true, ReferenceMode::None, false, Ret(Args...)> {};
 
 template<typename Ret, typename... Args> // 0010
 struct Ubpa::FuncTraits<Ret(Args...)&>
-	: details::FuncTraitsBase<false, false, ReferenceMode::LEFT, false, Ret(Args...)> {};
+	: details::FuncTraitsBase<false, false, ReferenceMode::Left, false, Ret(Args...)> {};
 
 template<typename Ret, typename... Args> // 1010
 struct Ubpa::FuncTraits<Ret(Args...)const&>
-	: details::FuncTraitsBase<true, false, ReferenceMode::LEFT, false, Ret(Args...)> {};
+	: details::FuncTraitsBase<true, false, ReferenceMode::Left, false, Ret(Args...)> {};
 
 template<typename Ret, typename... Args> // 0110
 struct Ubpa::FuncTraits<Ret(Args...)volatile&>
-	: details::FuncTraitsBase<false, true, ReferenceMode::LEFT, false, Ret(Args...)> {};
+	: details::FuncTraitsBase<false, true, ReferenceMode::Left, false, Ret(Args...)> {};
 
 template<typename Ret, typename... Args> // 1110
 struct Ubpa::FuncTraits<Ret(Args...)const volatile&>
-	: details::FuncTraitsBase<true, true, ReferenceMode::LEFT, false, Ret(Args...)> {};
+	: details::FuncTraitsBase<true, true, ReferenceMode::Left, false, Ret(Args...)> {};
 
 template<typename Ret, typename... Args> // 0020
 struct Ubpa::FuncTraits<Ret(Args...)&&>
-	: details::FuncTraitsBase<false, false, ReferenceMode::RIGHT, false, Ret(Args...)> {};
+	: details::FuncTraitsBase<false, false, ReferenceMode::Right, false, Ret(Args...)> {};
 
 template<typename Ret, typename... Args> // 1020
 struct Ubpa::FuncTraits<Ret(Args...)const&&>
-	: details::FuncTraitsBase<true, false, ReferenceMode::RIGHT, false, Ret(Args...)> {};
+	: details::FuncTraitsBase<true, false, ReferenceMode::Right, false, Ret(Args...)> {};
 
 template<typename Ret, typename... Args> // 0120
 struct Ubpa::FuncTraits<Ret(Args...)volatile&&>
-	: details::FuncTraitsBase<false, true, ReferenceMode::RIGHT, false, Ret(Args...)> {};
+	: details::FuncTraitsBase<false, true, ReferenceMode::Right, false, Ret(Args...)> {};
 
 template<typename Ret, typename... Args> // 1120
 struct Ubpa::FuncTraits<Ret(Args...)const volatile&&>
-	: details::FuncTraitsBase<true, true, ReferenceMode::RIGHT, false, Ret(Args...)> {};
+	: details::FuncTraitsBase<true, true, ReferenceMode::Right, false, Ret(Args...)> {};
 
 template<typename Ret, typename... Args> // 0001
 struct Ubpa::FuncTraits<Ret(Args...)noexcept>
-	: details::FuncTraitsBase<false, false, ReferenceMode::NONE, true, Ret(Args...)> {};
+	: details::FuncTraitsBase<false, false, ReferenceMode::None, true, Ret(Args...)> {};
 
 template<typename Ret, typename... Args> // 1001
 struct Ubpa::FuncTraits<Ret(Args...)const noexcept>
-	: details::FuncTraitsBase<true, false, ReferenceMode::NONE, true, Ret(Args...)> {};
+	: details::FuncTraitsBase<true, false, ReferenceMode::None, true, Ret(Args...)> {};
 
 template<typename Ret, typename... Args> // 0101
 struct Ubpa::FuncTraits<Ret(Args...)volatile noexcept>
-	: details::FuncTraitsBase<false, true, ReferenceMode::NONE, true, Ret(Args...)> {};
+	: details::FuncTraitsBase<false, true, ReferenceMode::None, true, Ret(Args...)> {};
 
 template<typename Ret, typename... Args> // 1101
 struct Ubpa::FuncTraits<Ret(Args...)const volatile noexcept>
-	: details::FuncTraitsBase<true, true, ReferenceMode::NONE, true, Ret(Args...)> {};
+	: details::FuncTraitsBase<true, true, ReferenceMode::None, true, Ret(Args...)> {};
 
 template<typename Ret, typename... Args> // 0011
 struct Ubpa::FuncTraits<Ret(Args...) & noexcept>
-	: details::FuncTraitsBase<false, false, ReferenceMode::LEFT, true, Ret(Args...)> {};
+	: details::FuncTraitsBase<false, false, ReferenceMode::Left, true, Ret(Args...)> {};
 
 template<typename Ret, typename... Args> // 1011
 struct Ubpa::FuncTraits<Ret(Args...)const& noexcept>
-	: details::FuncTraitsBase<true, false, ReferenceMode::LEFT, true, Ret(Args...)> {};
+	: details::FuncTraitsBase<true, false, ReferenceMode::Left, true, Ret(Args...)> {};
 
 template<typename Ret, typename... Args> // 0111
 struct Ubpa::FuncTraits<Ret(Args...)volatile& noexcept>
-	: details::FuncTraitsBase<false, true, ReferenceMode::LEFT, true, Ret(Args...)> {};
+	: details::FuncTraitsBase<false, true, ReferenceMode::Left, true, Ret(Args...)> {};
 
 template<typename Ret, typename... Args> // 1111
 struct Ubpa::FuncTraits<Ret(Args...)const volatile& noexcept>
-	: details::FuncTraitsBase<true, true, ReferenceMode::LEFT, true, Ret(Args...)> {};
+	: details::FuncTraitsBase<true, true, ReferenceMode::Left, true, Ret(Args...)> {};
 
 template<typename Ret, typename... Args> // 0021
 struct Ubpa::FuncTraits<Ret(Args...) && noexcept>
-	: details::FuncTraitsBase<false, false, ReferenceMode::RIGHT, true, Ret(Args...)> {};
+	: details::FuncTraitsBase<false, false, ReferenceMode::Right, true, Ret(Args...)> {};
 
 template<typename Ret, typename... Args> // 1021
 struct Ubpa::FuncTraits<Ret(Args...)const&& noexcept>
-	: details::FuncTraitsBase<true, false, ReferenceMode::RIGHT, true, Ret(Args...)> {};
+	: details::FuncTraitsBase<true, false, ReferenceMode::Right, true, Ret(Args...)> {};
 
 template<typename Ret, typename... Args> // 0121
 struct Ubpa::FuncTraits<Ret(Args...)volatile&& noexcept>
-	: details::FuncTraitsBase<false, true, ReferenceMode::RIGHT, true, Ret(Args...)> {};
+	: details::FuncTraitsBase<false, true, ReferenceMode::Right, true, Ret(Args...)> {};
 
 template<typename Ret, typename... Args> // 1121
 struct Ubpa::FuncTraits<Ret(Args...)const volatile&& noexcept>
-	: details::FuncTraitsBase<true, true, ReferenceMode::RIGHT, true, Ret(Args...)> {};
+	: details::FuncTraitsBase<true, true, ReferenceMode::Right, true, Ret(Args...)> {};
 
 // dispatch
 template<typename Func>

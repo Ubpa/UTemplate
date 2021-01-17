@@ -6,9 +6,9 @@
 
 namespace Ubpa {
 	enum class ReferenceMode {
-		NONE,
-		LEFT,
-		RIGHT
+		None,
+		Left,
+		Right
 	};
 
 	// type Object : if not member function, it is void
