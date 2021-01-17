@@ -17,9 +17,6 @@
 
 #include <string_view>
 #include <utility>
-#include <cassert>
-
-#include <iostream>
 
 namespace Ubpa {
 	template<typename C, std::size_t N>
@@ -104,14 +101,6 @@ namespace Ubpa::details {
 	}
 }
 
-#if (defined(__GNUC__) || defined(__GNUG__)) && !defined(__clang__)
-// 2^8 == 256
-#define USE_DECODE_TSTR 8
-#include "details/DecodeTStr.inl"
-// [C-style string type (value)]
-// use irqus's type_string for GCC
-#define TSTR(s) DECODE_TSTR(s){}
-#else
 // [C-style string type (value)]
 // in C++20, we can easily put a string into template parameter list
 // but in C++17, we just can use this disgusting trick
@@ -120,7 +109,6 @@ namespace Ubpa::details {
     struct tmp { static constexpr auto get() { return std::basic_string_view{s}; } }; \
     return Ubpa::details::TSTRHelper(tmp{});                                          \
 }())
-#endif
 
 namespace Ubpa {
 	template<typename C, C... chars>
