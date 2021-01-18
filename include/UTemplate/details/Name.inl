@@ -6,26 +6,10 @@
 #include <cassert>
 #include <cstring>
 
-// Checks UBPA_NAME_type compiler compatibility.
-#if defined(__clang__) && __clang_major__ >= 5 || defined(__GNUC__) && __GNUC__ >= 7 || defined(_MSC_VER) && _MSC_VER >= 1910
-#  undef  UBPA_NAME_TYPE_SUPPORTED
-#  define UBPA_NAME_TYPE_SUPPORTED 1
-#endif
-
 namespace Ubpa::details {
 	//
 	// core
 	/////////
-
-#if defined(_MSC_VER)
-	template <typename T>
-	struct identity {
-		using type = T;
-	};
-#else
-	template <typename T>
-	using identity = T;
-#endif
 
 	template<typename T>
 	constexpr auto func_signature_impl() noexcept {
@@ -40,7 +24,7 @@ namespace Ubpa::details {
 
 	template<typename T>
 	constexpr auto func_signature()noexcept {
-		return TSTR(func_signature_impl<identity<T>>());
+		return TSTR(func_signature_impl<std::type_identity<T>>());
 	}
 
 	//
@@ -109,16 +93,12 @@ namespace Ubpa::details {
 	template<typename T>
 	constexpr auto raw_type_name() noexcept {
 		constexpr auto sig = func_signature<T>();
-#if defined(UBPA_NAME_TYPE_SUPPORTED) && UBPA_NAME_TYPE_SUPPORTED
-#  if defined(__clang__)
-		return remove_suffix<1>(remove_prefix<47>(sig));
-#  elif defined(__GNUC__)
-		return remove_suffix<1>(remove_prefix<62>(sig));
-#  elif defined(_MSC_VER)
-		return remove_suffix(remove_suffix<17>(remove_prefix<79>(sig)), TStr_of<' '>{});
-#  endif
-#else
-		return TStr<char>{}; // Unsupported compiler.
+#if defined(__clang__)
+		return remove_suffix<1>(remove_prefix<42>(sig));
+#elif defined(__GNUC__)
+		return remove_suffix<1>(remove_prefix<57>(sig));
+#elif defined(_MSC_VER)
+		return remove_suffix(remove_suffix<17>(remove_prefix<74>(sig)), TStr_of<' '>{});
 #endif
 	}
 
