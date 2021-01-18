@@ -1,5 +1,7 @@
 #include <UTemplate/Name.h>
 
+#include <memory>
+
 using namespace Ubpa;
 
 struct A {
