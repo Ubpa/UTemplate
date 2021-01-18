@@ -77,7 +77,7 @@ namespace Ubpa {
 #define TSTR(s)                                                                                \
 ([] {                                                                                          \
 	constexpr std::basic_string_view str{s};                                                   \
-    return Ubpa::TStr<fixed_cstring<typename decltype(str)::value_type, str.size()>{ str }>{}; \
+    return Ubpa::TStr<Ubpa::fixed_cstring<typename decltype(str)::value_type, str.size()>{ str }>{}; \
 }())
 
 #else
