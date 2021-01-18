@@ -28,4 +28,17 @@ int main() {
 	cout << TypeID("const{A}").GetValue() << endl;
 	cout << TypeID_of<AA>.GetValue() << endl;
 	cout << TypeID("AA").GetValue() << endl;
+
+	if (TypeID_of<int> < TypeID_of<float>)
+		cout << "TypeID_of<int> < TypeID_of<float>" << endl;
+	if (TypeID_of<int> <= TypeID_of<float>)
+		cout << "TypeID_of<int> <= TypeID_of<float>" << endl;
+	if (TypeID_of<int> > TypeID_of<float>)
+		cout << "TypeID_of<int> > TypeID_of<float>" << endl;
+	if (TypeID_of<int> >= TypeID_of<float>)
+		cout << "TypeID_of<int> >= TypeID_of<float>" << endl;
+	if (TypeID_of<int> == TypeID_of<float>)
+		cout << "TypeID_of<int> == TypeID_of<float>" << endl;
+	if (TypeID_of<int> != TypeID_of<float>)
+		cout << "TypeID_of<int> != TypeID_of<float>" << endl;
 }

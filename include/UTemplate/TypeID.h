@@ -2,6 +2,8 @@
 
 #include "Name.h"
 
+#include <compare>
+
 namespace Ubpa {
 	class IDBase {
 	public:
@@ -23,6 +25,9 @@ namespace Ubpa {
 
 		explicit constexpr operator bool() const noexcept { return Valid(); }
 
+	protected:
+		constexpr std::strong_ordering operator<=>(const IDBase& rhs) const noexcept = default;
+
 	private:
 		std::size_t value;
 	};
@@ -30,13 +35,8 @@ namespace Ubpa {
 	class StrID : public IDBase {
 	public:
 		using IDBase::IDBase;
-
-		constexpr bool operator< (const StrID& rhs) const noexcept { return GetValue() <  rhs.GetValue(); }
-		constexpr bool operator<=(const StrID& rhs) const noexcept { return GetValue() <= rhs.GetValue(); }
-		constexpr bool operator> (const StrID& rhs) const noexcept { return GetValue() >  rhs.GetValue(); }
-		constexpr bool operator>=(const StrID& rhs) const noexcept { return GetValue() >= rhs.GetValue(); }
-		constexpr bool operator==(const StrID& rhs) const noexcept { return GetValue() == rhs.GetValue(); }
-		constexpr bool operator!=(const StrID& rhs) const noexcept { return GetValue() != rhs.GetValue(); }
+		constexpr std::strong_ordering operator<=>(const StrID& rhs) const { return IDBase::operator<=>(rhs); }
+		constexpr bool operator==(const StrID& rhs) const { return operator<=>(rhs) == std::strong_ordering::equal; }
 	};
 
 	class TypeID : public IDBase {
@@ -46,20 +46,16 @@ namespace Ubpa {
 
 		template<typename T>
 		constexpr bool Is() const noexcept { return IDBase::Is(type_name<T>().View()); }
-		
-		constexpr bool operator< (const TypeID& rhs) const noexcept { return GetValue() <  rhs.GetValue(); }
-		constexpr bool operator<=(const TypeID& rhs) const noexcept { return GetValue() <= rhs.GetValue(); }
-		constexpr bool operator> (const TypeID& rhs) const noexcept { return GetValue() >  rhs.GetValue(); }
-		constexpr bool operator>=(const TypeID& rhs) const noexcept { return GetValue() >= rhs.GetValue(); }
-		constexpr bool operator==(const TypeID& rhs) const noexcept { return GetValue() == rhs.GetValue(); }
-		constexpr bool operator!=(const TypeID& rhs) const noexcept { return GetValue() != rhs.GetValue(); }
+		constexpr std::strong_ordering operator<=>(const TypeID& rhs) const { return IDBase::operator<=>(rhs); }
+		constexpr bool operator==(const TypeID& rhs) const { return operator<=>(rhs) == std::strong_ordering::equal; }
 	};
 
 	template<typename T>
 	constexpr TypeID TypeID_of = TypeID{ type_name<T>().View() };
 
-	template<typename X, typename Y> struct TypeID_Less : IValue<bool, TypeID_of<X> < TypeID_of<Y> >
-	{ static_assert(std::is_same_v<X, Y> || TypeID_of<X> != TypeID_of<Y>); };
+	template<typename X, typename Y> struct TypeID_Less : IValue<bool, TypeID_of<X> < TypeID_of<Y> > {
+		static_assert(std::is_same_v<X, Y> || TypeID_of<X> != TypeID_of<Y>);
+	};
 
 	template<typename X, typename Y> constexpr bool TypeID_Less_v = TypeID_Less<X, Y>::value;
 }
