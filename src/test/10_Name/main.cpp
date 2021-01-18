@@ -160,6 +160,10 @@ int main() {
 		std::cout << "|" << type_name<double>().View() << "|" << std::endl;
 		std::cout << "|" << type_name<long double>().View() << "|" << std::endl;
 	}
+	{ // TSTR
+		static constexpr auto str = TSTR("hello");
+		std::cout << "|" << type_name<decltype(str)>().View() << "|" << std::endl;
+	}
 
 	return 0;
 }

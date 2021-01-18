@@ -136,6 +136,11 @@ namespace Ubpa {
 #define UBPA_TSTR_UTIL
 
 namespace Ubpa {
+	template<typename T>
+	concept TStrLike = requires{
+		{T::View()}->std::same_as<std::basic_string_view<typename T::Char>>;
+	};
+
 #ifdef UBPA_TSTR_NTTPC
 	template<typename Str>
 	constexpr auto empty_of(Str = {}) noexcept { return TStr < fixed_cstring<typename Str::Char, 0>{} > {}; }
