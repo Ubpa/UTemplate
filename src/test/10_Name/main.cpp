@@ -37,7 +37,7 @@ template<auto>
 struct E {};
 
 template<typename Value, typename T, Value C<T>::* ptr>
-struct Ubpa::details::member_pointer_name<ptr> {
+struct Ubpa::details::custom_constexpr_value_name<ptr> {
 	static constexpr auto get() noexcept {
 		if constexpr (member_pointer_equal(ptr, &C<T>::f))
 			return TSTR("f");
@@ -49,7 +49,7 @@ struct Ubpa::details::member_pointer_name<ptr> {
 };
 
 template<>
-struct Ubpa::details::type_namespace_name<C<decltype(&C<float>::f)>::D> {
+struct Ubpa::details::custom_type_namespace_name<C<decltype(&C<float>::f)>::D> {
 	static constexpr auto get() noexcept {
 		return type_name<C<decltype(&C<float>::f)>>();
 	}
@@ -59,7 +59,7 @@ struct BH {
 	void f() {};
 };
 template<>
-struct Ubpa::details::member_pointer_name<&BH::f> {
+struct Ubpa::details::custom_constexpr_value_name<&BH::f> {
 	static constexpr auto get() noexcept {
 		return TSTR("f");
 	}

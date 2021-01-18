@@ -21,12 +21,12 @@ namespace Ubpa::details {
 
 namespace Ubpa {
 	template<template<typename...>class OtherListTemplate, typename... Ts>
-	struct ToTypeList<OtherListTemplate, OtherListTemplate<Ts...>> : IType<TypeList<Ts...>> {};
+	struct ToTypeList<OtherListTemplate, OtherListTemplate<Ts...>> : std::type_identity<TypeList<Ts...>> {};
 
 	// =================================================
 
 	template<typename... Ts, template<typename...>class OtherListTemplate>
-	struct ToOtherList<TypeList<Ts...>, OtherListTemplate> : IType<OtherListTemplate<Ts...>> {};
+	struct ToOtherList<TypeList<Ts...>, OtherListTemplate> : std::type_identity<OtherListTemplate<Ts...>> {};
 
 	// =================================================
 
@@ -46,12 +46,12 @@ namespace Ubpa {
 	// =================================================
 
 	template<typename Head, typename... Tail>
-	struct Front<TypeList<Head, Tail...>> : IType<Head> {};
+	struct Front<TypeList<Head, Tail...>> : std::type_identity<Head> {};
 
 	// =================================================
 
 	template<typename List>
-	struct At<List, 0> : IType<Front_t<List>> {};
+	struct At<List, 0> : std::type_identity<Front_t<List>> {};
 
 	template<typename List, std::size_t N>
 	struct At : At<PopFront_t<List>, N - 1> {};
@@ -59,7 +59,7 @@ namespace Ubpa {
 	// =================================================
 
 	template<typename List, std::size_t... Indices>
-	struct Select : IType<TypeList<At_t<List, Indices>...>> {};
+	struct Select : std::type_identity<TypeList<At_t<List, Indices>...>> {};
 
 	// =================================================
 
@@ -89,7 +89,7 @@ namespace Ubpa {
 	// =================================================
 
 	template<template<typename...> class T, typename... Args>
-	struct Instantiate<TypeList<Args...>, T> : IType<T<Args...>> {};
+	struct Instantiate<TypeList<Args...>, T> : std::type_identity<T<Args...>> {};
 
 	// =================================================
 
@@ -104,22 +104,22 @@ namespace Ubpa {
 	// =================================================
 
 	template<typename T, typename... Ts>
-	struct PushFront<TypeList<Ts...>, T> : IType<TypeList<T, Ts...>> {};
+	struct PushFront<TypeList<Ts...>, T> : std::type_identity<TypeList<T, Ts...>> {};
 
 	// =================================================
 
 	template<typename T, typename... Ts>
-	struct PushBack<TypeList<Ts...>, T> : IType<TypeList<Ts..., T>> {};
+	struct PushBack<TypeList<Ts...>, T> : std::type_identity<TypeList<Ts..., T>> {};
 
 	// =================================================
 
 	template<typename Head, typename... Tail>
-	struct PopFront<TypeList<Head, Tail...>> : IType<TypeList<Tail...>> {};
+	struct PopFront<TypeList<Head, Tail...>> : std::type_identity<TypeList<Tail...>> {};
 
 	// =================================================
 
 	template<typename Head, typename... Tail>
-	struct Rotate<TypeList<Head, Tail...>> : IType<TypeList<Tail..., Head>> {};
+	struct Rotate<TypeList<Head, Tail...>> : std::type_identity<TypeList<Tail..., Head>> {};
 
 	// =================================================
 
@@ -155,15 +155,15 @@ namespace Ubpa {
 	// =================================================
 
 	template<template<typename T> class Op, typename... Ts>
-	struct Transform<TypeList<Ts...>, Op> : IType<TypeList<typename Op<Ts>::type...>> {};
+	struct Transform<TypeList<Ts...>, Op> : std::type_identity<TypeList<typename Op<Ts>::type...>> {};
 
 	// =================================================
 
 	template<template<typename X, typename Y>typename Less>
-	struct QuickSort<TypeList<>, Less> : IType<TypeList<>> {};
+	struct QuickSort<TypeList<>, Less> : std::type_identity<TypeList<>> {};
 
 	template<template<typename X, typename Y>typename Less, typename T>
-	struct QuickSort<TypeList<T>, Less> : IType<TypeList<T>> {};
+	struct QuickSort<TypeList<T>, Less> : std::type_identity<TypeList<T>> {};
 
 	template<template<typename X, typename Y>typename Less, typename Head, typename... Tail>
 	struct QuickSort<TypeList<Head, Tail...>, Less> {

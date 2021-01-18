@@ -13,8 +13,8 @@ int main() {
 	// constexpr name traits
 	//////////////////////////
 
-	static_assert(constexpr_name_is_null_pointer(constexpr_name<nullptr>()));
-	static_assert(constexpr_name_is_integral(constexpr_name<32>()));
+	static_assert(constexpr_name_is_null_pointer(constexpr_value_name<nullptr>()));
+	static_assert(constexpr_name_is_integral(constexpr_value_name<32>()));
 
 	//
 	// type name traits

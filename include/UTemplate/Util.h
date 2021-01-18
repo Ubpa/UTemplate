@@ -4,12 +4,10 @@
 #include <string_view>
 
 namespace Ubpa {
-	template<typename T> struct IType { using type = T; };
-	template<typename T, T V> struct IValue { static constexpr T value = V; };
-
 	template<typename T>
 	constexpr bool always_false = false;
 
+	template<typename T, T V> struct IValue { static constexpr T value = V; };
 	template<typename T> struct IsIValue;
 	template<typename T> constexpr bool IsIValue_v = IsIValue<T>::value;
 	template<auto V> using IValue_of = IValue<decltype(V), V>;
@@ -25,7 +23,7 @@ namespace Ubpa {
 	// template<typename T, std::size_t N>
 	// struct Array;
 	// to_typename_template_type_t<Array<T, N>> == typename_template_type<T, IValue<std::size_t, N>>
-	template<typename T> struct to_typename_template_type : IType<T> {};
+	template<typename T> struct to_typename_template_type : std::type_identity<T> {};
 	template<typename T> using to_typename_template_type_t = typename to_typename_template_type<T>::type;
 
 	// type object

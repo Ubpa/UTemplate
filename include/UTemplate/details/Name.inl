@@ -47,14 +47,14 @@ namespace Ubpa::details {
 	// custom
 	///////////
 
-	template<auto MemPtr>
-	struct member_pointer_name;
+	template<auto Value>
+	struct custom_constexpr_value_name;
 
-	template<auto MemPtr>
-	constexpr auto member_pointer_name_v = member_pointer_name<MemPtr>::get();
+	template<auto Value>
+	constexpr auto custom_constexpr_value_name_v = custom_constexpr_value_name<Value>::get();
 
-	template<typename T> struct type_namespace_name;
-	template<typename T> constexpr auto type_namespace_name_v = type_namespace_name<T>::get();
+	template<typename T> struct custom_type_namespace_name;
+	template<typename T> constexpr auto custom_type_namespace_name_v = custom_type_namespace_name<T>::get();
 
 	//
 	// decode
@@ -128,8 +128,8 @@ namespace Ubpa::details {
 		constexpr auto name1 = remove_class_key(name0);
 		constexpr auto name2 = remove_template(name1);
 		constexpr auto idx = find_last(name2, TStr_of<':'>{});
-		if constexpr (idx != static_cast<std::size_t>(-1) && is_defined_v<type_namespace_name<T>>)
-			return concat_seq(type_namespace_name_v<T>, TStrC_of<':',':'>{}, remove_prefix<idx + 1>(name2));
+		if constexpr (idx != static_cast<std::size_t>(-1) && is_defined_v<custom_type_namespace_name<T>>)
+			return concat_seq(custom_type_namespace_name_v<T>, TStrC_of<':',':'>{}, remove_prefix<idx + 1>(name2));
 		else
 			return name2;
 	}
@@ -190,7 +190,7 @@ namespace Ubpa::details {
 }
 
 template<auto V>
-constexpr auto Ubpa::constexpr_name() noexcept {
+constexpr auto Ubpa::constexpr_value_name() noexcept {
 	using T = decltype(V);
 	if constexpr (std::is_null_pointer_v<T>)
 		return TStrC_of<'n','u','l','l','p','t','r'>{};
@@ -206,8 +206,8 @@ constexpr auto Ubpa::constexpr_name() noexcept {
 		else {
 			using Object = member_pointer_traits_object<T>;
 			using Value = member_pointer_traits_value<T>;
-			if constexpr (is_defined_v<details::member_pointer_name<V>>) {
-				return concat_seq(TStr_of<'&'>{}, type_name<Object>(), TStrC_of<':',':'>{}, details::member_pointer_name_v<V>);
+			if constexpr (is_defined_v<details::custom_constexpr_value_name<V>>) {
+				return concat_seq(TStr_of<'&'>{}, type_name<Object>(), TStrC_of<':',':'>{}, details::custom_constexpr_value_name_v<V>);
 			}
 			else
 				return concat_seq(TStr_of<'&'>{}, type_name<Object>(), TSTR("::#UNKNOWN"));
@@ -250,14 +250,14 @@ constexpr auto Ubpa::type_name() noexcept {
 			if constexpr (ex == 0)
 				return concat_seq(TStrC_of<'[',']','{'>{}, type_name<std::remove_extent_t<T>>(), TStr_of<'}'>{});
 			else
-				return concat_seq(TStr_of<'['>{}, constexpr_name<ex>(), TStrC_of<']','{'>{}, type_name<std::remove_extent_t<T>>(), TStr_of<'}'>{});
+				return concat_seq(TStr_of<'['>{}, constexpr_value_name<ex>(), TStrC_of<']','{'>{}, type_name<std::remove_extent_t<T>>(), TStr_of<'}'>{});
 		}
 		else { // r > 1
 			static_assert(r > 1);
 			if constexpr (ex == 0)
 				return concat_seq(TStrC_of<'[',']'>{}, type_name<std::remove_extent_t<T>>());
 			else
-				return concat_seq(TStr_of<'['>{}, constexpr_name<ex>(), TStr_of<']'>{}, type_name<std::remove_extent_t<T>>());
+				return concat_seq(TStr_of<'['>{}, constexpr_value_name<ex>(), TStr_of<']'>{}, type_name<std::remove_extent_t<T>>());
 		}
 	}
 	else if constexpr (std::is_function_v<T>) {
@@ -319,11 +319,11 @@ constexpr auto Ubpa::type_name() noexcept {
 			static_assert("not support");
 	}
 	else if constexpr (IsIValue_v<T>)
-		return constexpr_name<T::value>();
+		return constexpr_value_name<T::value>();
 #ifdef UBPA_NAME_X_INT
 	else if constexpr (std::is_integral_v<T>) {
 		static_assert(sizeof(T) <= 8);
-		constexpr auto BitName = constexpr_name<8 * sizeof(T)>();
+		constexpr auto BitName = constexpr_value_name<8 * sizeof(T)>();
 		if constexpr (std::is_signed_v<T>)
 			return concat(TStrC_of<'i','n','t'>{}, BitName);
 		else
@@ -332,7 +332,7 @@ constexpr auto Ubpa::type_name() noexcept {
 #endif // UBPA_NAME_X_INT
 #ifdef UBPA_NAME_X_FLOAT
 	else if constexpr (std::is_floating_point_v<T>)
-		return concat(TStrC_of<'f','l','o','a','t'>{}, constexpr_name<8 * sizeof(T)>());
+		return concat(TStrC_of<'f','l','o','a','t'>{}, constexpr_value_name<8 * sizeof(T)>());
 #endif // UBPA_NAME_X_FLOAT
 	else {
 		using U = to_typename_template_type_t<T>;
@@ -341,8 +341,8 @@ constexpr auto Ubpa::type_name() noexcept {
 		else {
 			constexpr auto name = details::remove_class_key(details::raw_type_name<T>());
 			constexpr auto idx = find_last(name, TStr_of<':'>{});
-			if constexpr (idx != static_cast<std::size_t>(-1) && is_defined_v<details::type_namespace_name<T>>)
-				return concat_seq(details::type_namespace_name_v<T>, TStrC_of<':',':'>{}, remove_prefix<idx + 1>(name));
+			if constexpr (idx != static_cast<std::size_t>(-1) && is_defined_v<details::custom_type_namespace_name<T>>)
+				return concat_seq(details::custom_type_namespace_name_v<T>, TStrC_of<':',':'>{}, remove_prefix<idx + 1>(name));
 			else
 				return name;
 		}
@@ -350,7 +350,7 @@ constexpr auto Ubpa::type_name() noexcept {
 }
 
 constexpr bool Ubpa::constexpr_name_is_null_pointer(std::string_view name) noexcept {
-	return name == constexpr_name<nullptr>().View();
+	return name == constexpr_value_name<nullptr>().View();
 }
 
 constexpr bool Ubpa::constexpr_name_is_integral(std::string_view name) noexcept {
@@ -397,11 +397,10 @@ constexpr bool Ubpa::type_name_is_floating_point(std::string_view name) noexcept
 	else if (rmcv_name == type_name<double>().View())
 		return true;
 	else {
-		if constexpr (type_name<double>().View() == type_name<long double>().View())
+		if constexpr (std::is_same_v<decltype(type_name<double>()), decltype(type_name<long double>())>)
 			return false;
-		else {
+		else
 			return rmcv_name == type_name<long double>().View();
-		}
 	}
 }
 
