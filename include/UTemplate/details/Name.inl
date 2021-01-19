@@ -44,6 +44,18 @@ namespace Ubpa::details {
 	// decode
 	///////////
 
+	template<typename T>
+	constexpr auto raw_type_name() noexcept {
+		constexpr auto sig = func_signature<T>();
+#if defined(__clang__)
+		return remove_suffix<2>(remove_prefix<66>(sig));
+#elif defined(__GNUC__)
+		return remove_suffix<2>(remove_prefix<81>(sig));
+#elif defined(_MSC_VER)
+		return remove_suffix(remove_suffix<17>(remove_prefix<74>(sig)), TStr_of<' '>{});
+#endif
+	}
+
 	template<typename Str>
 	constexpr auto remove_class_key(Str = {}) {
 #if defined(__clang__)
@@ -88,18 +100,6 @@ namespace Ubpa::details {
 			return substr<0, idx, Str>();
 		else
 			return Str{};
-	}
-
-	template<typename T>
-	constexpr auto raw_type_name() noexcept {
-		constexpr auto sig = func_signature<T>();
-#if defined(__clang__)
-		return remove_suffix<1>(remove_prefix<42>(sig));
-#elif defined(__GNUC__)
-		return remove_suffix<1>(remove_prefix<57>(sig));
-#elif defined(_MSC_VER)
-		return remove_suffix(remove_suffix<17>(remove_prefix<74>(sig)), TStr_of<' '>{});
-#endif
 	}
 
 	template<typename T>
