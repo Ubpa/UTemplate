@@ -2,10 +2,10 @@
 
 namespace Ubpa {
 	template<template<typename...> class... Ts>
-	struct TLength<TemplateList<Ts...>> : IValue<std::size_t, sizeof...(Ts)> {};
+	struct TLength<TemplateList<Ts...>> : std::integral_constant<std::size_t, sizeof...(Ts)> {};
 
 	template<typename TList>
-	struct TIsEmpty : IValue<bool, TLength_v<TList> == 0 > {};
+	struct TIsEmpty : std::bool_constant<TLength_v<TList> == 0 > {};
 
 	/*
 	// TFront will introduce new template
@@ -59,19 +59,19 @@ namespace Ubpa {
 	// struct TSelect : std::type_identity<TemplateList<TAt<TList, Indices>::template Ttype...>> {};
 
 	template<template<typename...>class... Ts, typename Instance>
-	struct TExistGenericity<TemplateList<Ts...>, Instance> : IValue<bool, (is_instance_of_v<Instance, Ts> || ...)> {};
+	struct TExistGenericity<TemplateList<Ts...>, Instance> : std::bool_constant<(is_instance_of_v<Instance, Ts> || ...)> {};
 
 	template<typename ArgList, template<typename...> class... Ts>
 	struct TInstance<TemplateList<Ts...>, ArgList> : std::type_identity<TypeList<Instantiate_t<ArgList, Ts>...>> {};
 
 	template<typename TList, typename... Instances>
 	struct TExistGenericities<TList, TypeList<Instances...>>
-		: IValue<bool, (TExistGenericity_v<TList, Instances>&&...)> {};
+		: std::bool_constant<(TExistGenericity_v<TList, Instances>&&...)> {};
 
 	template<typename InstanceList, template<typename...>class... Ts>
 	struct TCanGeneralizeFromList<TemplateList<Ts...>, InstanceList>
-		: IValue<bool, (ExistInstance_v<InstanceList, Ts>&&...)> {};
+		: std::bool_constant<(ExistInstance_v<InstanceList, Ts>&&...)> {};
 
 	template<template<typename...>class... Ts, template<typename...>class T>
-	struct TContain<TemplateList<Ts...>, T> : IValue<bool, (is_same_typename_template_v<Ts, T> || ...)> {};
+	struct TContain<TemplateList<Ts...>, T> : std::bool_constant<(is_same_typename_template_v<Ts, T> || ...)> {};
 }

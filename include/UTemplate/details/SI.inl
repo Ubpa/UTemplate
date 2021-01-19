@@ -175,7 +175,7 @@ namespace Ubpa::details {
 	struct SI_Contains_Helper : std::false_type {};
 	template<typename T, template<typename Base, typename Impl>class Interface>
 	struct SI_Contains_Helper<std::void_t<ITopoSort_t<SI_ImplTraits_IList_t<T>>>, T, Interface>
-		: IValue<bool, TContain_v<ITopoSort_t<SI_ImplTraits_IList_t<T>>, Interface>> {};
+		: std::bool_constant<TContain_v<ITopoSort_t<SI_ImplTraits_IList_t<T>>, Interface>> {};
 }
 
 template<typename Impl>

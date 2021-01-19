@@ -6,6 +6,9 @@ namespace Ubpa::details {
 	template<typename List, typename T, std::size_t N = 0, bool found = false>
 	struct Find;
 
+	template<typename List, template<typename>class Op, std::size_t N = 0, bool found = false>
+	struct FindIf;
+
 	template<typename List, template <typename I, typename X> class Op, typename I, bool = IsEmpty_v<List>>
 	struct Accumulate;
 
@@ -36,12 +39,12 @@ namespace Ubpa {
 	// =================================================
 
 	template<typename... Ts>
-	struct Length<TypeList<Ts...>> : IValue<std::size_t, sizeof...(Ts)> {};
+	struct Length<TypeList<Ts...>> : std::integral_constant<std::size_t, sizeof...(Ts)> {};
 
 	// =================================================
 
 	template<typename List>
-	struct IsEmpty : IValue<bool, Length_v<List> == 0> {};
+	struct IsEmpty : std::integral_constant<bool, Length_v<List> == 0> {};
 
 	// =================================================
 
@@ -66,20 +69,23 @@ namespace Ubpa {
 	template<typename List, typename T>
 	struct Find : details::Find<List, T> { };
 
+	template<typename List, template<typename>class Op>
+	struct FindIf : details::FindIf<List, Op> { };
+
 	// =================================================
 
 	template<typename List, typename T>
-	struct Contain : IValue<bool, Find_v<List, T> != Find_fail> {};
+	struct Contain : std::integral_constant<bool, Find_v<List, T> != Find_fail> {};
 
 	// =================================================
 
 	template<typename List, typename... Ts>
-	struct ContainTs : IValue<bool, (Contain_v<List, Ts> &&...)> {};
+	struct ContainTs : std::integral_constant<bool, (Contain_v<List, Ts> &&...)> {};
 
 	// =================================================
 
 	template<typename List, typename... Ts>
-	struct ContainList<List, TypeList<Ts...>> : IValue<bool, (Contain_v<List, Ts> &&...)> {};
+	struct ContainList<List, TypeList<Ts...>> : std::integral_constant<bool, (Contain_v<List, Ts> &&...)> {};
 
 	// =================================================
 
@@ -187,15 +193,23 @@ namespace Ubpa {
 }
 
 namespace Ubpa::details {
-	template<typename List, typename T, std::size_t N, bool found>
-	struct Find;
 	template<typename T, std::size_t N, typename... Ts>
-	struct Find<TypeList<Ts...>, T, N, true> : IValue<std::size_t, N - 1> {};
+	struct Find<TypeList<Ts...>, T, N, true> : std::integral_constant<std::size_t, N - 1> {};
 	template<typename T, std::size_t N>
-	struct Find<TypeList<>, T, N, false> : IValue<std::size_t, Find_fail> {};
+	struct Find<TypeList<>, T, N, false> : std::integral_constant<std::size_t, Find_fail> {};
 	template<typename T, typename Head, std::size_t N, typename... Tail>
 	struct Find<TypeList<Head, Tail...>, T, N, false>
 		: Find<TypeList<Tail...>, T, N + 1, std::is_same_v<T, Head>> {};
+
+	// =================================================
+
+	template<template<typename>class Op, std::size_t N, typename... Ts>
+	struct FindIf<TypeList<Ts...>, Op, N, true> : std::integral_constant<std::size_t, N - 1> {};
+	template<template<typename>class Op, std::size_t N>
+	struct FindIf<TypeList<>, Op, N, false> : std::integral_constant<std::size_t, Find_fail> {};
+	template<template<typename>class Op, typename Head, std::size_t N, typename... Tail>
+	struct FindIf<TypeList<Head, Tail...>, Op, N, false>
+		: FindIf<TypeList<Tail...>, Op, N + 1, Op<Head>::value> {};
 
 	// =================================================
 

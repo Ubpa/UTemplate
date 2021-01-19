@@ -53,7 +53,7 @@ namespace Ubpa {
 	template<typename T>
 	constexpr TypeID TypeID_of = TypeID{ type_name<T>().View() };
 
-	template<typename X, typename Y> struct TypeID_Less : IValue<bool, TypeID_of<X> < TypeID_of<Y> > {
+	template<typename X, typename Y> struct TypeID_Less : std::bool_constant<TypeID_of<X> < TypeID_of<Y> > {
 		static_assert(std::is_same_v<X, Y> || TypeID_of<X> != TypeID_of<Y>);
 	};
 
