@@ -36,7 +36,7 @@ namespace Ubpa {
 	public:
 		using IDBase::IDBase;
 		constexpr std::strong_ordering operator<=>(const StrID& rhs) const { return IDBase::operator<=>(rhs); }
-		constexpr bool operator==(const StrID& rhs) const { return operator<=>(rhs) == std::strong_ordering::equal; }
+		friend constexpr bool operator==(const StrID& lhs, const StrID& rhs) noexcept { return lhs.operator<=>(rhs) == std::strong_ordering::equal; }
 	};
 
 	class TypeID : public IDBase {
@@ -47,7 +47,7 @@ namespace Ubpa {
 		template<typename T>
 		constexpr bool Is() const noexcept { return IDBase::Is(type_name<T>().View()); }
 		constexpr std::strong_ordering operator<=>(const TypeID& rhs) const { return IDBase::operator<=>(rhs); }
-		constexpr bool operator==(const TypeID& rhs) const { return operator<=>(rhs) == std::strong_ordering::equal; }
+		friend constexpr bool operator==(const TypeID& lhs, const TypeID& rhs) noexcept { return lhs.operator<=>(rhs) == std::strong_ordering::equal; }
 	};
 
 	template<typename T>

@@ -8,11 +8,11 @@ struct Ubpa::SI_InterfaceTraits<Interface> {        \
 	using IList = TemplateList<__VA_ARGS__>;        \
 }
 
-#define SI_InterfaceTraits_Register_Pro(Interface, ...)                             \
-template<>                                                                          \
+#define SI_InterfaceTraits_Register_Pro(Interface, ...)                            \
+template<>                                                                         \
 struct Ubpa::SI_InterfaceTraits<Interface> : Ubpa::details::IListBase<__VA_ARGS__>
 
-#define CombineInterface(Interface, ...)            \
+#define SI_CombineInterface(Interface, ...)         \
 template<typename Base, typename Impl>              \
 struct Interface : Base {                           \
     using Base::Base;                               \

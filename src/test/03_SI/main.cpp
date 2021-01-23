@@ -23,7 +23,7 @@ SI_InterfaceTraits_Register(IB, IA);
 SI_InterfaceTraits_Register(IC, IA);
 SI_InterfaceTraits_Register(ID, IB);
 SI_InterfaceTraits_Register(IE, IA);
-CombineInterface(IF, IC, ID);
+SI_CombineInterface(IF, IC, ID);
 
 // MSVC: /d1reportSingleClassLayoutG
 
