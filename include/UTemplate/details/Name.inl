@@ -319,7 +319,7 @@ constexpr auto Ubpa::type_name() noexcept {
 	else {
 		using U = to_typename_template_type_t<T>;
 		if constexpr (is_typename_template_type_v<U>)
-			return concat_seq(details::no_template_type_name<T>(), TStr_of<'<'>{}, details::template_args_name<U>(), TStrC_of<'>', '{', '}'>{});
+			return concat_seq(details::no_template_type_name<T>(), TStr_of<'<'>{}, details::template_args_name<U>(), TStrC_of<'>'>{});
 		else {
 			constexpr auto name = details::remove_class_key(details::raw_type_name<T>());
 			constexpr auto idx = find_last(name, TStr_of<':'>{});
