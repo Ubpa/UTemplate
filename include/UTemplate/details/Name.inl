@@ -706,14 +706,14 @@ constexpr std::string_view Ubpa::type_name_add_const(std::string_view name, Allo
 
 	if (type_name_is_volatile(name)) {
 		const std::size_t length = lengthof("const ") + name.size();
-		char* buffer = alloc.allocate(length);
+		char* buffer = alloc.allocate(length + 1); buffer[length] = '\0';
 		std::memcpy(buffer, "const ", lengthof("const "));
 		std::memcpy(buffer + lengthof("const "), name.data(), name.size());
 		return { buffer, length };
 	}
 	else {
 		const std::size_t length = lengthof("const{") + name.size() + lengthof("}");
-		char* buffer = alloc.allocate(length);
+		char* buffer = alloc.allocate(length + 1); buffer[length] = '\0';
 		std::memcpy(buffer, "const{", lengthof("const{"));
 		std::memcpy(buffer + lengthof("const{"), name.data(), name.size());
 		buffer[length - 1] = '}';
@@ -729,14 +729,14 @@ constexpr std::string_view Ubpa::type_name_add_volatile(std::string_view name, A
 	if (type_name_is_const(name)) {
 		name.remove_prefix(5); // {...}
 		const std::size_t length = lengthof("const volatile") + name.size();
-		char* buffer = alloc.allocate(length);
+		char* buffer = alloc.allocate(length + 1); buffer[length] = '\0';
 		std::memcpy(buffer, "const volatile", lengthof("const volatile"));
 		std::memcpy(buffer + lengthof("const volatile"), name.data(), name.size());
 		return { buffer, length };
 	}
 	else {
 		const std::size_t length = lengthof("volatile{") + name.size() + lengthof("}");
-		char* buffer = alloc.allocate(length);
+		char* buffer = alloc.allocate(length + 1); buffer[length] = '\0';
 		std::memcpy(buffer, "volatile{", lengthof("volatile{"));
 		std::memcpy(buffer + lengthof("volatile{"), name.data(), name.size());
 		buffer[length - 1] = '}';
@@ -752,21 +752,21 @@ constexpr std::string_view Ubpa::type_name_add_cv(std::string_view name, Alloc a
 	if (type_name_is_const(name)) {
 		name.remove_prefix(5); // {...}
 		const std::size_t length = lengthof("const volatile") + name.size();
-		char* buffer = alloc.allocate(length);
+		char* buffer = alloc.allocate(length + 1); buffer[length] = '\0';
 		std::memcpy(buffer, "const volatile", lengthof("const volatile"));
 		std::memcpy(buffer + lengthof("const volatile"), name.data(), name.size());
 		return { buffer, length };
 	}
 	else if (type_name_is_volatile(name)) {
 		const std::size_t length = lengthof("const ") + name.size();
-		char* buffer = alloc.allocate(length);
+		char* buffer = alloc.allocate(length + 1); buffer[length] = '\0';
 		std::memcpy(buffer, "const ", lengthof("const "));
 		std::memcpy(buffer + lengthof("const "), name.data(), name.size());
 		return { buffer, length };
 	}
 	else {
 		const std::size_t length = lengthof("const volatile{") + name.size() + lengthof("}");
-		char* buffer = alloc.allocate(length);
+		char* buffer = alloc.allocate(length + 1); buffer[length] = '\0';
 		std::memcpy(buffer, "const volatile{", lengthof("const volatile{"));
 		std::memcpy(buffer + lengthof("const volatile{"), name.data(), name.size());
 		buffer[length - 1] = '}';
@@ -782,13 +782,13 @@ constexpr std::string_view Ubpa::type_name_add_lvalue_reference(std::string_view
 	if (type_name_is_rvalue_reference(name)) {
 		name.remove_prefix(1);
 		const std::size_t length = name.size();
-		char* buffer = alloc.allocate(length);
+		char* buffer = alloc.allocate(length + 1); buffer[length] = '\0';
 		std::memcpy(buffer, name.data(), name.size());
 		return { buffer, length };
 	}
 	else {
 		const std::size_t length = lengthof("&{") + name.size() + lengthof("}");
-		char* buffer = alloc.allocate(length);
+		char* buffer = alloc.allocate(length + 1); buffer[length] = '\0';
 		std::memcpy(buffer, "&{", lengthof("&{"));
 		std::memcpy(buffer + lengthof("&{"), name.data(), name.size());
 		buffer[length - 1] = '}';
@@ -802,7 +802,7 @@ constexpr std::string_view Ubpa::type_name_add_rvalue_reference(std::string_view
 		return name;
 
 	const std::size_t length = lengthof("&&{") + name.size() + lengthof("}");
-	char* buffer = alloc.allocate(length);
+	char* buffer = alloc.allocate(length + 1); buffer[length] = '\0';
 	std::memcpy(buffer, "&&{", lengthof("&&{"));
 	std::memcpy(buffer + lengthof("&&{"), name.data(), name.size());
 	buffer[length - 1] = '}';
@@ -815,7 +815,7 @@ constexpr std::string_view Ubpa::type_name_add_pointer(std::string_view name, Al
 		name = type_name_remove_reference(name);
 
 	const std::size_t length = lengthof("*{") + name.size() + lengthof("}");
-	char* buffer = alloc.allocate(length);
+	char* buffer = alloc.allocate(length + 1); buffer[length] = '\0';
 	std::memcpy(buffer, "*{", lengthof("*{"));
 	std::memcpy(buffer + lengthof("*{"), name.data(), name.size());
 	buffer[length - 1] = '}';
@@ -829,7 +829,7 @@ constexpr std::string_view Ubpa::type_name_add_const_lvalue_reference(std::strin
 
 	if (type_name_is_volatile(name)) {
 		const std::size_t length = lengthof("&{const ") + name.size() + lengthof("}");
-		char* buffer = alloc.allocate(length);
+		char* buffer = alloc.allocate(length + 1); buffer[length] = '\0';
 		std::memcpy(buffer, "&{const ", lengthof("&{const "));
 		std::memcpy(buffer + lengthof("&{const "), name.data(), name.size());
 		buffer[length - 1] = '}';
@@ -837,7 +837,7 @@ constexpr std::string_view Ubpa::type_name_add_const_lvalue_reference(std::strin
 	}
 	else {
 		const std::size_t length = lengthof("&{const{") + name.size() + lengthof("}}");
-		char* buffer = alloc.allocate(length);
+		char* buffer = alloc.allocate(length + 1); buffer[length] = '\0';
 		std::memcpy(buffer, "&{const{", lengthof("&{const{"));
 		std::memcpy(buffer + lengthof("&{const{"), name.data(), name.size());
 		buffer[length - 2] = '}';
@@ -856,7 +856,7 @@ constexpr std::string_view Ubpa::type_name_add_const_rvalue_reference(std::strin
 
 	if (type_name_is_volatile(name)) {
 		const std::size_t length = lengthof("&&{const ") + name.size() + lengthof("}");
-		char* buffer = alloc.allocate(length);
+		char* buffer = alloc.allocate(length + 1); buffer[length] = '\0';
 		std::memcpy(buffer, "&&{const ", lengthof("&&{const "));
 		std::memcpy(buffer + lengthof("&&{const "), name.data(), name.size());
 		buffer[length - 1] = '}';
@@ -864,7 +864,7 @@ constexpr std::string_view Ubpa::type_name_add_const_rvalue_reference(std::strin
 	}
 	else {
 		const std::size_t length = lengthof("&&{const{") + name.size() + lengthof("}}");
-		char* buffer = alloc.allocate(length);
+		char* buffer = alloc.allocate(length + 1); buffer[length] = '\0';
 		std::memcpy(buffer, "&&{const{", lengthof("&&{const{"));
 		std::memcpy(buffer + lengthof("&&{const{"), name.data(), name.size());
 		buffer[length - 2] = '}';

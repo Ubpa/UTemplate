@@ -95,7 +95,9 @@ namespace Ubpa {
 	// modification (add, alloc)
 
 	// if no change, result's data is same with input (no allocate)
-	// else allocate (no end character '\0')
+	// else allocate (end with '\0')
+	// if rst.data() == name.data(), you shouldn't deallocate the result.
+	// else you should deallocate it (size : rst.size() + 1)
 
 	template<typename Alloc>
 	constexpr std::string_view type_name_add_const(std::string_view name, Alloc alloc);
