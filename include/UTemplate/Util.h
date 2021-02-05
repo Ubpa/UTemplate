@@ -92,6 +92,40 @@ namespace Ubpa {
 		template<typename X>
 		struct Ttype : std::is_same<X, Y> {};
 	};
+
+	enum class ReferenceMode {
+		None,
+		Left,
+		Right
+	};
+
+	enum class CVRefMode : std::uint8_t {
+		None          = 0b0000,
+		Left          = 0b0001,
+		Right         = 0b0010,
+		Const         = 0b0100,
+		ConstLeft     = 0b0101,
+		ConstRight    = 0b0110,
+		Volatile      = 0b1000,
+		VolatileLeft  = 0b1001,
+		VolatileRight = 0b1010,
+		CV            = 0b1100,
+		CVLeft        = 0b1101,
+		CVRight       = 0b1110,
+	};
+
+	constexpr bool CVRefMode_IsLeft(CVRefMode mode) noexcept {
+		return static_cast<std::uint8_t>(mode) & 0b0001;
+	}
+	constexpr bool CVRefMode_IsRight(CVRefMode mode) noexcept {
+		return static_cast<std::uint8_t>(mode) & 0b0010;
+	}
+	constexpr bool CVRefMode_IsConst(CVRefMode mode) noexcept {
+		return static_cast<std::uint8_t>(mode) & 0b0100;
+	}
+	constexpr bool CVRefMode_IsVolatile(CVRefMode mode) noexcept {
+		return static_cast<std::uint8_t>(mode) & 0b1000;
+	}
 }
 
 #include "details/ToTTType.inl"

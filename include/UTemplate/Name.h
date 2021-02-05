@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Util.h"
+
 #include <string_view>
 
 // u?int{8|16|32|64}
@@ -63,6 +65,8 @@ namespace Ubpa {
 	// properties
 
 	constexpr bool type_name_is_const(std::string_view name) noexcept;
+	// const{T}, &/&&{T}
+	constexpr bool type_name_is_read_only(std::string_view name) noexcept;
 	constexpr bool type_name_is_volatile(std::string_view name) noexcept;
 	constexpr bool type_name_is_cv(std::string_view name) noexcept;
 	constexpr bool type_name_is_reference(std::string_view name) noexcept;
@@ -74,6 +78,8 @@ namespace Ubpa {
 	constexpr std::size_t type_name_rank(std::string_view name) noexcept;
 	constexpr std::size_t type_name_extent(std::string_view name, std::size_t N = 0) noexcept;
 
+	constexpr CVRefMode type_name_cvref_mode(std::string_view name) noexcept;
+
 	// modification (clip)
 
 	constexpr std::string_view type_name_remove_cv(std::string_view name) noexcept;
@@ -81,6 +87,8 @@ namespace Ubpa {
 
 	constexpr std::string_view type_name_remove_topmost_volatile(std::string_view name) noexcept;
 
+	constexpr std::string_view type_name_remove_lvalue_reference(std::string_view name) noexcept;
+	constexpr std::string_view type_name_remove_rvalue_reference(std::string_view name) noexcept;
 	constexpr std::string_view type_name_remove_reference(std::string_view name) noexcept;
 	constexpr std::string_view type_name_remove_pointer(std::string_view name) noexcept;
 

@@ -5,12 +5,6 @@
 #include <tuple>
 
 namespace Ubpa {
-	enum class ReferenceMode {
-		None,
-		Left,
-		Right
-	};
-
 	// type Object : if not member function, it is void
 	// type ArgList : TypeList<Args...>
 	// type Return

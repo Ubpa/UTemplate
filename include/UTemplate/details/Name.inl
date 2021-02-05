@@ -467,6 +467,10 @@ constexpr bool Ubpa::type_name_is_const(std::string_view name) noexcept {
 	return name.starts_with(std::string_view{"const"}) && name.size() >= 6 && (name[5] == '{' || name[5] == ' ');
 }
 
+constexpr bool Ubpa::type_name_is_read_only(std::string_view name) noexcept {
+	return type_name_is_const(type_name_remove_reference(name));
+}
+
 constexpr bool Ubpa::type_name_is_volatile(std::string_view name) noexcept {
 	return name.starts_with(std::string_view{"volatile{"}) || name.starts_with(std::string_view{"const volatile"});
 }
@@ -550,24 +554,82 @@ constexpr std::size_t Ubpa::type_name_extent(std::string_view name, std::size_t 
 	return extent;
 }
 
+constexpr Ubpa::CVRefMode Ubpa::type_name_cvref_mode(std::string_view name) noexcept {
+	if (name.empty())
+		return CVRefMode::None;
+
+	if (name[0] == '&') {
+		assert(name.size() >= 4);
+		if (name[1] == '&') {
+			assert(name[2] == '{' && name.back() == '}');
+			std::string_view unref_name{ name.data() + 3, name.size() - 4 };
+			if (unref_name.starts_with("const")) {
+				assert(unref_name.size() >= 6);
+				if (unref_name[5] == '{')
+					return CVRefMode::ConstRight;
+				else if (unref_name[5] == ' ')
+					return CVRefMode::CVRight;
+				else
+					return CVRefMode::Right;
+			}
+			else if (unref_name.starts_with("volatile{"))
+				return CVRefMode::VolatileRight;
+			else
+				return CVRefMode::Right;
+		}
+		else {
+			assert(name[1] == '{' && name.back() == '}');
+			std::string_view unref_name{ name.data() + 2, name.size() - 3 };
+			if (unref_name.starts_with("const")) {
+				assert(unref_name.size() >= 6);
+				if (unref_name[5] == '{')
+					return CVRefMode::ConstLeft;
+				else if (unref_name[5] == ' ')
+					return CVRefMode::CVLeft;
+				else
+					return CVRefMode::Left;
+			}
+			else if (unref_name.starts_with("volatile{"))
+				return CVRefMode::VolatileLeft;
+			else
+				return CVRefMode::Left;
+		}
+	}
+	else {
+		if (name.starts_with("const")) {
+			assert(name.size() >= 6);
+			if (name[5] == '{')
+				return CVRefMode::Const;
+			else if (name[5] == ' ')
+				return CVRefMode::CV;
+			else
+				return CVRefMode::None;
+		}
+		else if (name.starts_with("volatile{"))
+			return CVRefMode::Volatile;
+		else
+			return CVRefMode::None;
+	}
+}
+
 // modification (clip)
 
 constexpr std::string_view Ubpa::type_name_remove_cv(std::string_view name) noexcept {
 	if (name.starts_with(std::string_view{"const"})) {
 		assert(name.size() >= 6);
 		if (name[5] == '{') {
-			assert(*name.rbegin() == '}');
+			assert(name.back() == '}');
 			return { name.data() + 6,name.size() - 7 };
 		}
 		else if (name[5] == ' ') {
-			assert(name.starts_with(std::string_view{"const volatile{"}) && *name.rbegin() == '}');
+			assert(name.starts_with(std::string_view{"const volatile{"}) && name.back() == '}');
 			return { name.data() + 15,name.size() - 16 };
 		}
 		else
 			return name;
 	}
 	else if (name.starts_with(std::string_view{"volatile{"})) {
-		assert(*name.rbegin() == '}');
+		assert(name.back() == '}');
 		return { name.data() + 9,name.size() - 10 };
 	}
 	else
@@ -581,7 +643,7 @@ constexpr std::string_view Ubpa::type_name_remove_const(std::string_view name) n
 	assert(name.size() >= 6);
 
 	if (name[5] == '{') {
-		assert(*name.rbegin() == '}');
+		assert(name.back() == '}');
 		return { name.data() + 6,name.size() - 7 };
 	}
 	else if (name[5] == ' ')
@@ -594,22 +656,37 @@ constexpr std::string_view Ubpa::type_name_remove_topmost_volatile(std::string_v
 	if (!name.starts_with(std::string_view{"volatile{"}))
 		return name;
 
-	assert(*name.rbegin() == '}');
+	assert(name.back() == '}');
 
 	return { name.data() + 9,name.size() - 10 };
 }
 
-constexpr std::string_view Ubpa::type_name_remove_reference(std::string_view name) noexcept {
-	if (!name.starts_with(std::string_view{"&"}))
+constexpr std::string_view Ubpa::type_name_remove_lvalue_reference(std::string_view name) noexcept {
+	if (name.size() <= 2 || name[0] != '&' || name[1] != '{')
 		return name;
 
-	assert(name.size() >= 2);
+	assert(name.size() >= 3 && name.back() == '}');
+	return { name.data() + 2, name.size() - 3 };
+}
+
+constexpr std::string_view Ubpa::type_name_remove_rvalue_reference(std::string_view name) noexcept {
+	if (name.size() <= 2 || name[0] != '&' || name[1] != '&')
+		return name;
+
+	assert(name.size() >= 4 && name[2] == '{' && name.back() == '}');
+	return { name.data() + 3, name.size() - 4 };
+}
+
+constexpr std::string_view Ubpa::type_name_remove_reference(std::string_view name) noexcept {
+	if (name.size() <= 2 || name[0] != '&')
+		return name;
+	
 	if (name[1] == '{') {
-		assert(*name.rbegin() == '}');
+		assert(name.size() >= 3 && name.back() == '}');
 		return { name.data() + 2, name.size() - 3 };
 	}
 	else {
-		assert(name.size() >= 3 && name[1] == '&' && name[2] == '{' && *name.rbegin() == '}');
+		assert(name.size() >= 4 && name[1] == '&' && name[2] == '{' && name.back() == '}');
 		return { name.data() + 3, name.size() - 4 };
 	}
 }
@@ -619,7 +696,7 @@ constexpr std::string_view Ubpa::type_name_remove_pointer(std::string_view name)
 	if (!name.starts_with(std::string_view{"*"}))
 		return name;
 
-	assert(name.size() >= 3 && name[1] == '{' && *name.rbegin() == '}');
+	assert(name.size() >= 3 && name[1] == '{' && name.back() == '}');
 	return { name.data() + 2, name.size() - 3 };
 }
 
@@ -645,7 +722,7 @@ constexpr std::string_view Ubpa::type_name_remove_extent(std::string_view name) 
 	if (name[idx] == '[')
 		return { name.data() + idx, name.size() - idx };
 	else {
-		assert(name[idx] == '{' && *name.rbegin() == '}');
+		assert(name[idx] == '{' && name.back() == '}');
 		return { name.data() + idx + 1, name.size() - idx - 2 };
 	}
 }
