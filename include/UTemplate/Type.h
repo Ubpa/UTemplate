@@ -21,8 +21,6 @@ namespace Ubpa {
 
 		constexpr bool Is(std::string_view str) const noexcept { return value == IDBase{ str }.GetValue(); }
 
-		constexpr void Reset() noexcept { value = InvalidValue(); }
-
 		explicit constexpr operator bool() const noexcept { return Valid(); }
 
 	protected:
@@ -58,6 +56,32 @@ namespace Ubpa {
 	};
 
 	template<typename X, typename Y> constexpr bool TypeID_Less_v = TypeID_Less<X, Y>::value;
+
+	class Type {
+	public:
+		constexpr Type() noexcept = default;
+		constexpr Type(std::string_view name) noexcept : name{ name }, typeID{ name }{}
+		constexpr Type(std::string_view name, TypeID typeID) noexcept : name{ name }, typeID{ typeID }
+		{ assert(TypeID{ name } == typeID); }
+		constexpr std::string_view GetName() const noexcept { return name; }
+		constexpr TypeID GetTypeID() const noexcept { return typeID; }
+		constexpr bool Valid() const noexcept { return !name.empty() && typeID.Valid(); }
+		constexpr std::strong_ordering operator<=>(const Type& rhs) const noexcept { return typeID <=> rhs.typeID; }
+		friend constexpr bool operator==(const Type& lhs, const Type& rhs) noexcept {
+			if (lhs.typeID == rhs.typeID) {
+				assert(lhs.name == rhs.name);
+				return true;
+			}
+			
+			return false;
+		}
+	private:
+		std::string_view name;
+		TypeID typeID;
+	};
+
+	template<typename T>
+	constexpr Type Type_of = Type{ type_name<T>().View() };
 }
 
 template<>
