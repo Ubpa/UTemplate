@@ -71,7 +71,7 @@ namespace Ubpa {
 	template<char... chars>
 	using TStrC_of = TStr < fixed_cstring<char, sizeof...(chars)>{ std::in_place, chars... } > ;
 	template<auto c>
-	using TStr_of = TStr< fixed_cstring<decltype(c), 1>{ c } >;
+	using TStr_of_a = TStr< fixed_cstring<decltype(c), 1>{ c } >;
 }
 
 #define TSTR(s)                                                                                      \
@@ -126,7 +126,7 @@ namespace Ubpa {
 	template<char... chars>
 	using TStrC_of = TStr<char, chars...>;
 	template<auto c>
-	using TStr_of = TStr<decltype(c), c>;
+	using TStr_of_a = TStr<decltype(c), c>;
 }
 
 #endif // UBPA_TSTR_NTTPC
@@ -369,18 +369,18 @@ namespace Ubpa {
 	template<auto V, std::enable_if_t<std::is_integral_v<decltype(V)>, int> = 0>
 	constexpr auto int_to_TSTR() {
 		if constexpr (V == 0)
-			return TStr_of<'0'>{};
+			return TStr_of_a<'0'>{};
 		else { // not zero
 			using T = decltype(V);
 			if constexpr (std::is_signed_v<T>) {
 				if constexpr (V < 0)
-					return concat(TStr_of<'-'>{}, int_to_TSTR<static_cast<std::make_unsigned_t<T>>(-V)>());
+					return concat(TStr_of_a<'-'>{}, int_to_TSTR<static_cast<std::make_unsigned_t<T>>(-V)>());
 				else
 					return int_to_TSTR<static_cast<std::make_unsigned_t<T>>(V)>();
 			}
 			else { // unsigned
 				if constexpr (V < 10) {
-					return TStr_of<static_cast<char>('0' + V)>{};
+					return TStr_of_a<static_cast<char>('0' + V)>{};
 				}
 				else
 					return concat(int_to_TSTR<V / 10>(), int_to_TSTR<V % 10>());

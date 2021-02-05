@@ -97,6 +97,9 @@ struct B10 {};
 template<decltype(&BH::f), typename, typename>
 struct B11 {};
 
+enum Enum {};
+union Union {};
+
 int main() {
 	{ // basic
 		std::cout
@@ -163,6 +166,10 @@ int main() {
 	{ // TSTR
 		static constexpr auto str = TSTR("hello");
 		std::cout << "|" << type_name<decltype(str)>().View() << "|" << std::endl;
+	}
+	{ // enum, union
+		std::cout << "|" << type_name<Enum>().View() << "|" << std::endl;
+		std::cout << "|" << type_name<Union>().View() << "|" << std::endl;
 	}
 
 	return 0;
