@@ -75,6 +75,67 @@ namespace Ubpa {
 			
 			return false;
 		}
+
+		//
+		// Traits
+		///////////
+
+		// primary
+
+		constexpr bool IsVoid() const noexcept { return type_name_is_void(name); }
+		constexpr bool IsNullptr() const noexcept { return type_name_is_null_pointer(name); }
+		constexpr bool IsIntegral() const noexcept { return type_name_is_integral(name); }
+		constexpr bool IsFloatingPoint() const noexcept { return type_name_is_floating_point(name); }
+		constexpr bool IsArray() const noexcept { return type_name_is_array(name); }
+		constexpr bool IsEnum() const noexcept { return type_name_is_enum(name); }
+		constexpr bool IsUnion() const noexcept { return type_name_is_union(name); }
+		constexpr bool IsFunction() const noexcept { return type_name_is_function(name); }
+		constexpr bool IsPointer() const noexcept { return type_name_is_pointer(name); }
+		constexpr bool IsLValueReference() const noexcept { return type_name_is_lvalue_reference(name); }
+		constexpr bool IsRValueReference() const noexcept { return type_name_is_rvalue_reference(name); }
+		constexpr bool IsMemberPointer() const noexcept { return type_name_is_member_pointer(name); }
+
+		// composite
+		constexpr bool IsArithmetic() const noexcept { return type_name_is_arithmetic(name); }
+		constexpr bool IsFundamental() const noexcept { return type_name_is_fundamental(name); }
+
+		// properties
+
+		constexpr bool IsConst() const noexcept { return type_name_is_const(name); }
+		constexpr bool IsVolatile() const noexcept { return type_name_is_volatile(name); }
+		constexpr bool IsCV() const noexcept { return type_name_is_cv(name); }
+		constexpr bool IsReference() const noexcept { return type_name_is_reference(name); }
+		constexpr bool IsSign() const noexcept { return type_name_is_signed(name); }
+		constexpr bool IsUnsigned() const noexcept { return type_name_is_unsigned(name); }
+		constexpr bool IsBoundedArray() const noexcept { return type_name_is_bounded_array(name); }
+		constexpr bool IsUnboundedArray() const noexcept { return type_name_is_unbounded_array(name); }
+		constexpr std::size_t Rank() const noexcept { return type_name_rank(name); }
+		constexpr std::size_t Extent() const noexcept { return type_name_extent(name); }
+
+		// modification (clip)
+
+		constexpr Type RemoveCV() const noexcept { return type_name_remove_cv(name); }
+		constexpr Type RemoveConst() const noexcept { return type_name_remove_const(name); }
+		constexpr Type RemoveTopMostVolatile() const noexcept { return type_name_remove_topmost_volatile(name); }
+		constexpr Type RemoveReference() const noexcept { return type_name_remove_reference(name); }
+		constexpr Type RemovePointer() const noexcept { return type_name_remove_pointer(name); }
+		constexpr Type RemoveCVRef() const noexcept { return type_name_remove_cvref(name); }
+		constexpr Type RemoveExtent() const noexcept { return type_name_remove_extent(name); }
+		constexpr Type RemoveAllExtents() const noexcept { return type_name_remove_all_extents(name); }
+
+		// modification (add, ID)
+
+		constexpr TypeID ID_AddConst() const noexcept { return TypeID{ type_name_add_const_hash(name) }; }
+		constexpr TypeID ID_AddVolatile() const noexcept { return TypeID{ type_name_add_volatile_hash(name) }; }
+		constexpr TypeID ID_AddCV() const noexcept { return TypeID{ type_name_add_cv_hash(name) }; }
+		constexpr TypeID ID_AddLValueReference() const noexcept { return TypeID{ type_name_add_lvalue_reference_hash(name) }; }
+		// same with type_name_add_lvalue_reference_hash, but it won't change &&{T}
+		constexpr TypeID ID_AddLValueReferenceWeak() const noexcept { return TypeID{ type_name_add_lvalue_reference_weak_hash(name) }; }
+		constexpr TypeID ID_AddRValueReference() const noexcept { return TypeID{ type_name_add_rvalue_reference_hash(name) }; }
+		constexpr TypeID ID_AddPointer() const noexcept { return TypeID{ type_name_add_pointer_hash(name) }; }
+		constexpr TypeID ID_AddConstLValueReference() const noexcept { return TypeID{ type_name_add_const_lvalue_reference_hash(name) }; }
+		constexpr TypeID ID_AddConstRValueReference() const noexcept { return TypeID{ type_name_add_const_rvalue_reference_hash(name) }; }
+
 	private:
 		std::string_view name;
 		TypeID typeID;
