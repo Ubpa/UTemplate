@@ -217,10 +217,9 @@ constexpr auto Ubpa::DecayLambda(Lambda&& lambda) noexcept {
 	return static_cast<std::add_pointer_t<FuncTraits_Signature<std::remove_reference_t<Lambda>>>>(std::forward<Lambda>(lambda));
 }
 
-template<typename Func>
+template<typename Obj, typename Func>
 struct Ubpa::MemFuncOf {
 	static_assert(std::is_function_v<Func>);
-	template<typename Obj>
 	static constexpr auto get(Func Obj::* func) noexcept {
 		return func;
 	}
