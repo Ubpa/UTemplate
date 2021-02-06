@@ -155,7 +155,7 @@ namespace Ubpa {
 		constexpr bool IsUnboundedArray() const noexcept { return type_name_is_unbounded_array(name.GetView()); }
 		constexpr std::size_t Rank() const noexcept { return type_name_rank(name.GetView()); }
 		constexpr std::size_t Extent() const noexcept { return type_name_extent(name.GetView()); }
-		constexpr CVRefMode CVRefMode() const noexcept { return type_name_cvref_mode(name.GetView()); }
+		constexpr CVRefMode GetCVRefMode() const noexcept { return type_name_cvref_mode(name.GetView()); }
 
 		// modification (clip)
 
