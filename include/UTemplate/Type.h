@@ -170,16 +170,16 @@ namespace Ubpa {
 		constexpr std::string_view Name_RemoveExtent() const noexcept { return type_name_remove_extent(name.GetView()); }
 		constexpr std::string_view Name_RemoveAllExtents() const noexcept { return type_name_remove_all_extents(name.GetView()); }
 
-		constexpr Type RemoveCV() const noexcept { return Name_RemoveCV(); }
-		constexpr Type RemoveConst() const noexcept { return Name_RemoveConst(); }
-		constexpr Type RemoveTopMostVolatile() const noexcept { return Name_RemoveTopMostVolatile(); }
-		constexpr Type RemoveLValueReference() const noexcept { return Name_RemoveLValueReference(); }
-		constexpr Type RemoveRValueReference() const noexcept { return Name_RemoveRValueReference(); }
-		constexpr Type RemoveReference() const noexcept { return Name_RemoveReference(); }
-		constexpr Type RemovePointer() const noexcept { return Name_RemovePointer(); }
-		constexpr Type RemoveCVRef() const noexcept { return Name_RemoveCVRef(); }
-		constexpr Type RemoveExtent() const noexcept { return Name_RemoveExtent(); }
-		constexpr Type RemoveAllExtents() const noexcept { return Name_RemoveAllExtents(); }
+		constexpr Type RemoveCV() const noexcept { return FastGetType(Name_RemoveCV()); }
+		constexpr Type RemoveConst() const noexcept { return FastGetType(Name_RemoveConst()); }
+		constexpr Type RemoveTopMostVolatile() const noexcept { return FastGetType(Name_RemoveTopMostVolatile()); }
+		constexpr Type RemoveLValueReference() const noexcept { return FastGetType(Name_RemoveLValueReference()); }
+		constexpr Type RemoveRValueReference() const noexcept { return FastGetType(Name_RemoveRValueReference()); }
+		constexpr Type RemoveReference() const noexcept { return FastGetType(Name_RemoveReference()); }
+		constexpr Type RemovePointer() const noexcept { return FastGetType(Name_RemovePointer()); }
+		constexpr Type RemoveCVRef() const noexcept { return FastGetType(Name_RemoveCVRef()); }
+		constexpr Type RemoveExtent() const noexcept { return FastGetType(Name_RemoveExtent()); }
+		constexpr Type RemoveAllExtents() const noexcept { return FastGetType(Name_RemoveAllExtents()); }
 
 		// modification (add, ID)
 
@@ -195,6 +195,9 @@ namespace Ubpa {
 		constexpr TypeID ID_AddConstRValueReference() const noexcept { return TypeID{ type_name_add_const_rvalue_reference_hash(name.GetView()) }; }
 
 	private:
+		// avoid hash
+		constexpr Type FastGetType(std::string_view str) const noexcept { return name.GetView().data() == str.data() ? *this : Type{ str }; }
+
 		Name name;
 	};
 
