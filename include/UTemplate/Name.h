@@ -7,6 +7,11 @@
 // u?int{8|16|32|64}
 #define UBPA_NAME_X_INT
 
+#ifdef UBPA_NAME_X_INT
+// bool
+#define UBPA_NAME_BOOL
+#endif // UBPA_NAME_X_INT
+
 // float{32|64} (maybe float80 for long double)
 #define UBPA_NAME_X_FLOAT
 
@@ -20,12 +25,14 @@ namespace Ubpa {
 	// - member pointer : {object_type_name}::*{value_type_name}
 	// - function : ({arg_1_type_name}, ..., {arg_n_type_name})-{const? volatile? &/&&? noexcept?}->{result_type_name}
 	// - int : u?int{8|16|32|64}
+	// - bool : bool
 	// - float : float{32|64}
 	// - template : name<{arg_1_type_name}, ..., {arg_n_type_name}>
 	// - enum : enum{...}
 	// - union : union{...}
 	// - basic : namspace_name::kernal_name
 	// [custom] you need to impl get()
+	// - custom_type_name
 	// - custom_constexpr_value_name
 	// - custom_type_namespace_name
 	template<typename T>

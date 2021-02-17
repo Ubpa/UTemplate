@@ -31,6 +31,9 @@ namespace Ubpa::details {
 	// custom
 	///////////
 
+	template<typename T>
+	struct custom_type_name;
+
 	template<auto Value>
 	struct custom_constexpr_value_name;
 
@@ -186,33 +189,35 @@ constexpr auto Ubpa::constexpr_value_name() noexcept {
 
 template<typename T>
 constexpr auto Ubpa::type_name() noexcept {
-	if constexpr (std::is_lvalue_reference_v<T>)
-		return concat_seq(TStrC_of<'&','{'>{}, type_name<std::remove_reference_t<T>>(), TStr_of_a<'}'>{});
+	if constexpr (is_defined_v<details::custom_type_name<T>>)
+		return details::custom_type_name<T>::get();
+	else if constexpr (std::is_lvalue_reference_v<T>)
+		return concat_seq(TStrC_of<'&', '{'>{}, type_name<std::remove_reference_t<T>>(), TStr_of_a<'}'>{});
 	else if constexpr (std::is_rvalue_reference_v<T>)
-		return concat_seq(TStrC_of<'&','&','{'>{}, type_name<std::remove_reference_t<T>>(), TStr_of_a<'}'>{});
+		return concat_seq(TStrC_of<'&', '&', '{'>{}, type_name<std::remove_reference_t<T>>(), TStr_of_a<'}'>{});
 	else if constexpr (std::is_const_v<T> && std::is_volatile_v<T>)
 		return concat_seq(TSTR("const volatile{"), type_name<std::remove_cv_t<T>>(), TStr_of_a<'}'>{});
 	else if constexpr (std::is_const_v<T> && !std::is_volatile_v<T>)
-		return concat_seq(TStrC_of<'c','o','n','s','t','{'>{}, type_name<std::remove_const_t<T>>(), TStr_of_a<'}'>{});
+		return concat_seq(TStrC_of<'c', 'o', 'n', 's', 't', '{'>{}, type_name<std::remove_const_t<T>>(), TStr_of_a<'}'>{});
 	else if constexpr (!std::is_const_v<T> && std::is_volatile_v<T>)
 		return concat_seq(TSTR("volatile{"), type_name<std::remove_volatile_t<T>>(), TStr_of_a<'}'>{});
 	else if constexpr (std::is_member_pointer_v<T>)
-		return concat_seq(TStr_of_a<'{'>{}, type_name<member_pointer_traits_object<T>>(), TStrC_of<'}',':',':','*','{'>{}, type_name<member_pointer_traits_value<T>>(), TStr_of_a<'}'>{});
+		return concat_seq(TStr_of_a<'{'>{}, type_name<member_pointer_traits_object<T>>(), TStrC_of<'}', ':', ':', '*', '{'>{}, type_name<member_pointer_traits_value<T>>(), TStr_of_a<'}'>{});
 	else if constexpr (std::is_pointer_v<T>)
-		return concat_seq(TStrC_of<'*','{'>{}, type_name<std::remove_pointer_t<T>>(), TStr_of_a<'}'>{});
+		return concat_seq(TStrC_of<'*', '{'>{}, type_name<std::remove_pointer_t<T>>(), TStr_of_a<'}'>{});
 	else if constexpr (std::is_array_v<T>) {
 		constexpr auto r = std::rank_v<T>;
 		constexpr auto ex = std::extent_v<T, 0>;
 		if constexpr (r == 1) {
 			if constexpr (ex == 0)
-				return concat_seq(TStrC_of<'[',']','{'>{}, type_name<std::remove_extent_t<T>>(), TStr_of_a<'}'>{});
+				return concat_seq(TStrC_of<'[', ']', '{'>{}, type_name<std::remove_extent_t<T>>(), TStr_of_a<'}'>{});
 			else
-				return concat_seq(TStr_of_a<'['>{}, constexpr_value_name<ex>(), TStrC_of<']','{'>{}, type_name<std::remove_extent_t<T>>(), TStr_of_a<'}'>{});
+				return concat_seq(TStr_of_a<'['>{}, constexpr_value_name<ex>(), TStrC_of<']', '{'>{}, type_name<std::remove_extent_t<T>>(), TStr_of_a<'}'>{});
 		}
 		else { // r > 1
 			static_assert(r > 1);
 			if constexpr (ex == 0)
-				return concat_seq(TStrC_of<'[',']'>{}, type_name<std::remove_extent_t<T>>());
+				return concat_seq(TStrC_of<'[', ']'>{}, type_name<std::remove_extent_t<T>>());
 			else
 				return concat_seq(TStr_of_a<'['>{}, constexpr_value_name<ex>(), TStr_of_a<']'>{}, type_name<std::remove_extent_t<T>>());
 		}
@@ -225,7 +230,7 @@ constexpr auto Ubpa::type_name() noexcept {
 		constexpr auto RetName = concat_seq(TStr_of_a<'{'>{}, type_name<Return>(), TStr_of_a<'}'>{});
 		// const, volatile, &/&&, noexcept : 24
 		if constexpr (!Traits::is_const && !Traits::is_volatile && Traits::ref == ReferenceMode::None && !Traits::is_noexcept) // 0000
-			return concat_seq(ArgsName, TStrC_of<'-','-','>', '{', '}'>{}, RetName);
+			return concat_seq(ArgsName, TStrC_of<'-', '-', '>', '{', '}'>{}, RetName);
 		else if constexpr (Traits::is_const && !Traits::is_volatile && Traits::ref == ReferenceMode::None && !Traits::is_noexcept) // 1000
 			return concat_seq(ArgsName, TSTR("-{const}->"), RetName);
 		else if constexpr (!Traits::is_const && Traits::is_volatile && Traits::ref == ReferenceMode::None && !Traits::is_noexcept) // 0100
@@ -233,7 +238,7 @@ constexpr auto Ubpa::type_name() noexcept {
 		else if constexpr (Traits::is_const && Traits::is_volatile && Traits::ref == ReferenceMode::None && !Traits::is_noexcept) // 1100
 			return concat_seq(ArgsName, TSTR("-{const volatile}->"), RetName);
 		else if constexpr (!Traits::is_const && !Traits::is_volatile && Traits::ref == ReferenceMode::Left && !Traits::is_noexcept) // 0010
-			return concat_seq(ArgsName, TStrC_of<'-','{','&','}','-','>', '{', '}'>{}, RetName);
+			return concat_seq(ArgsName, TStrC_of<'-', '{', '&', '}', '-', '>', '{', '}'>{}, RetName);
 		else if constexpr (Traits::is_const && !Traits::is_volatile && Traits::ref == ReferenceMode::Left && !Traits::is_noexcept) // 1010
 			return concat_seq(ArgsName, TSTR("-{const &}->"), RetName);
 		else if constexpr (!Traits::is_const && Traits::is_volatile && Traits::ref == ReferenceMode::Left && !Traits::is_noexcept) // 0110
@@ -241,7 +246,7 @@ constexpr auto Ubpa::type_name() noexcept {
 		else if constexpr (Traits::is_const && Traits::is_volatile && Traits::ref == ReferenceMode::Right && !Traits::is_noexcept) // 1110
 			return concat_seq(ArgsName, TSTR("-{const volatile &}->"), RetName);
 		else if constexpr (!Traits::is_const && !Traits::is_volatile && Traits::ref == ReferenceMode::Right && !Traits::is_noexcept) // 0020
-			return concat_seq(ArgsName, TStrC_of<'-','{','&','&','}','-','>', '{', '}'>{}, RetName);
+			return concat_seq(ArgsName, TStrC_of<'-', '{', '&', '&', '}', '-', '>', '{', '}'>{}, RetName);
 		else if constexpr (Traits::is_const && !Traits::is_volatile && Traits::ref == ReferenceMode::Right && !Traits::is_noexcept) // 1020
 			return concat_seq(ArgsName, TSTR("-{const &&}->"), RetName);
 		else if constexpr (!Traits::is_const && Traits::is_volatile && Traits::ref == ReferenceMode::Right && !Traits::is_noexcept) // 0120
@@ -278,6 +283,10 @@ constexpr auto Ubpa::type_name() noexcept {
 	else if constexpr (IsIValue_v<T>)
 		return constexpr_value_name<T::value>();
 #ifdef UBPA_NAME_X_INT
+#ifdef UBPA_NAME_BOOL
+	else if constexpr (std::is_same_v<T, bool>)
+		return TStrC_of<'b', 'o', 'o', 'l'>{};
+#endif // UBPA_NAME_BOOL
 	else if constexpr (std::is_integral_v<T>) {
 		static_assert(sizeof(T) <= 8);
 		constexpr auto BitName = constexpr_value_name<8 * sizeof(T)>();
