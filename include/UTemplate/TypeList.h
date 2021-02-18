@@ -99,9 +99,9 @@ namespace Ubpa {
 	using QuickSort_t = typename QuickSort<List, Less>::type;
 
 	template<typename List>
-	struct IsSet;
+	struct IsUnique;
 	template<typename List>
-	constexpr bool IsSet_v = IsSet<List>::value;
+	constexpr bool IsUnique_v = IsUnique<List>::value;
 }
 
 #include "details/TypeList.inl"

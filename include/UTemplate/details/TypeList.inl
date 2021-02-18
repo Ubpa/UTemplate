@@ -19,7 +19,7 @@ namespace Ubpa::details {
 	struct SearchInstance;
 
 	template<typename List, bool haveSame = false>
-	struct IsSet;
+	struct IsUnique;
 }
 
 namespace Ubpa {
@@ -189,7 +189,7 @@ namespace Ubpa {
 	// =================================================
 
 	template<typename List>
-	struct IsSet : details::IsSet<List> {};
+	struct IsUnique : details::IsUnique<List> {};
 }
 
 namespace Ubpa::details {
@@ -248,9 +248,9 @@ namespace Ubpa::details {
 	// =================================================
 
 	template<typename List>
-	struct IsSet<List, true> : std::false_type {};
+	struct IsUnique<List, true> : std::false_type {};
 	template<>
-	struct IsSet<TypeList<>, false> : std::true_type {};
+	struct IsUnique<TypeList<>, false> : std::true_type {};
 	template<typename Head, typename... Tail>
-	struct IsSet<TypeList<Head, Tail...>, false> : IsSet<TypeList<Tail...>, Contain_v<TypeList<Tail...>, Head>> {};
+	struct IsUnique<TypeList<Head, Tail...>, false> : IsUnique<TypeList<Tail...>, Contain_v<TypeList<Tail...>, Head>> {};
 }
