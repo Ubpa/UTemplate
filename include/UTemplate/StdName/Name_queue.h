@@ -16,17 +16,6 @@ struct Ubpa::details::custom_type_name<std::deque<T>> {
 };
 
 template<typename T>
-struct Ubpa::details::custom_type_name<std::pmr::deque<T>> {
-	static constexpr auto get() noexcept {
-		return concat_seq(
-			TSTR("std::pmr::deque<{"),
-			type_name<T>(),
-			TStrC_of<'}', '>'>{}
-		);
-	}
-};
-
-template<typename T>
 struct Ubpa::details::custom_type_name<std::priority_queue<T>> {
 	static constexpr auto get() noexcept {
 		return concat_seq(

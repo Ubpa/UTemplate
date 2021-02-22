@@ -14,14 +14,3 @@ struct Ubpa::details::custom_type_name<std::forward_list<T>> {
 		);
 	}
 };
-
-template<typename T>
-struct Ubpa::details::custom_type_name<std::pmr::forward_list<T>> {
-	static constexpr auto get() noexcept {
-		return concat_seq(
-			TSTR("std::pmr::forward_list<{"),
-			type_name<T>(),
-			TStrC_of<'}', '>'>{}
-		);
-	}
-};

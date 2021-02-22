@@ -17,6 +17,7 @@
 
 #include <string_view>
 #include <utility>
+#include <concepts>
 
 namespace Ubpa {
 	template<typename Char, std::size_t N>
