@@ -55,7 +55,7 @@ namespace Ubpa::details {
 #elif defined(__GNUC__)
 		return remove_suffix<1>(remove_prefix<62>(sig));
 #elif defined(_MSC_VER)
-		return remove_suffix(remove_suffix<16>(remove_prefix<55>(sig)), TStr_of_a<' '>{});
+		return remove_suffix(remove_suffix<16>(remove_prefix(remove_prefix<54>(sig), TStr_of_a<' '>{})), TStr_of_a<' '>{});
 #endif
 	}
 
