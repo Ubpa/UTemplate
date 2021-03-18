@@ -1,4 +1,4 @@
-#include <UTemplate/Func.h>
+#include <UTemplate/Func.hpp>
 
 #include <iostream>
 

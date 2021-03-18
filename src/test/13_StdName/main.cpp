@@ -1,5 +1,5 @@
-#include <UTemplate/StdName/Name_memory.h>
-#include <UTemplate/StdName/Name_vector.h>
+#include <UTemplate/StdName/Name_memory.hpp>
+#include <UTemplate/StdName/Name_vector.hpp>
 
 #include <iostream>
 

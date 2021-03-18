@@ -1,14 +1,14 @@
 #pragma once
 
-#include "../Name.h"
+#include "../Name.hpp"
 
-#include <span>
+#include <vector>
 
 template<typename T>
-struct Ubpa::details::custom_type_name<std::span<T>> {
+struct Ubpa::details::custom_type_name<std::vector<T>> {
 	static constexpr auto get() noexcept {
 		return concat_seq(
-			TSTR("std::span<{"),
+			TSTR("std::vector<{"),
 			type_name<T>(),
 			TStrC_of<'}', '>'>{}
 		);

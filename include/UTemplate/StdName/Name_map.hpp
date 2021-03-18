@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../Name.h"
+#include "../Name.hpp"
 
 #include <map>
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Name.h"
+#include "Name.hpp"
 
 #include <compare>
 
@@ -209,6 +209,31 @@ namespace Ubpa {
 	};
 
 	template<typename X, typename Y> constexpr bool Type_Less_v = Type_Less<X, Y>::value;
+
+	template<std::size_t N>
+	class TempNameIDs : public TempArray<NameID, N> {
+		using TempArray<NameID, N>::TempArray;
+	};
+	template<std::size_t N>
+	class TempTypeIDs : public TempArray<TypeID, N> {
+		using TempArray<TypeID, N>::TempArray;
+	};
+	template<std::size_t N>
+	class TempNames : public TempArray<Name, N> {
+		using TempArray<Name, N>::TempArray;
+	};
+	template<std::size_t N>
+	class TempTypes : public TempArray<Type, N> {
+		using TempArray<Type, N>::TempArray;
+	};
+	template<typename... Ts> TempNameIDs(Ts...)->TempNameIDs<sizeof...(Ts)>;
+	template<typename... Ts> TempTypeIDs(Ts...)->TempTypeIDs<sizeof...(Ts)>;
+	template<typename... Ts> TempNames(Ts...)->TempNames<sizeof...(Ts)>;
+	template<typename... Ts> TempTypes(Ts...)->TempTypes<sizeof...(Ts)>;
+	template<typename... Ts>
+	constexpr auto TypeIDs_of = TempTypeIDs{ TypeID_of<Ts>... };
+	template<typename... Ts>
+	constexpr auto Types_of = TempTypes{ Type_of<Ts>... };
 }
 
 template<>

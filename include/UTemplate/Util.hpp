@@ -2,6 +2,7 @@
 
 #include <type_traits>
 #include <string_view>
+#include <span>
 
 namespace Ubpa {
 	template<typename T>
@@ -126,6 +127,28 @@ namespace Ubpa {
 	constexpr bool CVRefMode_IsVolatile(CVRefMode mode) noexcept {
 		return static_cast<std::uint8_t>(mode) & 0b1000;
 	}
+
+	template<typename T, std::size_t N>
+	class TempArray {
+	public:
+		template<typename... Elems>
+		constexpr TempArray(Elems&&... elems) : data{ static_cast<T>(elems)... } {}
+
+		constexpr operator std::add_lvalue_reference_t<T[N]>()& { return data; }
+		constexpr operator std::add_lvalue_reference_t<const T[N]>()const& { return data; }
+		constexpr operator std::add_rvalue_reference_t<T[N]>()&& { return std::move(data); }
+		constexpr operator std::add_rvalue_reference_t<const T[N]>()const&& { return std::move(data); }
+
+		constexpr operator std::span<T>() { return data; }
+		constexpr operator std::span<const T>()const { return data; }
+		constexpr operator std::span<T, N>() { return data; }
+		constexpr operator std::span<const T, N>()const { return data; }
+	private:
+		T data[N];
+	};
+
+	template<typename T, typename... Ts>
+	TempArray(T, Ts...)->TempArray<T, sizeof...(Ts) + 1>;
 }
 
 #include "details/ToTTType.inl"

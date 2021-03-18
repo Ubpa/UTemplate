@@ -1,14 +1,14 @@
 #pragma once
 
-#include "../Name.h"
+#include "../Name.hpp"
 
-#include <forward_list>
+#include <queue>
 
 template<typename T>
-struct Ubpa::details::custom_type_name<std::forward_list<T>> {
+struct Ubpa::details::custom_type_name<std::queue<T>> {
 	static constexpr auto get() noexcept {
 		return concat_seq(
-			TSTR("std::forward_list<{"),
+			TSTR("std::queue<{"),
 			type_name<T>(),
 			TStrC_of<'}', '>'>{}
 		);

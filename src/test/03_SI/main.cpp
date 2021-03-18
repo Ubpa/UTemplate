@@ -3,7 +3,7 @@
 #include <type_traits>
 #include <array>
 
-#include <UTemplate/SI.h>
+#include <UTemplate/SI.hpp>
 
 using namespace std;
 using namespace Ubpa;

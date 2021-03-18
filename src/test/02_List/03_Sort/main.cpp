@@ -1,7 +1,7 @@
 #include <iostream>
 
-#include <UTemplate/Type.h>
-#include <UTemplate/TypeList.h>
+#include <UTemplate/Type.hpp>
+#include <UTemplate/TypeList.hpp>
 
 using namespace std;
 using namespace Ubpa;

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../TStr.h"
-#include "../Func.h"
+#include "../TStr.hpp"
+#include "../Func.hpp"
 
 #include <cassert>
 #include <cstring>

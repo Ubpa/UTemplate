@@ -1,6 +1,6 @@
 #pragma once
 
-#include "TemplateList.h"
+#include "TemplateList.hpp"
 
 #define SI_InterfaceTraits_Register(Interface, ...) \
 template<>                                          \

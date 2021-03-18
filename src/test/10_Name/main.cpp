@@ -1,4 +1,4 @@
-#include <UTemplate/Name.h>
+#include <UTemplate/Name.hpp>
 
 #include <iostream>
 #include <vector>

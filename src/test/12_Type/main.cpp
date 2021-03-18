@@ -1,4 +1,4 @@
-#include <UTemplate/Type.h>
+#include <UTemplate/Type.hpp>
 
 #include <iostream>
 
@@ -6,6 +6,8 @@ using namespace Ubpa;
 using namespace std;
 
 struct A{};
+
+void f(std::span<const Type>) {}
 
 int main() {
 	std::cout << Type_of<int>.GetName() << std::endl;
@@ -28,4 +30,6 @@ int main() {
 		cout << "Type_of<int> == Type_of<float>" << endl;
 	if (Type_of<int> != Type_of<float>)
 		cout << "Type_of<int> != Type_of<float>" << endl;
+
+	f(Types_of<int, float, double>);
 }
