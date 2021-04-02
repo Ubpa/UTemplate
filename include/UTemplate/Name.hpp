@@ -4,17 +4,6 @@
 
 #include <string_view>
 
-// u?int{8|16|32|64}
-#define UBPA_NAME_X_INT
-
-#ifdef UBPA_NAME_X_INT
-// bool
-#define UBPA_NAME_BOOL
-#endif // UBPA_NAME_X_INT
-
-// float{32|64} (maybe float80 for long double)
-#define UBPA_NAME_X_FLOAT
-
 namespace Ubpa {
 	template<auto V>
 	constexpr auto constexpr_value_name() noexcept;

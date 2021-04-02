@@ -182,6 +182,15 @@ struct Ubpa::FuncTraits<Func T::*> : FuncTraits<Func> {
 	using Function = Func;
 };
 
+template<typename Func>
+struct Ubpa::FuncTraits<Func&> : FuncTraits<Func> {};
+template<typename Func>
+struct Ubpa::FuncTraits<Func&&> : FuncTraits<Func> {};
+template<typename Func>
+struct Ubpa::FuncTraits<const Func&> : FuncTraits<Func> {};
+template<typename Func>
+struct Ubpa::FuncTraits<const Func&&> : FuncTraits<Func> {};
+
 template<typename T>
 struct Ubpa::FuncTraits : details::FuncTraitsDispatch<std::is_function_v<T>, T> {};
 
@@ -200,14 +209,14 @@ private:
 	static auto get(Func&& func, std::index_sequence<Ns...>) {
 		using FromArgList = typename FuncTraits<Func>::ArgList;
 		using ToArgList = TypeList<Args...>;
-		return[func = std::forward<Func>(func)](Args... args) {
+		return [func = std::forward<Func>(func)](Args... args) mutable -> decltype(auto) {
 			std::tuple<Args...> argTuple{ std::forward<Args>(args)... };
 			static_assert(details::CheckCompatibleArguments<ToArgList, FromArgList>::value,
 				"from and to arguments are not compatible.");
 			if constexpr (std::is_void_v<Ret>)
-				func(std::get<Ns>(argTuple)...);
+				func(std::forward<At_t<ToArgList, Ns>>(std::get<Ns>(argTuple))...);
 			else
-				return static_cast<Ret>(func(std::get<Ns>(argTuple)...));
+				return static_cast<Ret>(func(std::forward<At_t<ToArgList, Ns>>(std::get<Ns>(argTuple))...));
 		};
 	}
 };
