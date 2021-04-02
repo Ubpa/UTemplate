@@ -282,11 +282,8 @@ constexpr auto Ubpa::type_name() noexcept {
 	}
 	else if constexpr (IsIValue_v<T>)
 		return constexpr_value_name<T::value>();
-#ifdef UBPA_NAME_X_INT
-#ifdef UBPA_NAME_BOOL
 	else if constexpr (std::is_same_v<T, bool>)
 		return TStrC_of<'b', 'o', 'o', 'l'>{};
-#endif // UBPA_NAME_BOOL
 	else if constexpr (std::is_integral_v<T>) {
 		static_assert(sizeof(T) <= 8);
 		constexpr auto BitName = constexpr_value_name<8 * sizeof(T)>();
@@ -295,11 +292,8 @@ constexpr auto Ubpa::type_name() noexcept {
 		else
 			return concat(TStrC_of<'u','i','n','t'>{}, BitName);
 	}
-#endif // UBPA_NAME_X_INT
-#ifdef UBPA_NAME_X_FLOAT
 	else if constexpr (std::is_floating_point_v<T>)
 		return concat(TStrC_of<'f','l','o','a','t'>{}, constexpr_value_name<8 * sizeof(T)>());
-#endif // UBPA_NAME_X_FLOAT
 	else if constexpr (std::is_same_v<T, void>)
 		return TStrC_of<'v', 'o', 'i', 'd'>{};
 	else if constexpr (std::is_same_v<T, std::nullptr_t>)
@@ -356,6 +350,7 @@ constexpr bool Ubpa::type_name_is_null_pointer(std::string_view name) noexcept {
 constexpr bool Ubpa::type_name_is_integral(std::string_view name) noexcept {
 	switch (string_hash(type_name_remove_cv(name)))
 	{
+	case string_hash(type_name<bool>().View()):
 	case string_hash(type_name<int8_t>().View()):
 	case string_hash(type_name<int16_t>().View()):
 	case string_hash(type_name<int32_t>().View()):
@@ -422,6 +417,7 @@ constexpr bool Ubpa::type_name_is_arithmetic(std::string_view name) noexcept {
 	const std::size_t noncv_name_hash = string_hash(type_name_remove_cv(name));
 	switch (noncv_name_hash)
 	{
+	case string_hash(type_name<bool>().View()):
 	case string_hash(type_name<int8_t>().View()):
 	case string_hash(type_name<int16_t>().View()):
 	case string_hash(type_name<int32_t>().View()):
@@ -447,6 +443,7 @@ constexpr bool Ubpa::type_name_is_fundamental(std::string_view name) noexcept {
 	const std::size_t noncv_name_hash = string_hash(type_name_remove_cv(name));
 	switch (noncv_name_hash)
 	{
+	case string_hash(type_name<bool>().View()):
 	case string_hash(type_name<int8_t>().View()):
 	case string_hash(type_name<int16_t>().View()):
 	case string_hash(type_name<int32_t>().View()):
