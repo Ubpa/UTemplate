@@ -72,7 +72,7 @@ namespace Ubpa {
 	template<char... chars>
 	using TStrC_of = TStr < fixed_cstring<char, sizeof...(chars)>{ std::in_place, chars... } > ;
 	template<auto c>
-	using TStr_of_a = TStr< fixed_cstring<decltype(c), 1>{ c } >;
+	using TStr_of_a = TStr< fixed_cstring<decltype(c), 1>(c) >;
 }
 
 #define TSTR(s)                                                                                      \
