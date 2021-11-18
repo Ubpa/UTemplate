@@ -88,7 +88,7 @@ namespace Ubpa {
 
 			return false;
 		}
-		constexpr bool Is(std::string_view str) const noexcept { return this->str == str; }
+		constexpr bool Is(std::string_view in_str) const noexcept { return str == in_str; }
 	private:
 		std::string_view str;
 		NameID nameID;
