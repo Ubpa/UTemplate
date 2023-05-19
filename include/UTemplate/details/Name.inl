@@ -149,6 +149,54 @@ namespace Ubpa::details {
 	}
 }
 
+#if defined(__clang__) && __clang_major__ >= 5 || defined(__GNUC__) && __GNUC__ >= 9 || defined(_MSC_VER) && _MSC_VER >= 1910
+#  undef  ENUM_TO_STRING_SUPPORTED
+#  define ENUM_TO_STRING_SUPPORTED 1
+#endif
+template <typename T>
+struct supported
+#if defined(ENUM_TO_STRING_SUPPORTED) && ENUM_TO_STRING_SUPPORTED
+	: std::true_type{};
+#else
+	: std::false_type{};
+#endif
+constexpr std::string_view pretty_name(std::string_view name) noexcept {
+	for (std::size_t i = name.size(); i > 0; --i) {
+		if (!((name[i - 1] >= '0' && name[i - 1] <= '9') ||
+			(name[i - 1] >= 'a' && name[i - 1] <= 'z') ||
+			(name[i - 1] >= 'A' && name[i - 1] <= 'Z') ||
+			(name[i - 1] == '_'))) {
+			name.remove_prefix(i);
+			break;
+		}
+	}
+
+	if (name.size() > 0 && ((name[0] >= 'a' && name[0] <= 'z') ||
+		(name[0] >= 'A' && name[0] <= 'Z') ||
+		(name[0] == '_'))) {
+			return name;
+  }
+  return {}; // Invalid name.
+}
+template <typename E, E V>
+constexpr auto n() noexcept {
+	static_assert(std::is_enum_v<E>, "Ubpa::detail::n requires enum type.");
+
+	if constexpr (supported<E>::value) {
+#if defined(__clang__) || defined(__GNUC__)
+		constexpr auto name = pretty_name({ __PRETTY_FUNCTION__, sizeof(__PRETTY_FUNCTION__) - 2 });
+#elif defined(_MSC_VER)
+		constexpr auto name = pretty_name({ __FUNCSIG__, sizeof(__FUNCSIG__) - 17 });
+#else
+		constexpr auto name = std::string_view{};
+#endif
+		return name;
+	}
+	else {
+		return std::string_view{}; // Unsupported compiler or Invalid customize.
+	}
+}
+
 template<auto V>
 constexpr auto Ubpa::constexpr_value_name() noexcept {
 	using T = decltype(V);
@@ -182,6 +230,10 @@ constexpr auto Ubpa::constexpr_value_name() noexcept {
 		}
 		else
 			return int_to_TSTR<V>();
+	}
+	else if constexpr (std::is_enum_v<T>) {
+		constexpr auto str = n<T, V>();
+		return TStr < fixed_cstring<typename decltype(str)::value_type, str.size()>{ str } > {};
 	}
 	else
 		static_assert("not support");
